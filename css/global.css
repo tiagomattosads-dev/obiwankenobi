@@ -1,0 +1,66 @@
+/* =========================================
+   GLOBAL VARIÁVEIS & RESET
+========================================= */
+:root {
+    /* Paleta de Cores (Dark Neumorphism / Sci-Fi) */
+    --bg-dark: #0a0a0c;
+    --glass-bg: rgba(20, 20, 24, 0.45);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    
+    /* Cores de Texto */
+    --text-main: #eef0f2;
+    --text-muted: #8b8f98;
+    
+    /* Gradientes e Glows (Laranja/Pêssego e Azul/Roxo) */
+    --glow-left: rgba(255, 127, 80, 0.15);
+    --glow-right: rgba(138, 43, 226, 0.15);
+    --accent-gradient: linear-gradient(135deg, #a855f7 0%, #3b82f6 100%);
+    
+    /* Tipografia Fluida (Escala com a tela, mas tem limites seguros) */
+    --font-h1: clamp(1.5rem, 2vw, 2.5rem);
+    --font-p: clamp(0.875rem, 1vw, 1.1rem);
+    --font-small: clamp(0.75rem, 0.8vw, 0.9rem);
+    
+    /* Espaçamentos baseados em Viewport */
+    --space-sm: 1vw;
+    --space-md: 2vw;
+    --space-lg: 3vw;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden; /* Mantém o aspecto de "App Fixo" como um datapad */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* =========================================
+   COMPONENTES GLOBAIS (Botões e Inputs Base)
+========================================= */
+input {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--glass-border);
+    border-radius: 0.5vw;
+    color: var(--text-main);
+    padding: 1vw 1.2vw;
+    font-size: var(--font-p);
+    outline: none;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+input:focus {
+    border-color: rgba(168, 85, 247, 0.5); /* Foco roxo sutil */
+    box-shadow: 0 0 1vw rgba(168, 85, 247, 0.2);
+}

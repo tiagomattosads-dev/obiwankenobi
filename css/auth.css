@@ -1,0 +1,302 @@
+/* =========================================
+   LAYOUT FULLSCREEN
+========================================= */
+.authFullscreenLayout {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    background: #000;
+}
+
+/* =========================================
+   COLUNA ESQUERDA (Media/Imagem/Vídeo)
+========================================= */
+.mediaSection {
+    flex: 1; 
+    position: relative;
+    overflow: hidden; 
+    
+    /* Novas propriedades: */
+    margin: 20px; /* Descola a div das bordas revelando o fundo preto */
+    border-radius: 10px; /* Arredonda as pontas conforme solicitado */
+}
+
+/* =========================================
+   COLUNA DIREITA (Formulário)
+========================================= */
+.formSection {
+    width: 45vw; 
+    min-width: 400px; 
+    background: #000; 
+    display: flex;
+    justify-content: center;
+    align-items: center;     
+    padding: var(--space-lg);
+}
+
+.formContent {
+    width: 100%;
+    max-width: 450px; 
+    display: flex;
+    flex-direction: column;
+    gap: 1.5vw;
+}
+
+/* =========================================
+   ESTILOS INTERNOS DO FORMULÁRIO
+========================================= */
+.formHeader {
+    text-align: center;
+    margin-bottom: 2vw;
+}
+
+.formHeader h2 {
+    font-size: var(--font-h1);
+    color: white;
+}
+
+.formHeader p {
+    color: var(--text-muted);
+    font-size: var(--font-small);
+}
+
+.quickAccess {
+    display: flex;
+    gap: 1vw;
+    margin-bottom: 1.5vw;
+}
+
+.btnOutline {
+    flex: 1;
+    padding: 0.8vw;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: white;
+    border-radius: 0.5vw;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btnOutline:hover {
+    background: rgba(255,255,255,0.05);
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: var(--font-small);
+    margin-bottom: 1.5vw;
+}
+
+.divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.divider span {
+    padding: 0 1vw;
+}
+
+#loginForm {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5vw;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5vw;
+}
+
+.inputGroup label {
+    font-size: var(--font-small);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1vw;
+}
+
+input {
+    background: #0a0a0a;
+    border: 1px solid rgba(255,255,255,0.08);
+    color: white;
+    padding: 1vw 1.2vw;
+    border-radius: 0.5vw;
+    font-size: var(--font-p);
+    outline: none;
+    width: 100%;
+}
+
+.btnSolid {
+    background: white;
+    color: black;
+    border: none;
+    padding: 1vw;
+    border-radius: 0.5vw;
+    font-size: var(--font-p);
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 1vw;
+    transition: opacity 0.3s;
+}
+
+.btnSolid:hover {
+    opacity: 0.8;
+}
+
+.formFooter {
+    margin-top: 2vw;
+    text-align: center;
+    font-size: var(--font-small);
+    color: var(--text-muted);
+}
+
+.formFooter a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+/* Adicione isso ao seu arquivo css/auth.css */
+
+.mediaSection {
+    position: relative;
+    overflow: hidden;
+}
+
+.bgMedia {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+}
+
+/* Ajuste do z-index para a camada de gradiente azul ficar por cima do vídeo, mas abaixo dos controles */
+.mediaOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+/* =========================================
+   LAYOUT FULLSCREEN E OVERLAYS
+========================================= */
+.authFullscreenLayout {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    background: #000;
+}
+
+.mediaSection {
+    flex: 1; 
+    position: relative;
+    /* Remover o background sólido daqui, pois o gradiente ficará no mediaOverlay */
+    overflow: hidden; 
+}
+
+.bgMedia {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+}
+
+
+/* =========================================
+   CONTROLES DE MÍDIA MINIMALISTAS (FUTURISTA)
+========================================= */
+.mediaControlsMinimal {
+    position: absolute;
+    bottom: 40px;
+    left: 40px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    /* Fundo totalmente transparente, sem caixas */
+    background: transparent; 
+}
+
+.controlBtnMinimal {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.5);
+    border: none;
+    font-size: 0.85rem;
+    font-family: monospace; /* Fonte com estilo mais técnico/futurista */
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0;
+    transition: color 0.3s ease;
+}
+
+.controlBtnMinimal:hover {
+    color: rgba(255, 255, 255, 1);
+    /* Sem fundo ou neon no hover */
+}
+
+.controlBtnMinimal .icon {
+    font-size: 1.1rem;
+}
+
+.volumeControlMinimal {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.volumeControlMinimal .icon {
+    font-size: 1.1rem;
+}
+
+/* Slider Minimalista (Linha fina) */
+.sliderMinimal {
+    -webkit-appearance: none;
+    width: 100px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.2);
+    outline: none;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.sliderMinimal:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.sliderMinimal::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #fff;
+    cursor: pointer;
+}
+
+.sliderMinimal::-moz-range-thumb {
+    width: 8px;
+    height: 8px;
+    border: none;
+    border-radius: 50%;
+    background: #fff;
+    cursor: pointer;
+}
