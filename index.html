@@ -1,26 +1,30 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acesso Restrito | Cérebro Obi-Wan</title>
-    
+
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/auth.css">
 </head>
+
 <body>
 
     <!-- Estrutura Principal Full Screen -->
     <main class="authFullscreenLayout">
-        
+
         <!-- Coluna Esquerda: Onde entrará o vídeo ou imagem -->
         <section class="mediaSection">
             <!-- Vídeo em background -->
             <!-- Verifique se o caminho src="assets/video/..." está correto em relação a onde o login.html está salvo -->
-            <video id="bgVideo" src="assets/video/videoauth.mp4" autoplay loop muted playsinline class="bgMedia"></video>
-            
+            <video id="bgVideo" src="assets/video/videoauth.mp4" autoplay loop muted playsinline
+                class="bgMedia"></video>
+
             <!-- Áudio separado -->
-            <audio id="bgAudio" src="assets/audio/across.mp3" autoplay loop></audio>
+            <!-- Áudio separado (sem autoplay) -->
+            <audio id="bgAudio" src="assets/audio/across.mp3" loop></audio>
 
             <!-- A camada de gradiente com transparência -->
             <div class="mediaOverlay"></div>
@@ -28,14 +32,15 @@
             <!-- Controles de Mídia Minimalistas -->
             <div class="mediaControlsMinimal">
                 <button id="playPauseBtn" class="controlBtnMinimal">
-    <span class="icon" id="playPauseIcon">
-        <!-- SVG de Pause (pois o vídeo inicia no autoplay) -->
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
-        </svg>
-    </span>
-    <span id="playPauseText">Pausar</span>
-</button>
+                    <span class="icon" id="playPauseIcon">
+                        <!-- SVG de Pause (pois o vídeo inicia no autoplay) -->
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                        </svg>
+                    </span>
+                    <span id="playPauseText">Pausar</span>
+                </button>
                 <div class="volumeControlMinimal">
                     <span class="icon">♪</span>
                     <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.3" class="sliderMinimal">
@@ -56,12 +61,12 @@
                         <label for="username">Identificação</label>
                         <input type="text" id="username" placeholder="ex. mestre@jedi.com" required>
                     </div>
-                    
+
                     <div class="inputGroup">
                         <label for="password">Senha de acesso</label>
                         <input type="password" id="password" placeholder="••••••••" required>
                     </div>
-                    
+
                     <button type="submit" class="btnSolid">Acessar</button>
                 </form>
 
@@ -70,9 +75,10 @@
                 </div>
             </div>
         </section>
-        
+
     </main>
 
     <script src="js/auth.js"></script>
 </body>
+
 </html>
