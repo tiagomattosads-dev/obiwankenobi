@@ -165,13 +165,21 @@ if (registerForm) {
             const resposta = await API.cadastrar(nomeInput, emailInput, senhaInput);
             
             if (resposta.sucesso) {
-                localStorage.setItem('obiwan_user', nomeInput);
-                showToast("Operativo registrado com sucesso! Iniciando terminal...", false);
+                // 1. Mostra o aviso imersivo
+                showToast("Transmissão enviada! Verifique seu e-mail para confirmar as credenciais.", false);
                 
-                // Aguarda 1.5s para o usuário ler o aviso antes de redirecionar
+                // 2. Limpa os campos do formulário de cadastro
+                registerForm.reset();
+                
+                // 3. Devolve o botão ao estado normal
+                btn.textContent = "Cadastrar";
+                btn.disabled = false;
+
+                // 4. Aguarda 2.5s para o usuário ler, e joga a tela de volta pro formulário de Login
                 setTimeout(() => {
-                    window.location.href = 'chat.html';
-                }, 1500);
+                    document.getElementById('linkLogin').click(); 
+                }, 2500);
+
             } else {
                 showToast("Erro ao cadastrar: " + resposta.erro, true);
                 btn.textContent = "Cadastrar";
