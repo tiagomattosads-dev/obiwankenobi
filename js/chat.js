@@ -239,4 +239,28 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 80); 
         }, 1200); 
     }
+
+    // ==========================================
+    // 5. LÓGICA DE LOGOUT
+    // ==========================================
+    const logoutBtn = document.getElementById('logoutBtn');
+    
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+            // Efeito visual enquanto sai
+            logoutBtn.innerHTML = "Desconectando...";
+            logoutBtn.style.opacity = "0.5";
+
+            // 1. Desloga oficialmente do Supabase
+            if (typeof API !== 'undefined') {
+                await API.logout();
+            }
+            
+            // 2. Limpa o nome salvo na memória do navegador
+            localStorage.removeItem('obiwan_user');
+            
+            // 3. Redireciona de volta para a tela de login
+            window.location.href = 'index.html';
+        });
+    }
 }); // Fim do evento DOMContentLoaded
