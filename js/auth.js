@@ -1,4 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
+
+// === AUTH GUARD: Verifica se já está logado ===
+    const usuarioLogado = localStorage.getItem('obiwan_user');
+    
+    // Se a chave existir e não for "Visitante" (ou se tiver um token no futuro), manda pro chat
+    if (usuarioLogado && usuarioLogado !== "Visitante") {
+        window.location.href = 'chat.html';
+        return; // Para a execução do resto do script nesta página
+    }
+
     const bgVideo = document.getElementById('bgVideo');
     const bgAudio = document.getElementById('bgAudio');
     const playPauseBtn = document.getElementById('playPauseBtn');
