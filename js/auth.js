@@ -108,49 +108,63 @@ if (loginBox && registerBox && linkRegister && linkLogin) {
     });
 }
 
-// 7. LÓGICA DE SUBMISSÃO E REDIRECIONAMENTO
+// 7. LÓGICA DE SUBMISSÃO E REDIRECIONAMENTO (Conectado ao Supabase)
 const loginForm = document.getElementById('loginForm');
 const registerForm = document.getElementById('registerForm');
 
 if (loginForm) {
-    loginForm.addEventListener('submit', (e) => {
-        // Evita o recarregamento padrão
+    loginForm.addEventListener('submit', async (e) => {
         e.preventDefault(); 
         
-        // --- NOVA LÓGICA DE SALVAMENTO ---
-        // Pega o e-mail digitado no input com id 'username'
         const emailInput = document.getElementById('username').value;
+        const senhaInput = document.getElementById('password').value;
+        const btn = loginForm.querySelector('.btnSolid');
         
-        // Pega apenas a parte antes do "@" e deixa a primeira letra maiúscula
-        let extractedName = emailInput.split('@')[0];
-        if (extractedName) {
-            extractedName = extractedName.charAt(0).toUpperCase() + extractedName.slice(1);
-        } else {
-            extractedName = "Visitante";
-        }
-        
-        // Salva o nome na memória do navegador com a chave 'obiwan_user'
-        localStorage.setItem('obiwan_user', extractedName);
-        // ---------------------------------
+        // Efeito visual de carregando
+        btn.textContent = "Autenticando...";
+        btn.disabled = true;
 
-        // Vai para a página do chat
-        window.location.href = 'chat.html';
+        // Chama o Supabase através do nosso api.js
+        const resposta = await API.login(emailInput, senhaInput);
+
+        if (resposta.sucesso) {
+            // Salva o nome que veio do banco de dados na memória local para mostrar na tela de chat
+            const nomeCadastrado = resposta.dados.user.user_metadata.nome_operativo || "Mestre Jedi";
+            localStorage.setItem('obiwan_user', nomeCadastrado);
+            
+            // Sucesso! Vai para o chat
+            window.location.href = 'chat.html';
+        } else {
+            alert("Falha no acesso: " + resposta.erro);
+            btn.textContent = "Acessar";
+            btn.disabled = false;
+        }
     });
 }
 
 if (registerForm) {
-    registerForm.addEventListener('submit', (e) => {
+    registerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        // --- NOVA LÓGICA DE SALVAMENTO ---
-        // Pega o nome digitado no input com id 'regName'
-        const regNameInput = document.getElementById('regName').value;
+        const nomeInput = document.getElementById('regName').value;
+        const emailInput = document.getElementById('regEmail').value;
+        const senhaInput = document.getElementById('regPassword').value;
+        const btn = registerForm.querySelector('.btnSolid');
+
+        btn.textContent = "Registrando...";
+        btn.disabled = true;
         
-        // Salva na memória do navegador
-        localStorage.setItem('obiwan_user', regNameInput || "Visitante");
-        // ---------------------------------
+        // Chama o Supabase através do nosso api.js
+        const resposta = await API.cadastrar(nomeInput, emailInput, senhaInput);
         
-        // Vai para a página do chat
-        window.location.href = 'chat.html';
+        if (resposta.sucesso) {
+            localStorage.setItem('obiwan_user', nomeInput);
+            alert("Operativo cadastrado com sucesso! Iniciando terminal...");
+            window.location.href = 'chat.html';
+        } else {
+            alert("Erro ao cadastrar: " + resposta.erro);
+            btn.textContent = "Cadastrar";
+            btn.disabled = false;
+        }
     });
 }

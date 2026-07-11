@@ -127,6 +127,22 @@
                     <!-- O span vazio que o JS vai preencher -->
                     <span id="sidebarUserName">Mestre (...)</span>
                 </button>
+
+                <!-- Controles Inferiores do Menu -->
+            <div class="sidebarBottom">
+                <!-- ... botões de configuração e perfil que já estão aí ... -->
+
+                <button id="logoutBtn" class="navBtn" style="color: #ef4444;">
+                    <span class="icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                            <polyline points="16 17 21 12 16 7"></polyline>
+                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                    </span>
+                    Desconectar
+                </button>
+            </div>
             </div>
         </aside>
 
@@ -283,7 +299,11 @@
 
     </aside>
 
+<!-- Script Oficial do Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
     <script src="js/chat.js"></script>
 </body>
 </html>
