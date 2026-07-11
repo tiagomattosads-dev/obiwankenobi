@@ -3,7 +3,7 @@ const clienteSupabase = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG
 
 const API = {
     // 1. Função para Cadastrar Novo Usuário
-    async cadastrar(nome, email, senha) {
+    async cadastrar(nome, email, senha, tratamento) {
         try {
             const { data, error } = await clienteSupabase.auth.signUp({
                 email: email,

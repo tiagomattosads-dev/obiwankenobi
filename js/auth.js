@@ -128,6 +128,7 @@ if (loginForm) {
 
             if (resposta.sucesso) {
                 const nomeCadastrado = resposta.dados.user.user_metadata.nome_operativo || "Mestre Jedi";
+                const tratamentoCadastrado = resposta.dados.user.user_metadata.tratamento || "M";
                 localStorage.setItem('obiwan_user', nomeCadastrado);
                 localStorage.setItem('obiwan_tratamento', tratamentoCadastrado);
                 
