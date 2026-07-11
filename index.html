@@ -51,28 +51,64 @@
         <!-- Coluna Direita: O Formulário com fundo preto -->
         <section class="formSection">
             <div class="formContent">
-                <div class="formHeader">
-                    <h2>Acesso Restrito</h2>
-                    <p>Insira suas credenciais para entrar no sistema.</p>
-                </div>
-
-                <form id="loginForm">
-                    <div class="inputGroup">
-                        <label for="username">Identificação</label>
-                        <input type="text" id="username" placeholder="ex. mestre@jedi.com" required>
+                
+                <!-- CAIXA DE LOGIN (Mantendo seus textos originais) -->
+                <div id="loginBox" class="formBox">
+                    <div class="formHeader">
+                        <h2>Acesso Restrito</h2>
+                        <p>Insira suas credenciais para entrar no sistema.</p>
                     </div>
 
-                    <div class="inputGroup">
-                        <label for="password">Senha de acesso</label>
-                        <input type="password" id="password" placeholder="••••••••" required>
+                    <form id="loginForm">
+                        <div class="inputGroup">
+                            <label for="username">Identificação</label>
+                            <input type="text" id="username" placeholder="ex. mestre@jedi.com" required>
+                        </div>
+
+                        <div class="inputGroup">
+                            <label for="password">Senha de acesso</label>
+                            <input type="password" id="password" placeholder="••••••••" required>
+                        </div>
+
+                        <button type="submit" class="btnSolid">Acessar</button>
+                    </form>
+
+                    <div class="formFooter">
+                        <span>Ainda não tem acesso? <a href="#" id="linkRegister">Cadastre-se</a></span>
+                    </div>
+                </div>
+
+                <!-- CAIXA DE CADASTRO (Inicia Oculta e seguindo seu padrão) -->
+                <div id="registerBox" class="formBox hidden">
+                    <div class="formHeader">
+                        <h2>Novo Recruta</h2>
+                        <p>Registre seus dados na rede segura.</p>
                     </div>
 
-                    <button type="submit" class="btnSolid">Acessar</button>
-                </form>
+                    <form id="registerForm">
+                        <div class="inputGroup">
+                            <label for="regName">Nome de Operativo</label>
+                            <input type="text" id="regName" placeholder="Seu nome" required>
+                        </div>
 
-                <div class="formFooter">
-                    <span>Ainda não tem acesso? <a href="#" id="linkRegister">Cadastre-se</a></span>
+                        <div class="inputGroup">
+                            <label for="regEmail">Identificação (E-mail)</label>
+                            <input type="email" id="regEmail" placeholder="ex. padawan@jedi.com" required>
+                        </div>
+                        
+                        <div class="inputGroup">
+                            <label for="regPassword">Senha de acesso</label>
+                            <input type="password" id="regPassword" placeholder="Crie uma senha forte" required>
+                        </div>
+                        
+                        <button type="submit" class="btnSolid">Cadastrar</button>
+                    </form>
+
+                    <div class="formFooter">
+                        <span>Já possui credenciais? <a href="#" id="linkLogin">Acessar</a></span>
+                    </div>
                 </div>
+
             </div>
         </section>
 

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terminal | Cérebro Obi-Wan</title>
+
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/chat.css">
+</head>
+
+<body>
+
+    <div class="appLayout">
+
+        <!-- =========================================
+             SIDEBAR (Menu Lateral Estilo Gemini)
+        ========================================= -->
+        <aside class="sidebar">
+            
+            <!-- Cabeçalho: Logo e Recolher Menu -->
+            <div class="sidebarHeader">
+                <div class="brand">
+                    <span class="brandIcon">
+                        <!-- Ícone Customizado: Obi-Wan Kenobi -->
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="url(#logoGradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <defs>
+                                <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#1e40af" />
+                                    <stop offset="100%" stop-color="#3b82f6" />
+                                </linearGradient>
+                            </defs>
+                            
+                            <!-- Cabelo partido de lado (Estilo Ewan McGregor) -->
+                            <path d="M5 10 c0-5 3-7 7-7 5 0 7 2.5 7 6 0 1.5-.5 3-1 4 -1-2-3.5-3-6-3 -2 0-4 1-5 2.5 C5.5 11.5 5 10.5 5 10 Z" />
+                            
+                            <!-- Contorno do Rosto / Volume da Barba -->
+                            <path d="M6.5 11.5 v2.5 c0 3 2.5 5.5 5.5 5.5 s5.5-2.5 5.5-5.5 v-2.5" />
+                            
+                            <!-- Bigode Clássico (Pontas para baixo) -->
+                            <path d="M9.5 15.5 Q12 14 14.5 15.5" />
+                            
+                            <!-- Linha central do cavanhaque -->
+                            <line x1="12" y1="16.5" x2="12" y2="19.5" />
+                        </svg>
+                    </span>
+                    <span class="brandName">Kenobi</span>
+                </div>
+                
+                <button id="menuToggle" class="iconBtn" aria-label="Recolher menu">
+                    <!-- Ícone de Painel Lateral (Idêntico ao UI do Google) -->
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Ações Principais -->
+            <div class="sidebarActions">
+                <button id="newChatBtn" class="navBtn">
+                    <span class="icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </span>
+                    Nova conversa
+                </button>
+                
+                <button id="searchChatsBtn" class="navBtn">
+                    <span class="icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </span>
+                    Pesquisar conversas
+                </button>
+            </div>
+
+            <!-- Histórico de Conversas -->
+            <div class="sidebarMiddle">
+                <p class="sectionTitle">Recentes</p>
+                <ul id="chatHistoryList" class="chatList">
+                    <li class="historyItem">Aventura em Tatooine</li>
+                    <li class="historyItem">Ficha de Wookiee</li>
+                </ul>
+            </div>
+
+            <!-- Controles Inferiores do Menu -->
+            <div class="sidebarBottom">
+                <button id="settingsBtn" class="navBtn">
+                    <span class="icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path
+                                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                            </path>
+                        </svg>
+                    </span>
+                    Configurações
+                </button>
+                <button id="profileBtn" class="navBtn">
+                    <span class="icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </span>
+                    Mestre (Tiago)
+                </button>
+            </div>
+        </aside>
+
+        <!-- =========================================
+             ÁREA PRINCIPAL (Mensagens e Input)
+        ========================================= -->
+        <main class="chatMain">
+
+            <!-- Fundo escuro para quando o chat expandir -->
+            <div id="chatOverlay" class="chatOverlay hidden"></div>
+
+            <!-- Área de Rolagem das Mensagens -->
+            <div id="messagesArea" class="messagesContainer">
+                
+                <!-- Mensagem inicial do sistema -->
+                <div class="message systemMsg">
+                    <p>Conexão segura estabelecida. Cérebro Obi-Wan online.</p>
+                </div>
+
+                <!-- Exemplo de Mensagem do Usuário (Fundo Cinza) -->
+                <div class="message userMessage">
+                    <div class="messageContent">
+                        Mestre, eu atiro no Stormtrooper usando meu Blaster! Rolo quantos dados?
+                    </div>
+                </div>
+
+                <!-- Exemplo de Mensagem da IA (Sem fundo, com avatar) -->
+                <div class="message aiMessage">
+                    <div class="aiAvatar">
+                        <!-- Ícone do Obi-Wan menorzinho -->
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5 10 c0-5 3-7 7-7 5 0 7 2.5 7 6 0 1.5-.5 3-1 4 -1-2-3.5-3-6-3 -2 0-4 1-5 2.5 C5.5 11.5 5 10.5 5 10 Z" />
+                            <path d="M6.5 11.5 v2.5 c0 3 2.5 5.5 5.5 5.5 s5.5-2.5 5.5-5.5 v-2.5" />
+                            <path d="M9.5 15.5 Q12 14 14.5 15.5" />
+                            <line x1="12" y1="16.5" x2="12" y2="19.5" />
+                        </svg>
+                    </div>
+                    <div class="messageContent">
+                        <p>O Stormtrooper está a média distância e em cobertura parcial.</p>
+                        <p>Você precisa rolar <strong>2 Dados de Proficiência (Amarelos)</strong> e <strong>1 Dado de Dificuldade (Roxo)</strong>. Que a Força esteja com você.</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- =========================================
+                 BARRA DE DIGITAÇÃO FLUTUANTE
+            ========================================= -->
+            <div class="inputSection">
+                <!-- Efeito de luz difusa atrás do container -->
+                <div class="glowEffect redGlow"></div>
+                <div class="glowEffect blueGlow"></div>
+
+                <!-- O Container Glassmorphism principal -->
+                <div id="inputContainer" class="inputContainer">
+
+                    <!-- Novo Wrapper para o textarea e o botão de expandir -->
+                    <div class="textareaWrapper">
+                        <!-- Campo de texto auto-expansível -->
+                        <textarea id="chatInput" placeholder="Ask anything..." rows="1"></textarea>
+
+                        <!-- Botão de Expandir (Inicia oculto) -->
+                        <button id="expandBtn" class="expandBtn hidden" aria-label="Expandir">
+                            <svg id="expandIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="15 3 21 3 21 9"></polyline>
+                                <polyline points="9 21 3 21 3 15"></polyline>
+                                <line x1="21" y1="3" x2="14" y2="10"></line>
+                                <line x1="3" y1="21" x2="10" y2="14"></line>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Linha inferior de ações -->
+                    <div class="inputActions">
+
+                        <!-- Lado Esquerdo -->
+                        <div class="actionsLeft">
+                            <button id="attachBtn" class="actionBtn iconOnly" aria-label="Anexar">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Lado Direito -->
+                        <div class="actionsRight">
+                            <button id="voiceBtn" class="actionBtn pillBtn">
+                                <span class="icon">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M12 2v20" />
+                                        <path d="M18 6v12" />
+                                        <path d="M6 10v4" />
+                                        <path d="M22 10v4" />
+                                        <path d="M2 10v4" />
+                                    </svg>
+                                </span>
+                                Voice
+                            </button>
+
+                            <!-- Botão de Enviar com gradiente azul -->
+                            <button id="sendBtn" class="sendBtn" aria-label="Enviar">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                                </svg>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </main>
+
+    </div>
+
+    <!-- =========================================
+         PAINEL LATERAL DE CONFIGURAÇÕES (DRAWER)
+    ========================================= -->
+    <div id="settingsOverlay" class="settingsOverlay"></div>
+    <aside id="settingsDrawer" class="settingsDrawer">
+        
+        <div class="drawerHeader">
+            <h2>Configurações</h2>
+            <button id="closeSettingsBtn" class="iconBtn" aria-label="Fechar configurações">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <div class="drawerContent">
+            <!-- Seletor de Tema -->
+            <div class="settingGroup">
+                <label for="themeSelect">Tema Visual</label>
+                <select id="themeSelect" class="settingSelect">
+                    <option value="dark">Lado Sombrio (Escuro)</option>
+                    <option value="light">Lado da Luz (Claro)</option>
+                </select>
+            </div>
+
+            <!-- Seletor de Fonte -->
+            <div class="settingGroup">
+                <label for="fontSelect">Tipografia do Terminal</label>
+                <select id="fontSelect" class="settingSelect">
+                    <option value="system">Padrão do Sistema</option>
+                    <option value="monospace">Hacker (Monospace)</option>
+                    <option value="serif">Pergaminho (Serif)</option>
+                </select>
+            </div>
+        </div>
+
+    </aside>
+
+    <script src="js/chat.js"></script>
+</body>
+</html>

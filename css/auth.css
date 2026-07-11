@@ -300,3 +300,46 @@ input {
     background: #fff;
     cursor: pointer;
 }
+
+/* =========================================
+   ANIMAÇÕES DE TRANSIÇÃO (LOGIN / CADASTRO)
+========================================= */
+.formBox {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    animation-duration: 0.4s;
+    animation-fill-mode: forwards;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); /* Curva suave de aceleração */
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Classes controladas pelo JavaScript */
+.slideOutLeft { animation-name: slideOutLeft; }
+.slideInRight { animation-name: slideInRight; }
+.slideOutRight { animation-name: slideOutRight; }
+.slideInLeft { animation-name: slideInLeft; }
+
+/* Keyframes de Movimento */
+@keyframes slideOutLeft {
+    0% { opacity: 1; transform: translateX(0); }
+    100% { opacity: 0; transform: translateX(-3vw); }
+}
+
+@keyframes slideInRight {
+    0% { opacity: 0; transform: translateX(3vw); }
+    100% { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideOutRight {
+    0% { opacity: 1; transform: translateX(0); }
+    100% { opacity: 0; transform: translateX(3vw); }
+}
+
+@keyframes slideInLeft {
+    0% { opacity: 0; transform: translateX(-3vw); }
+    100% { opacity: 1; transform: translateX(0); }
+}
