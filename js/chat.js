@@ -234,7 +234,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const welcomeTitle = document.getElementById('welcomeTitle');
     
     if (cinematicWelcome && welcomeTitle) {
+        // A saudação personalizada que criamos
         const textToType = `${saudacao}, ${tituloSideBar} ${loggedInUser}.`;
+        let charIndex = 0;
+
+        // A Lógica da animação de digitação que havia sumido:
+        setTimeout(() => {
+            const typingInterval = setInterval(() => {
+                if (charIndex < textToType.length) {
+                    welcomeTitle.textContent += textToType.charAt(charIndex);
+                    charIndex++;
+                } else {
+                    clearInterval(typingInterval);
+                    setTimeout(() => {
+                        cinematicWelcome.classList.add('hide'); // <--- É isso que faz a tela preta sumir!
+                        if(chatInput) chatInput.focus();
+                    }, 1500); 
+                }
+            }, 80); 
+        }, 1200); 
     }
 
     // ==========================================
