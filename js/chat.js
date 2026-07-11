@@ -93,13 +93,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. LÓGICA DE ENVIO E LOADING DA IA
     // ==========================================
     
+    // Variável para guardar o balão de digitação e podermos apagá-lo depois
+    let typingBubble = null;
+
     // Constrói o HTML da nova mensagem e joga na tela
     const appendMessage = (text, isUser = true) => {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${isUser ? 'userMessage' : 'aiMessage'}`;
 
         if (isUser) {
-            // Mantém as quebras de linha digitadas pelo usuário
             messageDiv.innerHTML = `<div class="messageContent">${text.replace(/\n/g, '<br>')}</div>`;
         } else {
             messageDiv.innerHTML = `
@@ -118,9 +120,42 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         messagesArea.appendChild(messageDiv);
-        
-        // Rola o chat para a mensagem mais recente
         messagesArea.scrollTop = messagesArea.scrollHeight;
+    };
+
+    // Mostra o balão com os 3 pontinhos
+    const showTypingIndicator = () => {
+        typingBubble = document.createElement('div');
+        typingBubble.className = 'message aiMessage';
+        
+        typingBubble.innerHTML = `
+            <div class="aiAvatar">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 10 c0-5 3-7 7-7 5 0 7 2.5 7 6 0 1.5-.5 3-1 4 -1-2-3.5-3-6-3 -2 0-4 1-5 2.5 C5.5 11.5 5 10.5 5 10 Z" />
+                    <path d="M6.5 11.5 v2.5 c0 3 2.5 5.5 5.5 5.5 s5.5-2.5 5.5-5.5 v-2.5" />
+                    <path d="M9.5 15.5 Q12 14 14.5 15.5" />
+                    <line x1="12" y1="16.5" x2="12" y2="19.5" />
+                </svg>
+            </div>
+            <div class="messageContent">
+                <div class="typingIndicator">
+                    <div class="typingDot"></div>
+                    <div class="typingDot"></div>
+                    <div class="typingDot"></div>
+                </div>
+            </div>
+        `;
+        
+        messagesArea.appendChild(typingBubble);
+        messagesArea.scrollTop = messagesArea.scrollHeight;
+    };
+
+    // Remove o balão com os 3 pontinhos
+    const removeTypingIndicator = () => {
+        if (typingBubble) {
+            typingBubble.remove();
+            typingBubble = null;
+        }
     };
 
     // Liga ou desliga a animação das luzes
@@ -136,42 +171,72 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const handleSendMessage = () => {
         const text = chatInput.value.trim();
-        if (!text) return; // Não envia se estiver vazio
+        if (!text) return; 
 
-        // 1. Registra a mensagem do usuário
+        // 1. Envia a mensagem do usuário
         appendMessage(text, true);
 
-        // 2. Limpa o input, foca nele novamente e reseta o tamanho
+        // 2. Limpa o input
         chatInput.value = '';
         chatInput.focus();
         handleInputResize();
         
-        // Se estiver expandido e a mensagem for enviada, pode ser legal recolher:
-        // Se quiser que fique aberto, só remover o if abaixo.
         if (inputSection.classList.contains('expandedMode')) {
             document.getElementById('expandBtn').click(); 
         }
 
-        // 3. Ativa o "pensamento" da IA
+        // 3. Ativa o "pensamento" da IA e mostra os pontinhos
         setAiLoading(true);
+        showTypingIndicator();
 
-        // 4. Simulação de resposta (Timer de 2 segundos)
+        // 4. Simulação de resposta 
         setTimeout(() => {
+            removeTypingIndicator(); // Apaga os pontinhos
             appendMessage("Esta é uma resposta simulada. Em breve, esta mensagem virá diretamente do seu fluxo no n8n e do Supabase!", false);
-            setAiLoading(false);
+            setAiLoading(false); // Para o brilho
         }, 2000);
     };
 
     if (sendBtn && chatInput) {
-        // Envio pelo botão azul
         sendBtn.addEventListener('click', handleSendMessage);
-
-        // Envio pela tecla Enter (Shift + Enter pula linha normalmente)
         chatInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault(); // Evita a quebra de linha nativa
+                e.preventDefault(); 
                 handleSendMessage();
             }
         });
     }
-});
+
+    // ==========================================
+    // LÓGICA DO USUÁRIO LOGADO E TELA DE BOAS-VINDAS
+    // ==========================================
+    const loggedInUser = localStorage.getItem('obiwan_user') || "Visitante"; 
+
+    const sidebarUserName = document.getElementById('sidebarUserName');
+    if (sidebarUserName) {
+        sidebarUserName.textContent = `Mestre (${loggedInUser})`;
+    }
+
+    const cinematicWelcome = document.getElementById('cinematicWelcome');
+    const welcomeTitle = document.getElementById('welcomeTitle');
+    
+    if (cinematicWelcome && welcomeTitle) {
+        const textToType = `Bem-vindo, Mestre ${loggedInUser}.`;
+        let charIndex = 0;
+
+        setTimeout(() => {
+            const typingInterval = setInterval(() => {
+                if (charIndex < textToType.length) {
+                    welcomeTitle.textContent += textToType.charAt(charIndex);
+                    charIndex++;
+                } else {
+                    clearInterval(typingInterval);
+                    setTimeout(() => {
+                        cinematicWelcome.classList.add('hide');
+                        if(chatInput) chatInput.focus();
+                    }, 1500); 
+                }
+            }, 80); 
+        }, 1200); 
+    }
+}); // Fim do evento DOMContentLoaded

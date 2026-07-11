@@ -12,6 +12,19 @@
 
 <body>
 
+    <!-- =========================================
+         TELA DE BOAS-VINDAS CINEMATOGRÁFICA
+    ========================================= -->
+    <div id="cinematicWelcome" class="cinematicWelcome">
+        <div class="welcomeContent">
+            <!-- Subtítulo sutil (mantém igual) -->
+            <p class="welcomeSubtitle">Autorização confirmada</p>
+            
+            <!-- O texto principal começa VAZIO e ganha um ID -->
+            <h1 id="welcomeTitle" class="welcomeTitle"></h1>
+        </div>
+    </div>
+
     <div class="appLayout">
 
         <!-- =========================================
@@ -111,7 +124,8 @@
                             <circle cx="12" cy="7" r="4"></circle>
                         </svg>
                     </span>
-                    Mestre (Tiago)
+                    <!-- O span vazio que o JS vai preencher -->
+                    <span id="sidebarUserName">Mestre (...)</span>
                 </button>
             </div>
         </aside>
