@@ -1,11 +1,11 @@
-// Inicializa o cliente do Supabase usando as chaves do config.js
-const supabase = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+// Alterado para 'clienteSupabase' para evitar conflito com a CDN oficial
+const clienteSupabase = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
 
 const API = {
     // 1. Função para Cadastrar Novo Usuário
     async cadastrar(nome, email, senha) {
         try {
-            const { data, error } = await supabase.auth.signUp({
+            const { data, error } = await clienteSupabase.auth.signUp({
                 email: email,
                 password: senha,
                 options: {
@@ -27,7 +27,7 @@ const API = {
     // 2. Função para Fazer Login
     async login(email, senha) {
         try {
-            const { data, error } = await supabase.auth.signInWithPassword({
+            const { data, error } = await clienteSupabase.auth.signInWithPassword({
                 email: email,
                 password: senha
             });
@@ -41,10 +41,10 @@ const API = {
         }
     },
 
-    // 3. Função para Fazer Logout (NOVO)
+    // 3. Função para Fazer Logout
     async logout() {
         try {
-            const { error } = await supabase.auth.signOut();
+            const { error } = await clienteSupabase.auth.signOut();
             if (error) throw error;
             return { sucesso: true };
         } catch (erro) {

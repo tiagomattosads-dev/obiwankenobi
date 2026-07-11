@@ -120,22 +120,29 @@ if (loginForm) {
         const senhaInput = document.getElementById('password').value;
         const btn = loginForm.querySelector('.btnSolid');
         
-        // Efeito visual de carregando
         btn.textContent = "Autenticando...";
         btn.disabled = true;
 
-        // Chama o Supabase através do nosso api.js
-        const resposta = await API.login(emailInput, senhaInput);
+        try {
+            const resposta = await API.login(emailInput, senhaInput);
 
-        if (resposta.sucesso) {
-            // Salva o nome que veio do banco de dados na memória local para mostrar na tela de chat
-            const nomeCadastrado = resposta.dados.user.user_metadata.nome_operativo || "Mestre Jedi";
-            localStorage.setItem('obiwan_user', nomeCadastrado);
-            
-            // Sucesso! Vai para o chat
-            window.location.href = 'chat.html';
-        } else {
-            alert("Falha no acesso: " + resposta.erro);
+            if (resposta.sucesso) {
+                const nomeCadastrado = resposta.dados.user.user_metadata.nome_operativo || "Mestre Jedi";
+                localStorage.setItem('obiwan_user', nomeCadastrado);
+                
+                showToast("Acesso autorizado. Bem-vindo, " + nomeCadastrado + ".", false);
+                
+                // Aguarda 1.5s para o usuário ler o aviso antes de redirecionar
+                setTimeout(() => {
+                    window.location.href = 'chat.html';
+                }, 1500);
+            } else {
+                showToast("Acesso Negado: " + resposta.erro, true);
+                btn.textContent = "Acessar";
+                btn.disabled = false;
+            }
+        } catch (err) {
+            showToast("Erro de conexão com a base de dados.", true);
             btn.textContent = "Acessar";
             btn.disabled = false;
         }
@@ -154,17 +161,42 @@ if (registerForm) {
         btn.textContent = "Registrando...";
         btn.disabled = true;
         
-        // Chama o Supabase através do nosso api.js
-        const resposta = await API.cadastrar(nomeInput, emailInput, senhaInput);
-        
-        if (resposta.sucesso) {
-            localStorage.setItem('obiwan_user', nomeInput);
-            alert("Operativo cadastrado com sucesso! Iniciando terminal...");
-            window.location.href = 'chat.html';
-        } else {
-            alert("Erro ao cadastrar: " + resposta.erro);
+        try {
+            const resposta = await API.cadastrar(nomeInput, emailInput, senhaInput);
+            
+            if (resposta.sucesso) {
+                localStorage.setItem('obiwan_user', nomeInput);
+                showToast("Operativo registrado com sucesso! Iniciando terminal...", false);
+                
+                // Aguarda 1.5s para o usuário ler o aviso antes de redirecionar
+                setTimeout(() => {
+                    window.location.href = 'chat.html';
+                }, 1500);
+            } else {
+                showToast("Erro ao cadastrar: " + resposta.erro, true);
+                btn.textContent = "Cadastrar";
+                btn.disabled = false;
+            }
+        } catch (err) {
+            showToast("Erro de conexão com a base de dados.", true);
             btn.textContent = "Cadastrar";
             btn.disabled = false;
         }
     });
+}
+
+// Função para disparar o aviso
+function showToast(message, isError = true) {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    
+    toast.className = `toast ${isError ? 'error' : ''}`;
+    toast.textContent = `> ${message}`;
+    
+    container.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 400);
+    }, 4000);
 }
