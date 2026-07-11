@@ -100,6 +100,31 @@
                             <input type="text" id="regName" placeholder="Seu nome" required>
                         </div>
 
+                        <!-- Campo Custom Select: Tratamento -->
+                        <div class="inputGroup">
+                            <label>Título de Tratamento</label>
+                            
+                            <!-- Container principal do Custom Select -->
+                            <div class="customSelectWrapper" id="treatmentSelect">
+                                <!-- O input invisível que vai guardar o valor "M" ou "F" -->
+                                <input type="hidden" id="regTreatment" required>
+                                
+                                <!-- A barra onde o usuário clica -->
+                                <div class="customSelectTrigger">
+                                    <span>Selecione seu título...</span>
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevronIcon">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
+                                </div>
+                                
+                                <!-- A lista flutuante de opções -->
+                                <ul class="customSelectOptions">
+                                    <li data-value="M">Mestre (Masculino)</li>
+                                    <li data-value="F">Mestra (Feminino)</li>
+                                </ul>
+                            </div>
+                        </div>
+
                         <div class="inputGroup">
                             <label for="regEmail">Identificação (E-mail)</label>
                             <input type="email" id="regEmail" placeholder="ex. padawan@jedi.com" required>

@@ -129,8 +129,9 @@ if (loginForm) {
             if (resposta.sucesso) {
                 const nomeCadastrado = resposta.dados.user.user_metadata.nome_operativo || "Mestre Jedi";
                 localStorage.setItem('obiwan_user', nomeCadastrado);
+                localStorage.setItem('obiwan_tratamento', tratamentoCadastrado);
                 
-                showToast("Acesso autorizado. Bem-vindo, " + nomeCadastrado + ".", false);
+                showToast("Acesso autorizado. Preparando contato com mestre Kenobi...", false);
                 
                 // Aguarda 1.5s para o usuário ler o aviso antes de redirecionar
                 setTimeout(() => {
@@ -154,6 +155,7 @@ if (registerForm) {
         e.preventDefault();
         
         const nomeInput = document.getElementById('regName').value;
+        const tratamentoInput = document.getElementById('regTreatment').value;
         const emailInput = document.getElementById('regEmail').value;
         const senhaInput = document.getElementById('regPassword').value;
         
@@ -172,7 +174,7 @@ if (registerForm) {
         btn.disabled = true;
         
         try {
-            const resposta = await API.cadastrar(nomeInput, emailInput, senhaInput);
+            const resposta = await API.cadastrar(nomeInput, emailInput, senhaInput, tratamentoInput);
             
             if (resposta.sucesso) {
                 // 1. Mostra o aviso imersivo
@@ -252,3 +254,51 @@ togglePasswordBtns.forEach(btn => {
         }
     });
 });
+
+// ==========================================
+// LÓGICA DO CUSTOM SELECT (TRATAMENTO)
+// ==========================================
+const customSelect = document.getElementById('treatmentSelect');
+
+if (customSelect) {
+    const trigger = customSelect.querySelector('.customSelectTrigger');
+    const options = customSelect.querySelectorAll('.customSelectOptions li');
+    const hiddenInput = document.getElementById('regTreatment');
+    const triggerText = trigger.querySelector('span');
+
+    // 1. Abrir/Fechar menu ao clicar na barra
+    trigger.addEventListener('click', (e) => {
+        e.stopPropagation(); // Evita que o evento de clique vaze para o 'document'
+        customSelect.classList.toggle('open');
+    });
+
+    // 2. Quando clicar em uma opção
+    options.forEach(option => {
+        option.addEventListener('click', (e) => {
+            e.stopPropagation();
+            
+            // Remove a classe "selected" das outras opções
+            options.forEach(opt => opt.classList.remove('selected'));
+            
+            // Marca a opção clicada
+            option.classList.add('selected');
+            
+            // Troca o texto do botão pelo texto escolhido e acende a cor
+            triggerText.textContent = option.textContent;
+            trigger.classList.add('has-value');
+            
+            // Joga o valor (M ou F) para o input invisível
+            hiddenInput.value = option.getAttribute('data-value');
+            
+            // Fecha a janela
+            customSelect.classList.remove('open');
+        });
+    });
+
+    // 3. Fechar a lista se o usuário clicar fora dela
+    document.addEventListener('click', (e) => {
+        if (!customSelect.contains(e.target)) {
+            customSelect.classList.remove('open');
+        }
+    });
+}

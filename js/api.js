@@ -10,7 +10,8 @@ const API = {
                 password: senha,
                 options: {
                     data: {
-                        nome_operativo: nome
+                        nome_operativo: nome,
+                        tratamento: tratamento
                     }
                 }
             });

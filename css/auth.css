@@ -376,3 +376,91 @@ input {
 .togglePassword:hover {
     color: white;
 }
+
+/* =========================================
+   CUSTOM SELECT (TRATAMENTO)
+========================================= */
+.customSelectWrapper {
+    position: relative;
+    width: 100%;
+    user-select: none;
+}
+
+/* O botão principal do select */
+.customSelectTrigger {
+    background: #0a0a0a;
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--text-muted); /* Cor de placeholder */
+    padding: 1vw 1.2vw;
+    border-radius: 0.5vw;
+    font-size: var(--font-p);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+/* Quando uma opção for escolhida, a cor fica branca */
+.customSelectTrigger.has-value {
+    color: white; 
+}
+
+.customSelectWrapper.open .customSelectTrigger {
+    border-color: rgba(255,255,255,0.3);
+}
+
+.customSelectTrigger .chevronIcon {
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Gira a setinha quando o menu abre */
+.customSelectWrapper.open .chevronIcon {
+    transform: rotate(180deg);
+}
+
+/* A lista suspensa (Dropdown) */
+.customSelectOptions {
+    position: absolute;
+    top: calc(100% + 0.5vw);
+    left: 0;
+    width: 100%;
+    background: rgba(10, 10, 10, 0.95);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 0.5vw;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    list-style: none;
+    padding: 0.5vw 0;
+    margin: 0;
+    z-index: 50;
+    
+    /* Começa invisível e empurrado para cima */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Aparece a lista */
+.customSelectWrapper.open .customSelectOptions {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.customSelectOptions li {
+    padding: 0.8vw 1.2vw;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: var(--font-p);
+}
+
+/* Efeito Hover nas opções */
+.customSelectOptions li:hover,
+.customSelectOptions li.selected {
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+}

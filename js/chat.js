@@ -211,33 +211,30 @@ document.addEventListener('DOMContentLoaded', () => {
     // LÓGICA DO USUÁRIO LOGADO E TELA DE BOAS-VINDAS
     // ==========================================
     const loggedInUser = localStorage.getItem('obiwan_user') || "Visitante"; 
+    const loggedInTreatment = localStorage.getItem('obiwan_tratamento') || "M";
+
+    // Define a saudação baseada no tratamento
+    let saudacao = "Bem-vindo"; // Padrão 'M'
+    let tituloSideBar = "Mestre";
+
+    if (loggedInTreatment === "F") {
+        saudacao = "Bem-vinda";
+        tituloSideBar = "Mestra";
+    } else if (loggedInTreatment === "N") {
+        saudacao = "Boas-vindas";
+        tituloSideBar = "Mestre(a)";
+    }
 
     const sidebarUserName = document.getElementById('sidebarUserName');
     if (sidebarUserName) {
-        sidebarUserName.textContent = `Mestre (${loggedInUser})`;
+        sidebarUserName.textContent = `${tituloSideBar} (${loggedInUser})`;
     }
 
     const cinematicWelcome = document.getElementById('cinematicWelcome');
     const welcomeTitle = document.getElementById('welcomeTitle');
     
     if (cinematicWelcome && welcomeTitle) {
-        const textToType = `Bem-vindo, Mestre ${loggedInUser}.`;
-        let charIndex = 0;
-
-        setTimeout(() => {
-            const typingInterval = setInterval(() => {
-                if (charIndex < textToType.length) {
-                    welcomeTitle.textContent += textToType.charAt(charIndex);
-                    charIndex++;
-                } else {
-                    clearInterval(typingInterval);
-                    setTimeout(() => {
-                        cinematicWelcome.classList.add('hide');
-                        if(chatInput) chatInput.focus();
-                    }, 1500); 
-                }
-            }, 80); 
-        }, 1200); 
+        const textToType = `${saudacao}, ${tituloSideBar} ${loggedInUser}.`;
     }
 
     // ==========================================
