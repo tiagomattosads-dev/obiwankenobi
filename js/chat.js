@@ -388,29 +388,72 @@ document.addEventListener('DOMContentLoaded', () => {
         renderizarHistorico();
     };
 
-    const renomearConversa = async (id) => {
-        const novoNome = prompt("Digite o novo nome para esta aventura:"); // Janela nativa simples por enquanto
-        if (novoNome && novoNome.trim() !== "") {
-            await API.atualizarConversa(id, { titulo: novoNome.trim() });
-            renderizarHistorico();
-        }
+    // ==========================================
+    // MODAIS CUSTOMIZADOS (LÓGICA E INTEGRAÇÃO)
+    // ==========================================
+    const renameModal = document.getElementById('renameModal');
+    const deleteModal = document.getElementById('deleteModal');
+    const renameModalInput = document.getElementById('renameModalInput');
+    
+    // Variável para guardar qual chat o usuário está tentando modificar
+    let chatAlvoId = null;
+
+    // A. Fechar modais ao clicar em "Cancelar"
+    document.querySelectorAll('.cancelModalBtn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            renameModal.classList.remove('show');
+            deleteModal.classList.remove('show');
+            chatAlvoId = null;
+        });
+    });
+
+    // B. Substituição da função: Abre modal de Renomear
+    const renomearConversa = (id) => {
+        chatAlvoId = id;
+        renameModalInput.value = ''; // Limpa o input sempre que abre
+        renameModal.classList.add('show');
+        
+        // Foca automaticamente no campo para o usuário já sair digitando
+        setTimeout(() => renameModalInput.focus(), 100); 
     };
 
-    const excluirConversa = async (id) => {
-        const confirmar = confirm("Tem certeza que deseja apagar os registros desta aventura? Isso não pode ser desfeito.");
-        if (confirmar) {
-            await API.excluirConversa(id);
-            // Se eu apaguei a conversa que estou olhando, limpa a tela principal
-            if (conversaAtualId === id) {
-                conversaAtualId = null;
-                // Simula clique em nova conversa, mas sem criar uma no banco, apenas limpando
-                if (messagesArea) {
-                    messagesArea.querySelectorAll('.message:not(.systemMsg)').forEach(msg => msg.remove());
-                }
-            }
+    // C. Substituição da função: Abre modal de Excluir
+    const excluirConversa = (id) => {
+        chatAlvoId = id;
+        deleteModal.classList.add('show');
+    };
+
+    // D. Botão Salvar (Renomear) - Já com a API do Supabase!
+    document.getElementById('confirmRenameBtn').addEventListener('click', async () => {
+        const novoNome = renameModalInput.value.trim();
+        
+        if (novoNome !== "") {
+            // Usa a função do seu dev para salvar no banco
+            await API.atualizarConversa(chatAlvoId, { titulo: novoNome });
             renderizarHistorico();
         }
-    };
+        
+        renameModal.classList.remove('show');
+        chatAlvoId = null;
+    });
+
+    // E. Botão Excluir - Já com a API do Supabase!
+    document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+        // Usa a função do seu dev para apagar do banco
+        await API.excluirConversa(chatAlvoId);
+        
+        // Se apagou a conversa que estava olhando, limpa a tela principal
+        if (conversaAtualId === chatAlvoId) {
+            conversaAtualId = null;
+            if (messagesArea) {
+                messagesArea.querySelectorAll('.message:not(.systemMsg)').forEach(msg => msg.remove());
+            }
+        }
+        renderizarHistorico();
+        
+        deleteModal.classList.remove('show');
+        chatAlvoId = null;
+    });
 
     // 4. Lógica de cliques no Dropdown
     if (chatHistoryList) {

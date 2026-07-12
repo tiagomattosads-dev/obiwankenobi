@@ -407,6 +407,38 @@
 
     </aside>
 
+    <!-- =========================================
+         MODAIS CUSTOMIZADOS (RENOMEAR E EXCLUIR)
+    ========================================= -->
+    
+    <!-- Modal de Renomear -->
+    <div id="renameModal" class="customModalOverlay">
+        <div class="customModalBox">
+            <h3 class="modalTitle">Renomear Transmissão</h3>
+            <div class="modalBody">
+                <input type="text" id="renameModalInput" class="modalInput" placeholder="Digite o novo nome...">
+            </div>
+            <div class="modalFooter">
+                <button class="modalBtn modalBtnOutline cancelModalBtn">Cancelar</button>
+                <button id="confirmRenameBtn" class="modalBtn modalBtnSolid">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Excluir -->
+    <div id="deleteModal" class="customModalOverlay">
+        <div class="customModalBox">
+            <h3 class="modalTitle dangerTitle">Apagar Registros?</h3>
+            <div class="modalBody">
+                <p class="modalText">Tem certeza que deseja apagar os registros desta aventura? Esta ação não pode ser desfeita e os dados serão perdidos na Força.</p>
+            </div>
+            <div class="modalFooter">
+                <button class="modalBtn modalBtnOutline cancelModalBtn">Cancelar</button>
+                <button id="confirmDeleteBtn" class="modalBtn modalBtnDanger">Excluir</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Script Oficial do Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
