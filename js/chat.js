@@ -278,4 +278,181 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = 'index.html';
         });
     }
+
+    // ==========================================
+    // NOVA CONVERSA E HISTÓRICO AVANÇADO (CONECTADO AO SUPABASE)
+    // ==========================================
+
+    const newChatBtn = document.getElementById('newChatBtn');
+    const chatHistoryList = document.getElementById('chatHistoryList');
+    
+    // Variável para saber em qual conversa estamos digitando no momento
+    let conversaAtualId = null; 
+
+    // 1. Renderizar o Histórico Real do Banco de Dados
+    const renderizarHistorico = async () => {
+        if (!chatHistoryList) return;
+        
+        chatHistoryList.innerHTML = '<li class="historyItem" style="justify-content:center; opacity:0.5;">Buscando registros...</li>';
+        
+        const resposta = await API.obterConversas();
+        
+        if (!resposta.sucesso) {
+            chatHistoryList.innerHTML = '<li class="historyItem" style="color:var(--danger); justify-content:center;">Erro na rede segura.</li>';
+            return;
+        }
+
+        chatHistoryList.innerHTML = ''; // Limpa a lista
+
+        if (resposta.dados.length === 0) {
+            chatHistoryList.innerHTML = '<li class="historyItem" style="justify-content:center; opacity:0.5;">Nenhuma transmissão ainda.</li>';
+            return;
+        }
+
+        // Constrói cada item da lista (<li>) com os dados reais
+        resposta.dados.forEach(conversa => {
+            const isFixado = conversa.fixado;
+            
+            // Define o ícone de pino cheio se for fixado, senão balão de chat
+            const iconSvg = isFixado 
+                ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 11.2V6a3 3 0 0 0-6 0v5.2a2 2 0 0 1-1.11 1.35l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>`
+                : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>`;
+
+            const li = document.createElement('li');
+            li.className = 'historyItem';
+            if (conversaAtualId === conversa.id) li.style.background = 'rgba(255,255,255,0.1)'; // Destaca a conversa ativa
+            
+            li.setAttribute('data-id', conversa.id);
+            li.setAttribute('data-fixado', isFixado);
+
+            li.innerHTML = `
+                <span class="chatIcon">${iconSvg}</span>
+                <span class="chatTitle" title="${conversa.titulo}">${conversa.titulo}</span>
+                
+                <button class="optionsBtn" aria-label="Opções">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+                </button>
+
+                <div class="chatDropdown">
+                    <button class="dropdownItem action-pin">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 11.2V6a3 3 0 0 0-6 0v5.2a2 2 0 0 1-1.11 1.35l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>
+                        ${isFixado ? 'Desfixar' : 'Fixar'}
+                    </button>
+                    <button class="dropdownItem action-rename">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        Renomear
+                    </button>
+                    <button class="dropdownItem danger action-delete">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        Excluir
+                    </button>
+                </div>
+            `;
+            chatHistoryList.appendChild(li);
+        });
+    };
+
+    // Puxa o histórico assim que o código carrega
+    renderizarHistorico();
+
+    // 2. Função: Iniciar Nova Conversa (Agora cria no banco)
+    const iniciarNovaConversa = async () => {
+        // Limpa a tela central
+        if (messagesArea) {
+            const mensagens = messagesArea.querySelectorAll('.message:not(.systemMsg)');
+            mensagens.forEach(msg => msg.remove());
+        }
+        if (chatInput) {
+            chatInput.value = '';
+            chatInput.style.height = 'auto'; 
+            chatInput.focus();
+        }
+        if (expandBtn) expandBtn.classList.add('hidden');
+
+        // Cria no banco
+        const tituloInicial = "Nova Aventura...";
+        const resposta = await API.criarConversa(tituloInicial);
+        
+        if(resposta.sucesso) {
+            conversaAtualId = resposta.dados.id; // Atualiza a mira para a nova conversa
+            renderizarHistorico(); // Recarrega a barra lateral
+        }
+    };
+
+    if (newChatBtn) newChatBtn.addEventListener('click', iniciarNovaConversa);
+
+    // 3. Funções de Ação conectadas à API
+    const fixarConversa = async (id, estadoAtual) => {
+        const novoEstado = estadoAtual !== 'true'; // Inverte o status atual
+        await API.atualizarConversa(id, { fixado: novoEstado });
+        renderizarHistorico();
+    };
+
+    const renomearConversa = async (id) => {
+        const novoNome = prompt("Digite o novo nome para esta aventura:"); // Janela nativa simples por enquanto
+        if (novoNome && novoNome.trim() !== "") {
+            await API.atualizarConversa(id, { titulo: novoNome.trim() });
+            renderizarHistorico();
+        }
+    };
+
+    const excluirConversa = async (id) => {
+        const confirmar = confirm("Tem certeza que deseja apagar os registros desta aventura? Isso não pode ser desfeito.");
+        if (confirmar) {
+            await API.excluirConversa(id);
+            // Se eu apaguei a conversa que estou olhando, limpa a tela principal
+            if (conversaAtualId === id) {
+                conversaAtualId = null;
+                // Simula clique em nova conversa, mas sem criar uma no banco, apenas limpando
+                if (messagesArea) {
+                    messagesArea.querySelectorAll('.message:not(.systemMsg)').forEach(msg => msg.remove());
+                }
+            }
+            renderizarHistorico();
+        }
+    };
+
+    // 4. Lógica de cliques no Dropdown
+    if (chatHistoryList) {
+        chatHistoryList.addEventListener('click', (e) => {
+            
+            // Clicou nos 3 pontinhos
+            const optionsBtn = e.target.closest('.optionsBtn');
+            if (optionsBtn) {
+                e.stopPropagation(); 
+                const liContainer = optionsBtn.closest('.historyItem');
+                const dropdown = liContainer.querySelector('.chatDropdown');
+                
+                document.querySelectorAll('.chatDropdown.show').forEach(menu => {
+                    if (menu !== dropdown) menu.classList.remove('show');
+                });
+                
+                dropdown.classList.toggle('show');
+                return;
+            }
+
+            // Clicou em alguma das opções
+            const dropdownItem = e.target.closest('.dropdownItem');
+            if (dropdownItem) {
+                e.stopPropagation();
+                const liContainer = dropdownItem.closest('.historyItem');
+                const chatId = liContainer.getAttribute('data-id'); 
+                const estadoFixado = liContainer.getAttribute('data-fixado'); 
+
+                if (dropdownItem.classList.contains('action-pin')) fixarConversa(chatId, estadoFixado);
+                if (dropdownItem.classList.contains('action-rename')) renomearConversa(chatId);
+                if (dropdownItem.classList.contains('action-delete')) excluirConversa(chatId);
+
+                liContainer.querySelector('.chatDropdown').classList.remove('show');
+                return;
+            }
+        });
+    }
+
+    // 5. Fecha o menu dropdown ao clicar fora
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.chatDropdown.show').forEach(menu => {
+            menu.classList.remove('show');
+        });
+    });
 }); // Fim do evento DOMContentLoaded

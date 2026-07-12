@@ -52,5 +52,83 @@ const API = {
             console.error("Erro no logout:", erro.message);
             return { sucesso: false, erro: erro.message };
         }
+    },
+
+    // ==========================================
+    // FUNÇÕES DO BANCO DE DADOS (CHAT)
+    // ==========================================
+
+    // 4. Criar Nova Pasta de Conversa
+    async criarConversa(titulo) {
+        try {
+            // Descobre quem é o usuário logado agora
+            const { data: userData, error: userError } = await clienteSupabase.auth.getUser();
+            if (userError) throw userError;
+
+            // Insere a conversa no banco ligada a esse usuário
+            const { data, error } = await clienteSupabase
+                .from('conversas')
+                .insert([
+                    { titulo: titulo, usuario_id: userData.user.id }
+                ])
+                .select()
+                .single(); // Pega a linha criada de volta
+
+            if (error) throw error;
+            return { sucesso: true, dados: data };
+        } catch (erro) {
+            console.error("Erro ao criar conversa:", erro.message);
+            return { sucesso: false, erro: erro.message };
+        }
+    },
+
+    // 5. Puxar o Histórico do Usuário
+    async obterConversas() {
+        try {
+            const { data, error } = await clienteSupabase
+                .from('conversas')
+                .select('*')
+                .order('fixado', { ascending: false }) // Traz os fixados no topo
+                .order('created_at', { ascending: false }); // Traz os mais novos depois
+
+            if (error) throw error;
+            return { sucesso: true, dados: data };
+        } catch (erro) {
+            console.error("Erro ao buscar conversas:", erro.message);
+            return { sucesso: false, erro: erro.message };
+        }
+    },
+
+    // 6. Atualizar Conversa (Serve para Renomear E para Fixar)
+    async atualizarConversa(id, atualizacoes) {
+        try {
+            const { data, error } = await clienteSupabase
+                .from('conversas')
+                .update(atualizacoes)
+                .eq('id', id)
+                .select();
+
+            if (error) throw error;
+            return { sucesso: true, dados: data };
+        } catch (erro) {
+            console.error("Erro ao atualizar conversa:", erro.message);
+            return { sucesso: false, erro: erro.message };
+        }
+    },
+
+    // 7. Excluir Conversa (O Cascade apagará as mensagens dela junto)
+    async excluirConversa(id) {
+        try {
+            const { error } = await clienteSupabase
+                .from('conversas')
+                .delete()
+                .eq('id', id);
+
+            if (error) throw error;
+            return { sucesso: true };
+        } catch (erro) {
+            console.error("Erro ao excluir conversa:", erro.message);
+            return { sucesso: false, erro: erro.message };
+        }
     }
 };

@@ -792,3 +792,122 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
         opacity: 1; 
     }
 }
+
+/* =========================================
+   HISTÓRICO DE CONVERSAS & DROPDOWN
+========================================= */
+.historyItem {
+    position: relative; /* Necessário para ancorar o dropdown */
+    display: flex;
+    align-items: center;
+    gap: 0.6vw;
+    padding: 0.8vw;
+    border-radius: 0.5vw;
+    cursor: pointer;
+    color: var(--textMuted);
+    font-size: 0.9rem;
+    transition: 0.2s;
+}
+
+.historyItem:hover {
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--textMain);
+}
+
+.chatIcon {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0; /* Impede o ícone de amassar */
+}
+
+/* Corte de texto longo (Reticências) */
+.chatTitle {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 0.5vw;
+}
+
+/* Botão de 3 pontinhos (Escondido por padrão) */
+.optionsBtn {
+    background: transparent;
+    border: none;
+    color: var(--textMuted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0; /* Invisível... */
+    transition: opacity 0.2s, color 0.2s;
+    padding: 0.2vw;
+    border-radius: 0.3vw;
+}
+
+.optionsBtn:hover {
+    color: var(--textMain);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* ...revelado no hover da linha INTEIRA */
+.historyItem:hover .optionsBtn {
+    opacity: 1;
+}
+
+/* Dropdown Menu Glassmorphism */
+.chatDropdown {
+    position: absolute;
+    top: 2.2vw; /* Desce um pouco a partir dos 3 pontinhos */
+    right: 0.5vw;
+    background: var(--glassBg);
+    border: 1px solid var(--glassBorder);
+    border-radius: 0.5vw;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 100;
+    min-width: 140px;
+    display: flex;
+    flex-direction: column;
+    padding: 0.3vw;
+    
+    /* Estado inicial fechado */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-5px);
+    transition: all 0.2s ease;
+}
+
+/* Classe ativada pelo JS */
+.chatDropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdownItem {
+    background: transparent;
+    border: none;
+    color: var(--textMain);
+    padding: 0.6vw 0.8vw;
+    text-align: left;
+    font-size: 0.85rem;
+    cursor: pointer;
+    border-radius: 0.3vw;
+    display: flex;
+    align-items: center;
+    gap: 0.5vw;
+    transition: background 0.2s;
+}
+
+.dropdownItem:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* Destaque vermelho para a exclusão */
+.dropdownItem.danger {
+    color: #ef4444; /* Vermelho Sith */
+}
+.dropdownItem.danger:hover {
+    background: rgba(239, 68, 68, 0.15);
+}
