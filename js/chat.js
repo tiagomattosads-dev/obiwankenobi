@@ -204,11 +204,28 @@ document.addEventListener('DOMContentLoaded', () => {
         setAiLoading(true);
         showTypingIndicator();
 
-        // 5. Simulação de resposta (Logo substituiremos isso pela chamada do n8n)
-        setTimeout(async () => {
+        try {
+            // 5. Chamada real para o n8n via Webhook POST
+            const respostaN8n = await fetch(CONFIG.N8N_WEBHOOK_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    mensagem: text,
+                    conversaId: conversaAtualId
+                })
+            });
+
+            if (!respostaN8n.ok) {
+                throw new Error("Erro na comunicação com a Força (n8n).");
+            }
+
+            // Captura o JSON devolvido pelo node 'Respond to Webhook' do n8n
+            const dadosIA = await respostaN8n.json(); 
+            const textoIA = dadosIA.resposta; 
+
             removeTypingIndicator(); // Apaga os pontinhos
-            
-            const textoIA = "Esta é uma resposta simulada. Em breve, esta mensagem virá diretamente do seu fluxo no n8n e do Supabase!";
             
             // Desenha a resposta da IA na tela
             appendMessage(textoIA, false);
@@ -216,8 +233,13 @@ document.addEventListener('DOMContentLoaded', () => {
             // SALVA A RESPOSTA DA IA NO BANCO!
             await API.salvarMensagem(conversaAtualId, 'ia', textoIA);
             
+        } catch (erro) {
+            console.error("Distúrbio na Força:", erro);
+            removeTypingIndicator();
+            appendMessage("Sinto um distúrbio na Força. Não foi possível contatar o Mestre.", false);
+        } finally {
             setAiLoading(false); // Para o brilho
-        }, 2000);
+        }
     };
 
     if (sendBtn && chatInput) {
