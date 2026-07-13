@@ -130,5 +130,69 @@ const API = {
             console.error("Erro ao excluir conversa:", erro.message);
             return { sucesso: false, erro: erro.message };
         }
+    }, // <--- COLOQUE ESTA VÍRGULA AQUI!
+
+    // ==========================================
+    // 8. Puxar as Mensagens de uma Conversa
+    // ==========================================
+    async obterMensagens(conversaId) {
+        try {
+            const { data, error } = await clienteSupabase
+                .from('mensagens')
+                .select('*')
+                .eq('conversa_id', conversaId)
+                .order('created_at', { ascending: true }); // Cronológico (mais velhas em cima)
+
+            if (error) throw error;
+            return { sucesso: true, dados: data };
+        } catch (erro) {
+            console.error("Erro ao buscar mensagens:", erro.message);
+            return { sucesso: false, erro: erro.message };
+        }
+    },
+
+    // ==========================================
+    // 8. Puxar as Mensagens de uma Conversa
+    // ==========================================
+    async obterMensagens(conversaId) {
+        try {
+            const { data, error } = await clienteSupabase
+                .from('mensagens')
+                .select('*')
+                .eq('conversa_id', conversaId)
+                .order('created_at', { ascending: true }); // Cronológico (mais velhas em cima)
+
+            if (error) throw error;
+            return { sucesso: true, dados: data };
+        } catch (erro) {
+            console.error("Erro ao buscar mensagens:", erro.message);
+            return { sucesso: false, erro: erro.message };
+        }
+    }, // <--- COLOQUE ESTA VÍRGULA AQUI!
+
+    // ==========================================
+    // 9. Salvar Nova Mensagem
+    // ==========================================
+    async salvarMensagem(conversaId, autor, conteudo) {
+        try {
+            const { data, error } = await clienteSupabase
+                .from('mensagens')
+                .insert([
+                    {
+                        conversa_id: conversaId,
+                        autor: autor, // Será 'user' ou 'ia'
+                        conteudo: conteudo
+                    }
+                ])
+                .select();
+
+            if (error) throw error;
+            return { sucesso: true, dados: data };
+        } catch (erro) {
+            console.error("Erro ao salvar mensagem:", erro.message);
+            return { sucesso: false, erro: erro.message };
+        }
     }
-};
+    
+}; // Fim do const API
+

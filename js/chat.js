@@ -169,11 +169,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    const handleSendMessage = () => {
+    const handleSendMessage = async () => {
         const text = chatInput.value.trim();
         if (!text) return; 
 
-        // 1. Envia a mensagem do usuário
+        // TRAVA DE SEGURANÇA: Se não houver conversa ativa, cria uma na hora
+        if (!conversaAtualId) {
+            const respostaNova = await API.criarConversa("Nova Transmissão...");
+            if (respostaNova.sucesso) {
+                conversaAtualId = respostaNova.dados.id;
+                renderizarHistorico(); // Atualiza o menu lateral
+            } else {
+                console.error("Erro ao criar conversa para a mensagem.");
+                return;
+            }
+        }
+
+        // 1. Envia a mensagem do usuário (Visual)
         appendMessage(text, true);
 
         // 2. Limpa o input
@@ -185,14 +197,25 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('expandBtn').click(); 
         }
 
-        // 3. Ativa o "pensamento" da IA e mostra os pontinhos
+        // 3. SALVA A MENSAGEM DO USUÁRIO NO BANCO!
+        await API.salvarMensagem(conversaAtualId, 'user', text);
+
+        // 4. Ativa o "pensamento" da IA e mostra os pontinhos
         setAiLoading(true);
         showTypingIndicator();
 
-        // 4. Simulação de resposta 
-        setTimeout(() => {
+        // 5. Simulação de resposta (Logo substituiremos isso pela chamada do n8n)
+        setTimeout(async () => {
             removeTypingIndicator(); // Apaga os pontinhos
-            appendMessage("Esta é uma resposta simulada. Em breve, esta mensagem virá diretamente do seu fluxo no n8n e do Supabase!", false);
+            
+            const textoIA = "Esta é uma resposta simulada. Em breve, esta mensagem virá diretamente do seu fluxo no n8n e do Supabase!";
+            
+            // Desenha a resposta da IA na tela
+            appendMessage(textoIA, false);
+            
+            // SALVA A RESPOSTA DA IA NO BANCO!
+            await API.salvarMensagem(conversaAtualId, 'ia', textoIA);
+            
             setAiLoading(false); // Para o brilho
         }, 2000);
     };
@@ -455,11 +478,37 @@ document.addEventListener('DOMContentLoaded', () => {
         chatAlvoId = null;
     });
 
-    // 4. Lógica de cliques no Dropdown
+    // 4. Lógica de Cliques na Barra Lateral (Opções e Abrir Conversa)
+    
+    // Nova Função: Carregar mensagens da conversa clicada
+    const carregarConversa = async (id) => {
+        conversaAtualId = id;
+        renderizarHistorico(); // Chama para atualizar a cor de "ativo" na lista lateral
+        
+        // Limpa a tela central
+        if (messagesArea) {
+            messagesArea.querySelectorAll('.message:not(.systemMsg)').forEach(msg => msg.remove());
+        }
+
+        // Se o chatInput estava escondido (se implementarmos isso depois), garante que apareça
+        if (chatInput) chatInput.focus();
+
+        // Busca no banco de dados
+        const resposta = await API.obterMensagens(id);
+        
+        if (resposta.sucesso && resposta.dados.length > 0) {
+            // Desenha as mensagens antigas na tela
+            resposta.dados.forEach(msg => {
+                const isUser = msg.autor === 'user'; // Verifica se foi você ou a IA
+                appendMessage(msg.conteudo, isUser);
+            });
+        }
+    };
+
     if (chatHistoryList) {
         chatHistoryList.addEventListener('click', (e) => {
             
-            // Clicou nos 3 pontinhos
+            // A) Clicou nos 3 pontinhos
             const optionsBtn = e.target.closest('.optionsBtn');
             if (optionsBtn) {
                 e.stopPropagation(); 
@@ -474,7 +523,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Clicou em alguma das opções
+            // B) Clicou em alguma das opções do menu Dropdown (Fixar, Renomear, Excluir)
             const dropdownItem = e.target.closest('.dropdownItem');
             if (dropdownItem) {
                 e.stopPropagation();
@@ -489,6 +538,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 liContainer.querySelector('.chatDropdown').classList.remove('show');
                 return;
             }
+
+            // C) Clicou na PRÓPRIA conversa (no corpo dela) para abrir
+            const historyItem = e.target.closest('.historyItem');
+            if (historyItem) {
+                const chatId = historyItem.getAttribute('data-id');
+                // Só carrega se não for a conversa que já está aberta
+                if (chatId && chatId !== conversaAtualId) {
+                    carregarConversa(chatId);
+                }
+            }
         });
     }
 
@@ -498,4 +557,7 @@ document.addEventListener('DOMContentLoaded', () => {
             menu.classList.remove('show');
         });
     });
+
+    
 }); // Fim do evento DOMContentLoaded
+
