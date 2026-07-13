@@ -102,8 +102,13 @@ document.addEventListener('DOMContentLoaded', () => {
         messageDiv.className = `message ${isUser ? 'userMessage' : 'aiMessage'}`;
 
         if (isUser) {
+            // Mensagem do usuário (mantém simples, só quebrando linha)
             messageDiv.innerHTML = `<div class="messageContent">${text.replace(/\n/g, '<br>')}</div>`;
         } else {
+            // Mensagem da IA: Onde a mágica acontece.
+            // O marked.parse traduz o texto do n8n, e a classe markdown-body aplica o estilo Gemini
+            const htmlFormatado = typeof marked !== 'undefined' ? marked.parse(text) : `<p>${text}</p>`;
+
             messageDiv.innerHTML = `
                 <div class="aiAvatar">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -113,8 +118,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         <line x1="12" y1="16.5" x2="12" y2="19.5" />
                     </svg>
                 </div>
-                <div class="messageContent">
-                    <p>${text}</p>
+                <div class="messageContent markdown-body">
+                    ${htmlFormatado}
                 </div>
             `;
         }

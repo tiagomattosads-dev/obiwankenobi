@@ -1039,3 +1039,79 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
 .modalBtnDanger:hover {
     background: #dc2626;
 }
+
+/* =========================================
+   FORMATAÇÃO DA ORATÓRIA DA IA (GEMINI CLONE)
+========================================= */
+.markdown-body {
+    /* Cor de texto levemente acinzentada para leitura longa não cansar, igual ao Gemini */
+    color: #e3e3e3; 
+    font-size: 1rem;
+    line-height: 1.7; /* Respiro maior entre as linhas da narrativa */
+    font-weight: 300;
+}
+
+/* Espaçamento perfeito entre parágrafos */
+.markdown-body p {
+    margin-bottom: 1.5rem;
+}
+
+.markdown-body p:last-child {
+    margin-bottom: 0;
+}
+
+/* Destacando os negritos com branco puro para criar contraste */
+.markdown-body strong {
+    color: #ffffff; 
+    font-weight: 600;
+}
+
+/* Tratamento de Listas (Para ficar igual à imagem do Arsenal de Nayla) */
+.markdown-body ul, 
+.markdown-body ol {
+    margin-top: 0.5rem;
+    margin-bottom: 1.5rem;
+    padding-left: 1.5rem;
+}
+
+.markdown-body li {
+    margin-bottom: 0.8rem;
+    padding-left: 0.5rem;
+}
+
+/* Bolinha vazada para listas não ordenadas */
+.markdown-body ul li {
+    list-style-type: circle; 
+}
+
+/* Listas numéricas alinhadas */
+.markdown-body ol li {
+    list-style-type: decimal;
+}
+
+/* Correção de bug do Marked.js que às vezes quebra o alinhamento da lista */
+.markdown-body li > p {
+    margin-bottom: 0;
+    display: inline;
+}
+
+/* Títulos nativos (caso a IA use # ou ##) */
+.markdown-body h1, 
+.markdown-body h2, 
+.markdown-body h3,
+.markdown-body h4 {
+    color: #ffffff;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+/* Citações e blocos de destaque */
+.markdown-body blockquote {
+    border-left: 3px solid #3b82f6;
+    padding-left: 1rem;
+    margin-left: 0;
+    color: #a0a0a5;
+    font-style: italic;
+}
