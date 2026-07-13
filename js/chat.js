@@ -209,7 +209,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const respostaN8n = await fetch(CONFIG.N8N_WEBHOOK_URL, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'maquiagemdaheloisa': 'pretty little liars' 
                 },
                 body: JSON.stringify({
                     mensagem: text,
