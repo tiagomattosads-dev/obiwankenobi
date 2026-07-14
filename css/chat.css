@@ -1116,6 +1116,11 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
     font-style: italic;
 }
 
+/* Cabeçalho Mobile (Escondido no Desktop por padrão) */
+.mobileHeader {
+    display: none;
+}
+
 /* =========================================
    📱 RESPONSIVIDADE (MOBILE & TABLETS)
    Ponto de quebra: 768px
@@ -1233,5 +1238,30 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
         width: 100vw; /* Toma a tela inteira em celulares */
         max-width: 100%;
         padding: 1.5rem;
+    }
+
+    
+    
+    /* Mostra o cabeçalho no celular */
+    .mobileHeader {
+        display: flex;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        background: var(--bgDark);
+        border-bottom: 1px solid var(--borderColor);
+        gap: 1rem;
+        z-index: 10;
+        flex-shrink: 0; /* Impede que ele seja esmagado pelo chat */
+    }
+
+    .mobileTitle {
+        font-size: 1.1rem;
+        font-weight: 500;
+        color: var(--textMain);
+    }
+    
+    /* E para evitar que a primeira mensagem fique grudada no teto do mobile: */
+    .messagesContainer {
+        padding-top: 1rem; 
     }
 }

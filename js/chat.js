@@ -92,13 +92,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     // RESPONSIVIDADE: ABRIR/FECHAR SIDEBAR MOBILE
     // ==========================================
-    const menuToggle = document.getElementById('menuToggle');
+    const menuToggle = document.getElementById('menuToggle'); // Botão de fechar (dentro da sidebar)
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn'); // Botão de abrir (no topo do celular)
     const sidebar = document.querySelector('.sidebar');
     
-    // Se não existir um overlay escuro exclusivo para a sidebar, usamos o mesmo de configurações
+    // Usamos o overlay para escurecer o fundo quando o menu abre
     const mobileOverlay = document.getElementById('settingsOverlay'); 
 
-    if (menuToggle && sidebar) {
+    if (sidebar) {
         const toggleSidebar = () => {
             sidebar.classList.toggle('open');
             if (window.innerWidth <= 768) {
@@ -106,7 +107,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
-        menuToggle.addEventListener('click', toggleSidebar);
+        // Adiciona o evento de clique aos dois botões
+        if (menuToggle) menuToggle.addEventListener('click', toggleSidebar);
+        if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', toggleSidebar);
         
         // Fecha a sidebar ao clicar na parte escura (fora dela) no mobile
         mobileOverlay.addEventListener('click', () => {
