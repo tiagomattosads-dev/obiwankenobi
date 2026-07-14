@@ -90,6 +90,33 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
+    // RESPONSIVIDADE: ABRIR/FECHAR SIDEBAR MOBILE
+    // ==========================================
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.querySelector('.sidebar');
+    
+    // Se não existir um overlay escuro exclusivo para a sidebar, usamos o mesmo de configurações
+    const mobileOverlay = document.getElementById('settingsOverlay'); 
+
+    if (menuToggle && sidebar) {
+        const toggleSidebar = () => {
+            sidebar.classList.toggle('open');
+            if (window.innerWidth <= 768) {
+                mobileOverlay.classList.toggle('active');
+            }
+        };
+
+        menuToggle.addEventListener('click', toggleSidebar);
+        
+        // Fecha a sidebar ao clicar na parte escura (fora dela) no mobile
+        mobileOverlay.addEventListener('click', () => {
+            if (sidebar.classList.contains('open') && window.innerWidth <= 768) {
+                toggleSidebar();
+            }
+        });
+    }
+
+    // ==========================================
     // 3. LÓGICA DE ENVIO E LOADING DA IA
     // ==========================================
     
@@ -203,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // 3. SALVA A MENSAGEM DO USUÁRIO NO BANCO!
-        await API.salvarMensagem(conversaAtualId, 'user', text);
+        //await API.salvarMensagem(conversaAtualId, 'user', text);
 
         // 4. Ativa o "pensamento" da IA e mostra os pontinhos
         setAiLoading(true);

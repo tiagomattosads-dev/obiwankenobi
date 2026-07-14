@@ -1115,3 +1115,123 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
     color: #a0a0a5;
     font-style: italic;
 }
+
+/* =========================================
+   📱 RESPONSIVIDADE (MOBILE & TABLETS)
+   Ponto de quebra: 768px
+========================================= */
+@media screen and (max-width: 768px) {
+    
+    /* 1. LAYOUT GERAL & ÁREA DE TOQUE */
+    /* Sobrescrevendo a raiz para garantir que nada passe da tela */
+    .appLayout {
+        flex-direction: column;
+        overflow-x: hidden;
+    }
+
+    /* 2. MENU LATERAL (SIDEBAR) ESCONDIDO */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 85vw; /* Ocupa 85% da tela do celular */
+        max-width: 320px;
+        z-index: 8000;
+        padding: 1.5rem; /* Substituindo vw por rem */
+        transform: translateX(-100%); /* Começa fora da tela */
+        transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        box-shadow: 10px 0 30px rgba(0,0,0,0.8);
+    }
+
+    /* Classe que o JS vai adicionar para abrir o menu no celular */
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    /* Conversão dos vws do menu lateral para medidas absolutas */
+    .sidebarHeader { margin-bottom: 2rem; padding: 0; }
+    .sidebarActions { gap: 0.5rem; margin-bottom: 2.5rem; }
+    .navBtn { padding: 1rem; gap: 1rem; font-size: 1rem; border-radius: 8px; }
+    .historyItem { padding: 1rem; gap: 0.8rem; font-size: 1rem; border-radius: 8px; }
+    .sidebarBottom { gap: 0.8rem; padding-top: 1.5rem; }
+
+    /* 3. MENU DROPDOWN DO HISTÓRICO (3 PONTINHOS) */
+    /* Os botões de opção devem estar sempre visíveis no mobile, pois não existe :hover */
+    .optionsBtn {
+        opacity: 1; 
+        padding: 0.5rem;
+    }
+    .chatDropdown {
+        top: 3rem; /* Ajuste para não bugar com os rems novos */
+        right: 0;
+    }
+    .dropdownItem { padding: 0.8rem; font-size: 1rem; gap: 0.8rem; }
+
+    /* 4. ÁREA DE MENSAGENS E CHAT */
+    .messagesContainer {
+        padding: 1.5rem 1rem; /* Margens seguras para celular */
+        gap: 1.5rem;
+    }
+
+    /* Ajuste dos balões de mensagem */
+    .message {
+        max-width: 100%;
+    }
+    .userMessage .messageContent {
+        max-width: 95%; /* Ocupa mais espaço na tela fina */
+        padding: 1rem 1.2rem;
+        border-radius: 18px;
+    }
+    .aiMessage {
+        gap: 0.8rem;
+    }
+    .aiMessage .messageContent {
+        max-width: 100%;
+        padding: 0; /* O Glassmorphism já não tem padding de fundo aqui */
+    }
+
+    /* Reduzindo o padding nativo das listas Markdown da IA no mobile */
+    .markdown-body ul, 
+    .markdown-body ol {
+        padding-left: 1rem;
+    }
+
+    /* 5. INPUT E BARRA DE DIGITAÇÃO */
+    .inputSection {
+        padding: 0 0.5rem 1rem 0.5rem; /* Mais colado nas bordas do celular */
+    }
+
+    .inputContainer {
+        padding: 1rem;
+        border-radius: 20px;
+    }
+
+    textarea#chatInput {
+        margin-bottom: 1rem;
+        font-size: 1rem;
+    }
+
+    /* Botões de Ação do Input em tamanho de toque amigável */
+    .actionsLeft, .actionsRight { gap: 0.8rem; }
+    .actionBtn { gap: 0.5rem; font-size: 0.9rem; }
+    .pillBtn { padding: 0.6rem 1rem; }
+    .iconOnly { width: 40px; height: 40px; }
+    .sendBtn { width: 44px; height: 44px; } /* 44px: Regra da Apple para touch */
+
+    /* 6. MODAL EXPANDIDO (FULLSCREEN MOBILE) */
+    .inputSection.expandedMode .inputContainer {
+        width: 100%; /* Toma a tela toda */
+        height: 100vh; /* Tira o limite de altura */
+        bottom: 0;
+        border-radius: 20px 20px 0 0; /* Arredonda só o topo */
+        padding: 1.5rem 1rem;
+    }
+
+    /* 7. SETTINGS DRAWER */
+    .settingsDrawer {
+        width: 100vw; /* Toma a tela inteira em celulares */
+        max-width: 100%;
+        padding: 1.5rem;
+    }
+}
