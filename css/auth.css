@@ -464,3 +464,92 @@ input {
     background: rgba(255, 255, 255, 0.05);
     color: white;
 }
+
+/* =========================================
+   📱 RESPONSIVIDADE (MOBILE & TABLETS) - TELA DE LOGIN
+   Ponto de quebra: 768px
+========================================= */
+@media screen and (max-width: 768px) {
+    /* 1. Esconde completamente a coluna do vídeo/imagem */
+    .mediaSection {
+        display: none !important;
+    }
+
+    /* 2. O formulário agora toma 100% da tela do celular */
+    .formSection {
+        width: 100vw;
+        min-width: 100%;
+        height: 100vh;
+        padding: 2rem; /* Margens seguras ao redor da tela */
+        align-items: center; /* Centraliza perfeitamente no meio da tela */
+    }
+
+    .formContent {
+        width: 100%;
+        max-width: 100%; 
+        gap: 1.5rem; /* Substituindo vw por rem */
+    }
+
+    /* 3. Ajuste de Fontes e Espaçamentos (Matando o VW) */
+    .formHeader { margin-bottom: 2rem; }
+    .formHeader h2 { font-size: 2rem; } 
+    .formHeader p { font-size: 0.95rem; }
+    
+    .quickAccess { gap: 1rem; margin-bottom: 1.5rem; }
+    .btnOutline { padding: 1rem; border-radius: 8px; font-size: 0.95rem; }
+    
+    .divider { margin-bottom: 1.5rem; font-size: 0.9rem; }
+    .divider span { padding: 0 1rem; }
+    
+    #loginForm, #registerForm { gap: 1.5rem; }
+    
+    .inputGroup { gap: 0.5rem; }
+    .inputGroup label { font-size: 0.85rem; letter-spacing: 1px; }
+    
+    /* 4. Áreas de Toque Nativas (Touch Targets Seguros) */
+    input {
+        padding: 1rem 1.2rem;
+        border-radius: 8px;
+        font-size: 1rem; /* Evita que o iPhone dê zoom automático no input */
+    }
+    
+    .btnSolid {
+        padding: 1rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .formFooter { margin-top: 2rem; font-size: 0.95rem; }
+
+    /* 5. Ajustes do Custom Select no Mobile */
+    .customSelectTrigger {
+        padding: 1rem 1.2rem;
+        border-radius: 8px;
+        font-size: 1rem;
+    }
+    .customSelectOptions {
+        top: calc(100% + 0.5rem);
+        border-radius: 8px;
+    }
+    .customSelectOptions li {
+        padding: 1rem 1.2rem;
+        font-size: 1rem;
+    }
+
+    /* 6. Ajuste do botão de Olho da Senha */
+    .passwordWrapper input { padding-right: 3rem; }
+    .togglePassword { right: 1rem; padding: 0.5rem; }
+
+    /* 7. Ajuste dos Toasts (Avisos flutuantes) para Mobile */
+    .toast-container {
+        bottom: 1rem;
+        right: 1rem;
+        left: 1rem; /* Força o toast a ocupar a largura do celular ao invés de ficar no canto */
+        gap: 0.8rem;
+    }
+    .toast {
+        padding: 1rem;
+        font-size: 0.9rem;
+    }
+}

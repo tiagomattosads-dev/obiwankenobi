@@ -131,13 +131,27 @@ document.addEventListener('DOMContentLoaded', () => {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${isUser ? 'userMessage' : 'aiMessage'}`;
 
+        // Prevenção de erro: Se o texto for undefined/nulo, usa uma string vazia para não travar o JS
+        const textoSeguro = text || "Sinto um distúrbio na Força. O sinal foi perdido.";
+
         if (isUser) {
             // Mensagem do usuário (mantém simples, só quebrando linha)
-            messageDiv.innerHTML = `<div class="messageContent">${text.replace(/\n/g, '<br>')}</div>`;
+            messageDiv.innerHTML = `<div class="messageContent">${textoSeguro.replace(/\n/g, '<br>')}</div>`;
         } else {
-            // Mensagem da IA: Onde a mágica acontece.
-            // O marked.parse traduz o texto do n8n, e a classe markdown-body aplica o estilo Gemini
-            const htmlFormatado = typeof marked !== 'undefined' ? marked.parse(text) : `<p>${text}</p>`;
+            // Mensagem da IA com tradutor de Markdown Blindado
+            let htmlFormatado = `<p>${textoSeguro}</p>`;
+            
+            try {
+                if (typeof marked !== 'undefined') {
+                    // Protege contra diferentes versões da biblioteca Marked
+                    htmlFormatado = typeof marked.parse === 'function' 
+                        ? marked.parse(textoSeguro) 
+                        : marked(textoSeguro);
+                }
+            } catch (erroMarkdown) {
+                console.error("Erro no tradutor de Markdown:", erroMarkdown);
+                htmlFormatado = `<p>${textoSeguro}</p>`; // Fallback seguro
+            }
 
             messageDiv.innerHTML = `
                 <div class="aiAvatar">
@@ -245,7 +259,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'maquiagemdaheloisa': 'pretty little liars' 
+                    'maquiagemdaheloisa': 'pretty little liars',
+                    'ngrok-skip-browser-warning': 'true' // <--- BLINDAGEM CONTRA O NGROK
                 },
                 body: JSON.stringify({
                     mensagem: text,
@@ -253,12 +268,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
             });
 
+            // MODO DETETIVE: Lê a resposta como texto bruto antes de tentar converter
+            const textoBruto = await respostaN8n.text();
+            console.log("STATUS DA RESPOSTA:", respostaN8n.status);
+            console.log("CONTEÚDO BRUTO QUE VOLTOU:", textoBruto);
+
             if (!respostaN8n.ok) {
-                throw new Error("Erro na comunicação com a Força (n8n).");
+                throw new Error(`Erro na comunicação: Status ${respostaN8n.status}`);
             }
 
-            // Captura o JSON devolvido pelo node 'Respond to Webhook' do n8n
-            const dadosIA = await respostaN8n.json(); 
+            // Converte o texto manualmente para JSON
+            const dadosIA = JSON.parse(textoBruto); 
             const textoIA = dadosIA.resposta; 
 
             removeTypingIndicator(); // Apaga os pontinhos
