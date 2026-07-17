@@ -1116,6 +1116,161 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
     font-style: italic;
 }
 
+/* =========================================
+   BOTÃO DE EDITAR MENSAGEM (PODA DO TEMPO)
+========================================= */
+.userMessage {
+    align-items: center; /* Centraliza o botão horizontalmente com o balão */
+    gap: 0.8rem; /* Dá um respiro entre o balão e o botão de lápis */
+}
+
+.userMessage .messageContent {
+    position: relative;
+    /* O padding-right gigante foi removido daqui! */
+}
+
+.editMsgBtn {
+    position: static; /* Sai do modo absolute */
+    background: rgba(255, 255, 255, 0.05); /* Fundo circular igual ao Gemini */
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0; /* Escondido por padrão para manter a tela limpa */
+    transition: all 0.2s ease;
+    flex-shrink: 0; /* Impede o botão de amassar caso o texto seja gigante */
+}
+
+.editMsgBtn img {
+    width: 16px;
+    height: 16px;
+    opacity: 0.8;
+    filter: brightness(0) invert(1);
+}
+
+/* O botão só aparece quando passamos o mouse na mensagem toda */
+.userMessage:hover .editMsgBtn {
+    opacity: 0.6;
+}
+
+/* Quando passamos o mouse especificamente no botão */
+.editMsgBtn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    opacity: 1 !important;
+}
+
+/* Quando passamos o mouse especificamente no botão... */
+.editMsgBtn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    opacity: 1 !important;
+}
+
+/* ... a imagem (ícone) dentro dele fica 100% branca e opaca! */
+.editMsgBtn:hover img {
+    opacity: 1;
+    filter: brightness(0) invert(1);
+}
+
+/* =========================================
+   INLINE EDIT FORM (PODA DA LINHA DO TEMPO)
+========================================= */
+.inlineEditForm {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    width: 100%;
+    min-width: 250px; /* Garante que não fique esmagado */
+}
+
+.inlineEditTextarea {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: var(--textMain);
+    border-radius: 8px;
+    padding: 0.8rem;
+    font-family: inherit;
+    font-size: 1rem;
+    line-height: 1.5;
+    resize: none; /* O JS controla a altura automaticamente */
+    outline: none;
+    overflow: hidden;
+    transition: border-color 0.2s;
+}
+
+.inlineEditTextarea:focus {
+    border-color: #3b82f6; /* Foco azul Obi-Wan */
+}
+
+.inlineEditActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.cancelEditBtn, .saveEditBtn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.cancelEditBtn {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--textMuted);
+}
+
+.cancelEditBtn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--textMain);
+}
+
+.saveEditBtn {
+    background: #3b82f6;
+    border: none;
+    color: white;
+}
+
+.saveEditBtn:hover {
+    background: #2563eb;
+}
+
+.saveEditBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* No Mobile, como não há mouse para dar :hover, deixamos sempre visível */
+@media screen and (max-width: 768px) {
+    .editMsgBtn {
+        opacity: 0.8;
+        width: 36px;
+        height: 36px;
+    }
+}
+
+/* No Mobile, mantemos ele um pouco maior e sempre visível */
+@media screen and (max-width: 768px) {
+    .editMsgBtn {
+        opacity: 0.6;
+        width: 32px;
+        height: 32px;
+        bottom: 0.4rem;
+        right: 0.4rem;
+    }
+    .editMsgBtn img {
+        width: 18px;
+        height: 18px;
+    }
+}
+
 /* Cabeçalho Mobile (Escondido no Desktop por padrão) */
 .mobileHeader {
     display: none;

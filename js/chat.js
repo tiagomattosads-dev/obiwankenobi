@@ -127,30 +127,40 @@ document.addEventListener('DOMContentLoaded', () => {
     let typingBubble = null;
 
     // Constrói o HTML da nova mensagem e joga na tela
-    const appendMessage = (text, isUser = true) => {
+    const appendMessage = (text, isUser = true, messageId = null) => {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${isUser ? 'userMessage' : 'aiMessage'}`;
 
-        // Prevenção de erro: Se o texto for undefined/nulo, usa uma string vazia para não travar o JS
+        // Se já tiver ID (histórico carregado ou IA respondendo), injeta na div
+        if (messageId) {
+            messageDiv.setAttribute('data-id', messageId);
+        }
+
         const textoSeguro = text || "Sinto um distúrbio na Força. O sinal foi perdido.";
 
         if (isUser) {
-            // Mensagem do usuário (mantém simples, só quebrando linha)
-            messageDiv.innerHTML = `<div class="messageContent">${textoSeguro.replace(/\n/g, '<br>')}</div>`;
+            // Se NÃO tem ID (acabou de digitar), o botão de lápis nasce escondido
+            const displayBtn = messageId ? 'flex' : 'none';
+
+            // O botão agora fica do LADO DE FORA do messageContent
+            messageDiv.innerHTML = `
+                <div class="messageContent">
+                    <span class="textContent">${textoSeguro.replace(/\n/g, '<br>')}</span>
+                </div>
+                <button class="editMsgBtn" style="display: ${displayBtn};" aria-label="Editar mensagem" title="Editar e ramificar linha do tempo">
+                    <img src="assets/icons/pen-field (1).svg" alt="Editar">
+                </button>
+            `;
         } else {
             // Mensagem da IA com tradutor de Markdown Blindado
             let htmlFormatado = `<p>${textoSeguro}</p>`;
-            
             try {
                 if (typeof marked !== 'undefined') {
-                    // Protege contra diferentes versões da biblioteca Marked
-                    htmlFormatado = typeof marked.parse === 'function' 
-                        ? marked.parse(textoSeguro) 
-                        : marked(textoSeguro);
+                    htmlFormatado = typeof marked.parse === 'function' ? marked.parse(textoSeguro) : marked(textoSeguro);
                 }
             } catch (erroMarkdown) {
                 console.error("Erro no tradutor de Markdown:", erroMarkdown);
-                htmlFormatado = `<p>${textoSeguro}</p>`; // Fallback seguro
+                htmlFormatado = `<p>${textoSeguro}</p>`; 
             }
 
             messageDiv.innerHTML = `
@@ -170,6 +180,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         messagesArea.appendChild(messageDiv);
         messagesArea.scrollTop = messagesArea.scrollHeight;
+
+        // RETORNO CRUCIAL: Devolve a div para podermos injetar o ID nela depois
+        return messageDiv;
     };
 
     // Mostra o balão com os 3 pontinhos
@@ -222,45 +235,42 @@ document.addEventListener('DOMContentLoaded', () => {
         const text = chatInput.value.trim();
         if (!text) return; 
 
-        // TRAVA DE SEGURANÇA: Se não houver conversa ativa, cria uma na hora
+        // TRAVA DE SEGURANÇA: Cria conversa se não houver
         if (!conversaAtualId) {
             const respostaNova = await API.criarConversa("Nova Transmissão...");
             if (respostaNova.sucesso) {
                 conversaAtualId = respostaNova.dados.id;
-                renderizarHistorico(); // Atualiza o menu lateral
+                renderizarHistorico(); 
             } else {
                 console.error("Erro ao criar conversa para a mensagem.");
                 return;
             }
         }
 
-        // 1. Envia a mensagem do usuário (Visual)
-        appendMessage(text, true);
+        // 1. Envia a mensagem do usuário e GUARDA A REFERÊNCIA do balão!
+        const balaoUsuarioAtual = appendMessage(text, true);
 
         // 2. Limpa o input
         chatInput.value = '';
         chatInput.focus();
-        handleInputResize();
+        if (typeof handleInputResize === 'function') handleInputResize();
         
         if (inputSection.classList.contains('expandedMode')) {
             document.getElementById('expandBtn').click(); 
         }
 
-        // 3. SALVA A MENSAGEM DO USUÁRIO NO BANCO!
-        //await API.salvarMensagem(conversaAtualId, 'user', text);
-
-        // 4. Ativa o "pensamento" da IA e mostra os pontinhos
+        // 3. Ativa o "pensamento" da IA e mostra os pontinhos
         setAiLoading(true);
         showTypingIndicator();
 
         try {
-            // 5. Chamada real para o n8n via Webhook POST
+            // 4. Chamada real para o n8n via Webhook POST
             const respostaN8n = await fetch(CONFIG.N8N_WEBHOOK_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'maquiagemdaheloisa': 'pretty little liars',
-                    'ngrok-skip-browser-warning': 'true' // <--- BLINDAGEM CONTRA O NGROK
+                    'ngrok-skip-browser-warning': 'true' 
                 },
                 body: JSON.stringify({
                     mensagem: text,
@@ -268,27 +278,39 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
             });
 
-            // MODO DETETIVE: Lê a resposta como texto bruto antes de tentar converter
             const textoBruto = await respostaN8n.text();
-            console.log("STATUS DA RESPOSTA:", respostaN8n.status);
-            console.log("CONTEÚDO BRUTO QUE VOLTOU:", textoBruto);
 
             if (!respostaN8n.ok) {
                 throw new Error(`Erro na comunicação: Status ${respostaN8n.status}`);
             }
 
-            // Converte o texto manualmente para JSON
+            // Converte o texto da resposta do n8n para JSON
             const dadosIA = JSON.parse(textoBruto); 
             const textoIA = dadosIA.resposta; 
+            
+            // ====================================================
+            // A MÁGICA DA INJEÇÃO ACONTECE AQUI
+            // ====================================================
+            
+            // A) Pega o ID que o n8n gerou para a mensagem do usuário no Supabase
+            const idMensagemUsuario = dadosIA.userMessageId; 
+
+            // Se recebemos um ID válido, injetamos no balão e revelamos o lápis!
+            if (idMensagemUsuario && balaoUsuarioAtual) {
+                balaoUsuarioAtual.setAttribute('data-id', idMensagemUsuario);
+                const btnEditar = balaoUsuarioAtual.querySelector('.editMsgBtn');
+                if (btnEditar) btnEditar.style.display = 'flex';
+            }
 
             removeTypingIndicator(); // Apaga os pontinhos
             
-            // Desenha a resposta da IA na tela
-            appendMessage(textoIA, false);
+            // B) Pega o ID que o n8n gerou para a resposta do Kenobi
+            const idMensagemIA = dadosIA.aiMessageId;
             
-            // SALVA A RESPOSTA DA IA NO BANCO!
-            await API.salvarMensagem(conversaAtualId, 'ia', textoIA);
-            
+            // Desenha a resposta da IA na tela, já entregando o ID dela
+            appendMessage(textoIA, false, idMensagemIA);
+            // ====================================================
+
         } catch (erro) {
             console.error("Distúrbio na Força:", erro);
             removeTypingIndicator();
@@ -576,9 +598,11 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (resposta.sucesso && resposta.dados.length > 0) {
             // Desenha as mensagens antigas na tela
+            // Desenha as mensagens antigas na tela
             resposta.dados.forEach(msg => {
-                const isUser = msg.autor === 'user'; // Verifica se foi você ou a IA
-                appendMessage(msg.conteudo, isUser);
+                const isUser = msg.autor === 'user'; 
+                // NOVO: Enviando o ID que veio do Supabase para a função
+                appendMessage(msg.conteudo, isUser, msg.id); 
             });
         }
     };
@@ -639,3 +663,127 @@ document.addEventListener('DOMContentLoaded', () => {
     
 }); // Fim do evento DOMContentLoaded
 
+// ==========================================
+    // LÓGICA DE EDIÇÃO (PODA DA LINHA DO TEMPO INLINE)
+    // ==========================================
+    if (messagesArea) {
+        messagesArea.addEventListener('click', async (e) => {
+
+            // ----------------------------------------------------
+            // A. CLIQUE NO BOTÃO DE LÁPIS (Abre modo de edição)
+            // ----------------------------------------------------
+            const editBtn = e.target.closest('.editMsgBtn');
+            if (editBtn) {
+                const messageDiv = editBtn.closest('.message');
+                const contentContainer = messageDiv.querySelector('.messageContent');
+                const textSpan = messageDiv.querySelector('.textContent');
+
+                // Prevenção: Impede abrir vários forms no mesmo balão
+                if (contentContainer.querySelector('.inlineEditForm')) return;
+
+                const originalText = textSpan.innerText;
+
+                // Esconde o botão de lápis e o texto
+                editBtn.style.display = 'none';
+                textSpan.style.display = 'none';
+
+                // Cria o form inline
+                const editForm = document.createElement('div');
+                editForm.className = 'inlineEditForm';
+                editForm.innerHTML = `
+                    <textarea class="inlineEditTextarea">${originalText}</textarea>
+                    <div class="inlineEditActions">
+                        <button class="cancelEditBtn">Cancelar</button>
+                        <button class="saveEditBtn">Atualizar</button>
+                    </div>
+                `;
+
+                contentContainer.appendChild(editForm);
+
+                // Auto-resize para a textarea nascer do mesmo tamanho do texto original
+                const textarea = editForm.querySelector('textarea');
+                textarea.style.height = textarea.scrollHeight + 'px';
+                textarea.addEventListener('input', () => {
+                    textarea.style.height = 'auto';
+                    textarea.style.height = textarea.scrollHeight + 'px';
+                });
+
+                // Foca na textarea e joga o cursor para o final
+                textarea.focus();
+                textarea.selectionStart = textarea.selectionEnd = textarea.value.length;
+                return;
+            }
+
+            // ----------------------------------------------------
+            // B. CLIQUE EM CANCELAR EDIÇÃO
+            // ----------------------------------------------------
+            const cancelBtn = e.target.closest('.cancelEditBtn');
+            if (cancelBtn) {
+                const messageDiv = cancelBtn.closest('.message');
+                const textSpan = messageDiv.querySelector('.textContent');
+                const editBtnPencil = messageDiv.querySelector('.editMsgBtn');
+                const editForm = messageDiv.querySelector('.inlineEditForm');
+
+                // Remove o form e restaura o visual original sem afetar o banco
+                editForm.remove();
+                textSpan.style.display = 'block'; 
+                editBtnPencil.style.display = 'flex';
+                return;
+            }
+
+            // ----------------------------------------------------
+            // C. CLIQUE EM ATUALIZAR (Poda o banco e reenvia)
+            // ----------------------------------------------------
+            const saveBtn = e.target.closest('.saveEditBtn');
+            if (saveBtn) {
+                const messageDiv = saveBtn.closest('.message');
+                const messageId = messageDiv.getAttribute('data-id');
+                const editForm = messageDiv.querySelector('.inlineEditForm');
+                const textarea = editForm.querySelector('textarea');
+                const newText = textarea.value.trim();
+
+                if (!newText) return; // Trava contra atualização vazia
+
+                // Feedback visual de processamento
+                saveBtn.textContent = 'Ajustando o tempo...';
+                saveBtn.disabled = true;
+                textarea.disabled = true;
+
+                // 1. Chama o Back-end para deletar a mensagem clicada e as da frente
+                if (messageId && typeof API.voltarNoTempo === 'function') {
+                    try {
+                        await API.voltarNoTempo(messageId);
+                    } catch (error) {
+                        console.error("Erro na poda da linha do tempo:", error);
+                        saveBtn.textContent = 'Atualizar';
+                        saveBtn.disabled = false;
+                        textarea.disabled = false;
+                        return; // Aborta a deleção visual se a API do Supabase falhar
+                    }
+                }
+
+                // 2. Limpeza visual: Apaga da tela tudo do balão clicado para BAIXO
+                let sibling = messageDiv;
+                while (sibling) {
+                    let next = sibling.nextElementSibling;
+                    sibling.remove();
+                    sibling = next;
+                }
+
+                // 3. Joga o texto novo na barra e FORÇA um novo envio pro n8n
+                if (chatInput) {
+                    chatInput.value = newText;
+                    
+                    if (typeof handleInputResize === 'function') handleInputResize();
+                    
+                    // Dispara a função handleSendMessage (ela refaz o balão visualmente,
+                    // ganha um ID novo do n8n e gera a nova resposta da IA)
+                    if (typeof handleSendMessage === 'function') {
+                        handleSendMessage();
+                    } else {
+                        document.getElementById('sendBtn').click();
+                    }
+                }
+            }
+        });
+    }

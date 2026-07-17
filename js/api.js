@@ -130,7 +130,7 @@ const API = {
             console.error("Erro ao excluir conversa:", erro.message);
             return { sucesso: false, erro: erro.message };
         }
-    }, // <--- COLOQUE ESTA VÍRGULA AQUI!
+    },
 
     // ==========================================
     // 8. Puxar as Mensagens de uma Conversa
@@ -152,25 +152,6 @@ const API = {
     },
 
     // ==========================================
-    // 8. Puxar as Mensagens de uma Conversa
-    // ==========================================
-    async obterMensagens(conversaId) {
-        try {
-            const { data, error } = await clienteSupabase
-                .from('mensagens')
-                .select('*')
-                .eq('conversa_id', conversaId)
-                .order('created_at', { ascending: true }); // Cronológico (mais velhas em cima)
-
-            if (error) throw error;
-            return { sucesso: true, dados: data };
-        } catch (erro) {
-            console.error("Erro ao buscar mensagens:", erro.message);
-            return { sucesso: false, erro: erro.message };
-        }
-    }, // <--- COLOQUE ESTA VÍRGULA AQUI!
-
-    // ==========================================
     // 9. Salvar Nova Mensagem
     // ==========================================
     async salvarMensagem(conversaId, autor, conteudo) {
@@ -180,11 +161,12 @@ const API = {
                 .insert([
                     {
                         conversa_id: conversaId,
-                        autor: autor, // Será 'user' ou 'ia'
+                        autor: autor, 
                         conteudo: conteudo
                     }
                 ])
-                .select();
+                .select()
+                .single(); // Adicionamos single() para ele devolver o objeto exato salvo
 
             if (error) throw error;
             return { sucesso: true, dados: data };
@@ -192,7 +174,35 @@ const API = {
             console.error("Erro ao salvar mensagem:", erro.message);
             return { sucesso: false, erro: erro.message };
         }
-    }
-    
-}; // Fim do const API
+    },
 
+    // ==========================================
+    // 10. Máquina do Tempo (Poda da Linha do Tempo)
+    // ==========================================
+    async voltarNoTempo(mensagemId) {
+        try {
+            // 1. Descobre a data/hora exata em que essa mensagem foi enviada
+            const { data: msgAlvo, error: erroBusca } = await clienteSupabase
+                .from('mensagens')
+                .select('created_at, conversa_id')
+                .eq('id', mensagemId)
+                .single();
+
+            if (erroBusca) throw erroBusca;
+
+            // 2. O Estalo do Thanos: Apaga ela e TUDO o que veio depois dela nesta conversa
+            const { error: erroDelete } = await clienteSupabase
+                .from('mensagens')
+                .delete()
+                .eq('conversa_id', msgAlvo.conversa_id)
+                .gte('created_at', msgAlvo.created_at); // gte = Greater Than or Equal (Maior ou igual)
+
+            if (erroDelete) throw erroDelete;
+            
+            return { sucesso: true };
+        } catch (erro) {
+            console.error("Erro ao voltar no tempo:", erro.message);
+            return { sucesso: false, erro: erro.message };
+        }
+    }
+}; // Fim do const API
