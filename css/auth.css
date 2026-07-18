@@ -191,8 +191,8 @@ input {
    LAYOUT FULLSCREEN E OVERLAYS
 ========================================= */
 .authFullscreenLayout {
-    width: 100vw;
-    height: 100vh;
+    width: 100%; /* Trocar vw por % evita scroll fantasma */
+    min-height: 100dvh; /* O 'dvh' se adapta à barra do celular */
     display: flex;
     background: #000;
 }
@@ -477,9 +477,9 @@ input {
 
     /* 2. O formulário agora toma 100% da tela do celular */
     .formSection {
-        width: 100vw;
+        width: 100%; /* Trocar vw por % */
         min-width: 100%;
-        min-height: 100dvh; /* E troque aqui também (tinha um height: 100vh) */
+        min-height: 100dvh; 
         padding: 2rem; 
         align-items: center; 
     }
@@ -545,11 +545,15 @@ input {
     .toast-container {
         bottom: 1rem;
         right: 1rem;
-        left: 1rem; /* Força o toast a ocupar a largura do celular ao invés de ficar no canto */
+        left: 1rem; 
         gap: 0.8rem;
+        pointer-events: none !important; /* <-- MÁGICA: O toque atravessa a caixa invisível */
+        z-index: 9999; 
     }
+
     .toast {
         padding: 1rem;
         font-size: 0.9rem;
+        pointer-events: auto !important; /* Devolve o toque apenas para a caixinha de aviso */
     }
 }
