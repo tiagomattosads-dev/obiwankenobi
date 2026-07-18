@@ -542,14 +542,21 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    /* Fundo super sutil apenas para destacar o SVG */
     background: rgba(255, 255, 255, 0.05); 
     border: 1px solid var(--borderColor);
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-shrink: 0; /* Impede o ícone de amassar se o texto for muito grande */
+    flex-shrink: 0; 
     color: #3b82f6; 
+    overflow: hidden; /* NOVO: Garante que a imagem não vaze do círculo */
+}
+
+/* NOVO: Estilo para a imagem do avatar */
+.aiAvatar img {
+    width: 33px; /* Mantém o mesmo tamanho interno que o SVG tinha */
+    height: 33px;
+    object-fit: cover; /* Garante que a imagem não fique distorcida */
 }
 
 .aiMessage .messageContent {
