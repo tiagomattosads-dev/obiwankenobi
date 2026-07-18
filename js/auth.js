@@ -34,7 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Fica aguardando qualquer clique, toque na tela ou tecla digitada para iniciar a música
         document.addEventListener('click', iniciarAudio);
         document.addEventListener('keydown', iniciarAudio);
-        
 
         // 3. Captura os elementos de ícone e texto do botão de vídeo
         const playPauseIcon = document.getElementById('playPauseIcon');

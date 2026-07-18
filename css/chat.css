@@ -193,6 +193,8 @@ body {
     flex-direction: column;
     position: relative;
     background: radial-gradient(circle at center, #111114 0%, var(--bgDark) 100%);
+    min-height: 0;
+    height: 100dvh;
 }
 
 .messagesContainer {
@@ -202,6 +204,8 @@ body {
     display: flex;
     flex-direction: column;
     gap: 1.5vw;
+    min-height: 0;
+    scroll-behavior: smooth;
 }
 
 .message p {
@@ -1361,12 +1365,13 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
 ========================================= */
 @media screen and (max-width: 768px) {
     
-    /* 1. LAYOUT GERAL & ÁREA DE TOQUE */
-    /* Sobrescrevendo a raiz para garantir que nada passe da tela */
-    .appLayout {
-        flex-direction: column;
-        overflow-x: hidden;
-    }
+
+.appLayout {
+    display: flex;
+    height: 100dvh; /* Substitui o vh por dvh (Dynamic Viewport Height) */
+    width: 100vw;
+    overflow: hidden; /* Trava qualquer scroll fora do lugar */
+}
 
     /* 2. MENU LATERAL (SIDEBAR) ESCONDIDO */
     .sidebar {
@@ -1438,7 +1443,10 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
 
     /* 5. INPUT E BARRA DE DIGITAÇÃO */
     .inputSection {
-        padding: 0 0.5rem 1rem 0.5rem; /* Mais colado nas bordas do celular */
+        /* O 'env' cria uma margem segura para os iPhones modernos */
+        padding: 0 0.5rem calc(1rem + env(safe-area-inset-bottom)) 0.5rem; 
+        flex-shrink: 0; /* Impede o input de ser esmagado pelo chat */
+        z-index: 10;
     }
 
     .inputContainer {
@@ -1484,8 +1492,10 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
         background: var(--bgDark);
         border-bottom: 1px solid var(--borderColor);
         gap: 1rem;
-        z-index: 10;
-        flex-shrink: 0; /* Impede que ele seja esmagado pelo chat */
+        z-index: 50; /* Aumentado para garantir que fique por cima de tudo */
+        flex-shrink: 0; /* Impede que ele seja esmagado */
+        position: sticky; /* Gruda no teto */
+        top: 0;
     }
 
     .mobileTitle {
