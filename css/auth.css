@@ -479,9 +479,9 @@ input {
     .formSection {
         width: 100vw;
         min-width: 100%;
-        height: 100vh;
-        padding: 2rem; /* Margens seguras ao redor da tela */
-        align-items: center; /* Centraliza perfeitamente no meio da tela */
+        min-height: 100dvh; /* E troque aqui também (tinha um height: 100vh) */
+        padding: 2rem; 
+        align-items: center; 
     }
 
     .formContent {
