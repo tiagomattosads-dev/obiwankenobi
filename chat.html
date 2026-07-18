@@ -6,6 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mestre Kenobi</title>
 
+    <!-- Tags Mágicas para virar Web App Nativo -->
+    <meta name="theme-color" content="#0a0a0c">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/chat.css">
 </head>
@@ -63,7 +70,7 @@
                             <line x1="5" y1="12" x2="19" y2="12"></line>
                         </svg>
                     </span>
-                    Nova conversa
+                    <span class="navText">Nova conversa</span>
                 </button>
 
                 <button id="searchChatsBtn" class="navBtn">
@@ -74,7 +81,7 @@
                             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                         </svg>
                     </span>
-                    Pesquisar conversas
+                    <span class="navText">Pesquisar conversas</span>
                 </button>
             </div>
 
@@ -205,7 +212,7 @@
                             </path>
                         </svg>
                     </span>
-                    Configurações
+                    <span class="navText">Configurações</span>
                 </button>
                 <button id="profileBtn" class="navBtn">
                     <span class="icon">
@@ -215,7 +222,7 @@
                             <circle cx="12" cy="7" r="4"></circle>
                         </svg>
                     </span>
-                    <span id="sidebarUserName">Mestre (...)</span>
+                    <span class="navText" id="sidebarUserName">Mestre (...)</span>
                 </button>
 
                 <!-- Botão de Logout unificado na mesma div principal -->
@@ -228,7 +235,7 @@
                             <line x1="21" y1="12" x2="9" y2="12"></line>
                         </svg>
                     </span>
-                    Desconectar
+                    <span class="navText">Desconectar</span>
                 </button>
             </div>
         </aside>

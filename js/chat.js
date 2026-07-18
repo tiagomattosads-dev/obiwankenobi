@@ -90,28 +90,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // RESPONSIVIDADE: ABRIR/FECHAR SIDEBAR MOBILE
+    // RESPONSIVIDADE E MENU RETRÁTIL (DESKTOP/MOBILE)
     // ==========================================
-    const menuToggle = document.getElementById('menuToggle'); // Botão de fechar (dentro da sidebar)
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn'); // Botão de abrir (no topo do celular)
+    const menuToggle = document.getElementById('menuToggle'); 
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn'); 
     const sidebar = document.querySelector('.sidebar');
-    
-    // Usamos o overlay para escurecer o fundo quando o menu abre
     const mobileOverlay = document.getElementById('settingsOverlay'); 
 
     if (sidebar) {
         const toggleSidebar = () => {
-            sidebar.classList.toggle('open');
             if (window.innerWidth <= 768) {
+                // No Mobile: Abre e fecha a gaveta lateral
+                sidebar.classList.toggle('open');
                 mobileOverlay.classList.toggle('active');
+            } else {
+                // No Desktop: Alterna entre expandido e retrátil (só ícones)
+                sidebar.classList.toggle('collapsed');
             }
         };
 
-        // Adiciona o evento de clique aos dois botões
         if (menuToggle) menuToggle.addEventListener('click', toggleSidebar);
         if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', toggleSidebar);
         
-        // Fecha a sidebar ao clicar na parte escura (fora dela) no mobile
         mobileOverlay.addEventListener('click', () => {
             if (sidebar.classList.contains('open') && window.innerWidth <= 768) {
                 toggleSidebar();
@@ -404,19 +404,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const renderizarHistorico = async () => {
         if (!chatHistoryList) return;
         
-        chatHistoryList.innerHTML = '<li class="historyItem" style="justify-content:center; opacity:0.5;">Buscando registros...</li>';
+        // CORREÇÃO 1: Adicionado o <span class="navText">
+        chatHistoryList.innerHTML = '<li class="historyItem" style="justify-content:center; opacity:0.5;"><span class="navText">Buscando registros...</span></li>';
         
         const resposta = await API.obterConversas();
         
         if (!resposta.sucesso) {
-            chatHistoryList.innerHTML = '<li class="historyItem" style="color:var(--danger); justify-content:center;">Erro na rede segura.</li>';
+            // CORREÇÃO 2: Adicionado o <span class="navText">
+            chatHistoryList.innerHTML = '<li class="historyItem" style="color:var(--danger); justify-content:center;"><span class="navText">Erro na rede segura.</span></li>';
             return;
         }
 
         chatHistoryList.innerHTML = ''; // Limpa a lista
 
         if (resposta.dados.length === 0) {
-            chatHistoryList.innerHTML = '<li class="historyItem" style="justify-content:center; opacity:0.5;">Nenhuma transmissão ainda.</li>';
+            // CORREÇÃO 3: Adicionado o <span class="navText">
+            chatHistoryList.innerHTML = '<li class="historyItem" style="justify-content:center; opacity:0.5;"><span class="navText">Nenhuma transmissão ainda.</span></li>';
             return;
         }
 

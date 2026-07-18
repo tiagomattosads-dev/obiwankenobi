@@ -1,0 +1,20 @@
+{
+  "name": "Mestre Kenobi",
+  "short_name": "Kenobi",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0a0a0c",
+  "theme_color": "#0a0a0c",
+  "icons": [
+    {
+      "src": "assets/img/obiwankenobiprofile.webp",
+      "sizes": "192x192",
+      "type": "image/webp"
+    },
+    {
+      "src": "assets/img/obiwankenobiprofile.webp",
+      "sizes": "512x512",
+      "type": "image/webp"
+    }
+  ]
+}

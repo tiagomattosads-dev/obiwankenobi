@@ -46,6 +46,10 @@ body {
     display: flex;
     flex-direction: column;
     padding: 1vw;
+    
+    /* ADICIONE ESTAS DUAS LINHAS: */
+    transition: width 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    overflow-x: hidden; 
 }
 
 .sidebarHeader {
@@ -109,6 +113,19 @@ body {
 .sidebarMiddle {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden; /* NOVO: Impede qualquer barra de rolagem horizontal de existir */
+}
+
+/* NOVO: Estiliza a barra de rolagem da área de chats para ficar fininha e futurista */
+.sidebarMiddle::-webkit-scrollbar {
+    width: 4px;
+}
+.sidebarMiddle::-webkit-scrollbar-track {
+    background: transparent;
+}
+.sidebarMiddle::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
 }
 
 .sectionTitle {
@@ -1260,6 +1277,53 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
 .saveEditBtn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+/* =========================================
+   ESTADO RETRÁTIL (COLLAPSED) NO DESKTOP
+========================================= */
+@media screen and (min-width: 769px) {
+    .sidebar.collapsed {
+        width: 80px; /* Largura fina idêntica ao Gemini */
+        padding: 1vw 0.5vw;
+    }
+
+    /* Esconde todos os textos, títulos e o logotipo Kenobi (Deixa só o ícone do hambúrguer no topo) */
+    .sidebar.collapsed .brand,
+    .sidebar.collapsed .navText,
+    .sidebar.collapsed .sectionTitle,
+    .sidebar.collapsed .chatTitle,
+    .sidebar.collapsed .optionsBtn {
+        opacity: 0;
+        visibility: hidden;
+        display: none;
+    }
+
+    /* Centraliza o botão do Menu no topo */
+    .sidebar.collapsed .sidebarHeader {
+        justify-content: center;
+        padding: 0;
+    }
+
+    /* Centraliza os botões principais de ação */
+    .sidebar.collapsed .navBtn {
+        justify-content: center;
+        padding: 1vw 0;
+    }
+
+    .sidebar.collapsed .navBtn .icon {
+        margin: 0;
+    }
+
+    /* Centraliza os ícones do histórico de conversas */
+    .sidebar.collapsed .historyItem {
+        justify-content: center;
+        padding: 1vw 0;
+    }
+
+    .sidebar.collapsed .chatIcon {
+        margin: 0;
+    }
 }
 
 /* No Mobile, como não há mouse para dar :hover, deixamos sempre visível */
