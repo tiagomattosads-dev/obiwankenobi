@@ -72,6 +72,14 @@ body {
     justify-content: center;
 }
 
+/* NOVO: Estilo para a foto no menu lateral */
+.brandIcon img {
+    width: 28px; /* Um pouco menor para ficar elegante no menu */
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
 .sidebarActions {
     display: flex;
     flex-direction: column;

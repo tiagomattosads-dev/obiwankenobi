@@ -187,12 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         typingBubble.innerHTML = `
             <div class="aiAvatar">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M5 10 c0-5 3-7 7-7 5 0 7 2.5 7 6 0 1.5-.5 3-1 4 -1-2-3.5-3-6-3 -2 0-4 1-5 2.5 C5.5 11.5 5 10.5 5 10 Z" />
-                    <path d="M6.5 11.5 v2.5 c0 3 2.5 5.5 5.5 5.5 s5.5-2.5 5.5-5.5 v-2.5" />
-                    <path d="M9.5 15.5 Q12 14 14.5 15.5" />
-                    <line x1="12" y1="16.5" x2="12" y2="19.5" />
-                </svg>
+                <img src="assets/img/obiwankenobiprofile.webp" alt="Kenobi">
             </div>
             <div class="messageContent">
                 <div class="typingIndicator">
