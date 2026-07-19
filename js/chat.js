@@ -139,27 +139,32 @@ document.addEventListener('DOMContentLoaded', () => {
         const textoSeguro = text || "Sinto um distúrbio na Força. O sinal foi perdido.";
 
         if (isUser) {
-            // Se NÃO tem ID (acabou de digitar), o botão de lápis nasce escondido
             const displayBtn = messageId ? 'flex' : 'none';
 
-            // O botão agora fica do LADO DE FORA do messageContent
             messageDiv.innerHTML = `
                 <div class="messageContent">
                     <span class="textContent">${textoSeguro.replace(/\n/g, '<br>')}</span>
                 </div>
-                <button class="editMsgBtn" style="display: ${displayBtn};" aria-label="Editar mensagem" title="Editar e ramificar linha do tempo">
-                    <img src="assets/icons/pen-field (1).svg" alt="Editar">
-                </button>
+                <div class="msgActions">
+                    <button class="actionIconBtn editMsgBtn" style="display: ${displayBtn};" aria-label="Editar" title="Editar linha do tempo">
+                        <!-- SVG de Lápis -->
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    </button>
+                    <button class="actionIconBtn copyMsgBtn" style="display: ${displayBtn};" aria-label="Copiar" title="Copiar mensagem">
+                        <!-- SVG de Prancheta -->
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    </button>
+                </div>
             `;
-        } else {
-            // Mensagem da IA com tradutor de Markdown Blindado
+            } else {
+            // Mensagem da IA
             let htmlFormatado = `<p>${textoSeguro}</p>`;
             try {
                 if (typeof marked !== 'undefined') {
                     htmlFormatado = typeof marked.parse === 'function' ? marked.parse(textoSeguro) : marked(textoSeguro);
                 }
             } catch (erroMarkdown) {
-                console.error("Erro no tradutor de Markdown:", erroMarkdown);
+                console.error("Erro no tradutor:", erroMarkdown);
                 htmlFormatado = `<p>${textoSeguro}</p>`; 
             }
 
@@ -167,8 +172,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="aiAvatar">
                     <img src="assets/img/obiwankenobiprofile.webp" alt="Kenobi">
                 </div>
-                <div class="messageContent markdown-body">
-                    ${htmlFormatado}
+                <div class="aiContentWrapper">
+                    <div class="messageContent markdown-body">
+                        ${htmlFormatado}
+                    </div>
+                    <div class="msgActions">
+                        <button class="actionIconBtn copyMsgBtn" aria-label="Copiar" title="Copiar resposta">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                    </div>
                 </div>
             `;
         }
@@ -291,6 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 balaoUsuarioAtual.setAttribute('data-id', idMensagemUsuario);
                 const btnEditar = balaoUsuarioAtual.querySelector('.editMsgBtn');
                 if (btnEditar) btnEditar.style.display = 'flex';
+                if (btnCopiar) btnCopiar.style.display = 'flex';
             }
 
             removeTypingIndicator(); // Apaga os pontinhos
@@ -775,6 +788,58 @@ document.addEventListener('DOMContentLoaded', () => {
                         document.getElementById('sendBtn').click();
                     }
                 }
+            }
+
+            // ----------------------------------------------------
+            // D. CLIQUE NO BOTÃO DE COPIAR (USER & IA)
+            // ----------------------------------------------------
+            const copyBtn = e.target.closest('.copyMsgBtn');
+            if (copyBtn) {
+                const messageDiv = copyBtn.closest('.message');
+                const isUser = messageDiv.classList.contains('userMessage');
+                
+                let plainText = "";
+                let htmlText = "";
+                
+                if (isUser) {
+                    const textSpan = messageDiv.querySelector('.textContent');
+                    plainText = textSpan.innerText; 
+                    htmlText = textSpan.innerHTML; // Pega as quebras de linha (<br>)
+                } else {
+                    const markdownBody = messageDiv.querySelector('.markdown-body');
+                    plainText = markdownBody.innerText;
+                    htmlText = markdownBody.innerHTML; // Captura o HTML completo (negritos, tabelas, títulos)
+                }
+
+                try {
+                    // API moderna para copiar Formatação Rica (Rich Text)
+                    if (navigator.clipboard && window.ClipboardItem) {
+                        const htmlBlob = new Blob([htmlText], { type: 'text/html' });
+                        const textBlob = new Blob([plainText], { type: 'text/plain' });
+                        
+                        const clipboardItem = new ClipboardItem({
+                            'text/html': htmlBlob,
+                            'text/plain': textBlob
+                        });
+                        
+                        await navigator.clipboard.write([clipboardItem]);
+                    } else {
+                        // Plano B de segurança (Fallback) para navegadores antigos
+                        await navigator.clipboard.writeText(plainText);
+                    }
+                    
+                    // Feedback Visual Temporário (Ícone de Check Verde)
+                    const originalHTML = copyBtn.innerHTML;
+                    copyBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+                    
+                    // Retorna ao ícone normal após 2 segundos
+                    setTimeout(() => {
+                        copyBtn.innerHTML = originalHTML;
+                    }, 2000);
+                } catch (err) {
+                    console.error('Falha ao copiar da Força: ', err);
+                }
+                return;
             }
         });
     }

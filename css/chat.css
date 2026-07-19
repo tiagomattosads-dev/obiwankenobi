@@ -8,7 +8,7 @@
     --textMain: #ffffff;
     --textMuted: #888890;
     --borderColor: rgba(255, 255, 255, 0.08);
-    
+
     /* Variáveis do Glassmorphism */
     --glassBg: rgba(18, 18, 20, 0.75);
     --glassBorder: rgba(255, 255, 255, 0.12);
@@ -46,10 +46,10 @@ body {
     display: flex;
     flex-direction: column;
     padding: 1vw;
-    
+
     /* ADICIONE ESTAS DUAS LINHAS: */
     transition: width 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-    overflow-x: hidden; 
+    overflow-x: hidden;
 }
 
 .sidebarHeader {
@@ -78,7 +78,8 @@ body {
 
 /* NOVO: Estilo para a foto no menu lateral */
 .brandIcon img {
-    width: 28px; /* Um pouco menor para ficar elegante no menu */
+    width: 28px;
+    /* Um pouco menor para ficar elegante no menu */
     height: 28px;
     border-radius: 50%;
     object-fit: cover;
@@ -105,7 +106,7 @@ body {
 }
 
 .iconBtn:hover {
-    background: rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.05);
     color: var(--textMain);
 }
 
@@ -113,16 +114,19 @@ body {
 .sidebarMiddle {
     flex: 1;
     overflow-y: auto;
-    overflow-x: hidden; /* NOVO: Impede qualquer barra de rolagem horizontal de existir */
+    overflow-x: hidden;
+    /* NOVO: Impede qualquer barra de rolagem horizontal de existir */
 }
 
 /* NOVO: Estiliza a barra de rolagem da área de chats para ficar fininha e futurista */
 .sidebarMiddle::-webkit-scrollbar {
     width: 4px;
 }
+
 .sidebarMiddle::-webkit-scrollbar-track {
     background: transparent;
 }
+
 .sidebarMiddle::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 10px;
@@ -153,7 +157,7 @@ body {
 }
 
 .historyItem:hover {
-    background: rgba(255,255,255,0.03);
+    background: rgba(255, 255, 255, 0.03);
     color: var(--textMain);
 }
 
@@ -181,7 +185,7 @@ body {
 }
 
 .navBtn:hover {
-    background: rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.05);
 }
 
 /* =========================================
@@ -247,7 +251,7 @@ body {
     top: -20px;
     left: 10%;
     /* Um vermelho neon vibrante para dar o contraste perfeito */
-    background: #ff2a2a; 
+    background: #ff2a2a;
 }
 
 .blueGlow {
@@ -263,15 +267,15 @@ body {
     background: var(--glassBg);
     border-radius: 24px;
     padding: 1.2vw 1.5vw;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255,255,255,0.15);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.15);
     border: 1px solid var(--glassBorder);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
-    
+
     transition: all 3s cubic-bezier(0.2, 0.8, 0.2, 1);
-    
+
     /* NOVA REGRA: Define que a animação nasce da base do elemento */
-    transform-origin: bottom center; 
+    transform-origin: bottom center;
 }
 
 
@@ -301,7 +305,8 @@ textarea#chatInput::placeholder {
     align-items: center;
 }
 
-.actionsLeft, .actionsRight {
+.actionsLeft,
+.actionsRight {
     display: flex;
     align-items: center;
     gap: 0.8vw;
@@ -311,7 +316,7 @@ textarea#chatInput::placeholder {
     display: flex;
     align-items: center;
     gap: 0.5vw;
-    background: rgba(255,255,255,0.03);
+    background: rgba(255, 255, 255, 0.03);
     border: 1px solid transparent;
     color: var(--textMuted);
     cursor: pointer;
@@ -320,7 +325,7 @@ textarea#chatInput::placeholder {
 }
 
 .actionBtn:hover {
-    background: rgba(255,255,255,0.08);
+    background: rgba(255, 255, 255, 0.08);
     color: var(--textMain);
 }
 
@@ -338,9 +343,9 @@ textarea#chatInput::placeholder {
 }
 
 .actionBtn.active {
-    background: rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.1);
     color: var(--textMain);
-    border: 1px solid rgba(255,255,255,0.15);
+    border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .chevron {
@@ -378,13 +383,15 @@ textarea#chatInput::placeholder {
     position: relative;
     width: 100%;
     display: flex;
-    flex-direction: column; /* Necessário para preencher o modal depois */
+    flex-direction: column;
+    /* Necessário para preencher o modal depois */
 }
 
 textarea#chatInput {
-    max-height: 120px; 
+    max-height: 120px;
     overflow-y: hidden;
-    padding-right: 40px; /* Espaço fixo e seguro para o botão não sobrepor o texto */
+    padding-right: 40px;
+    /* Espaço fixo e seguro para o botão não sobrepor o texto */
     width: 100%;
 }
 
@@ -392,13 +399,16 @@ textarea#chatInput {
 textarea#chatInput::-webkit-scrollbar {
     width: 6px;
 }
+
 textarea#chatInput::-webkit-scrollbar-track {
     background: transparent;
 }
+
 textarea#chatInput::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.15);
     border-radius: 10px;
 }
+
 textarea#chatInput::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.3);
 }
@@ -416,12 +426,13 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
     border-radius: 50%;
     display: flex;
     transition: 0.2s;
-    z-index: 5; /* Garante que o botão fique acima do scrollbar e do texto */
+    z-index: 5;
+    /* Garante que o botão fique acima do scrollbar e do texto */
 }
 
 .expandBtn:hover {
     color: var(--textMain);
-    background: rgba(255,255,255,0.08);
+    background: rgba(255, 255, 255, 0.08);
 }
 
 .hidden {
@@ -443,7 +454,7 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
     z-index: 10;
-    
+
     /* SUAVIZAÇÃO DO FUNDO ESCURO */
     opacity: 0;
     visibility: hidden;
@@ -458,7 +469,7 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
 
 /* 1. Remove a âncora inferior e oculta brilhos quando expandido */
 .inputSection.expandedMode {
-    position: static; 
+    position: static;
 }
 
 .inputSection.expandedMode .glowEffect {
@@ -470,24 +481,24 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
 /* 2. O Modal centralizado perfeitamente na área do Chat */
 .inputSection.expandedMode .inputContainer {
     position: absolute;
-    
+
     /* 1. Troca o Top pelo Bottom. Agora ele está preso no chão e vai esticar para cima! */
-    bottom: 5vh; 
-    
+    bottom: 5vh;
+
     /* 2. Remoção do left 50% e do transform. O margin: 0 auto centraliza sem bugar a animação */
     left: 0;
     right: 0;
-    margin: 0 auto; 
-    
-    width: 85%; 
+    margin: 0 auto;
+
+    width: 85%;
     max-width: 900px;
-    height: 85vh; 
+    height: 85vh;
     z-index: 20;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), inset 0 1px 1px rgba(255,255,255,0.15);
-    padding: 1.5vw 2vw; 
-    
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+    padding: 1.5vw 2vw;
+
     /* 3. Uma animação dedicada para dar um "empurrãozinho" macio para cima */
     animation: modalSlideUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
@@ -498,6 +509,7 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
         opacity: 0;
         transform: translateY(30px) scale(0.95);
     }
+
     100% {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -535,28 +547,32 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
     display: flex;
     width: 100%;
     max-width: 850px;
-    margin: 0 auto; /* Centraliza o fluxo da conversa na tela */
+    margin: 0 auto;
+    /* Centraliza o fluxo da conversa na tela */
 }
 
 .messageContent {
     font-size: 1rem;
     line-height: 1.6;
     color: var(--textMain);
-    word-wrap: break-word; 
+    word-wrap: break-word;
 }
 
 /* -----------------------------------------
    Mensagem do Usuário
 ----------------------------------------- */
 .userMessage {
-    justify-content: flex-end; /* Joga para a direita */
+    justify-content: flex-end;
+    /* Joga para a direita */
 }
 
 .userMessage .messageContent {
-    background-color: #2a2a2f; /* Cinza escuro elegante */
+    background-color: #2a2a2f;
+    /* Cinza escuro elegante */
     padding: 1vw 1.5vw;
     border-radius: 24px;
-    max-width: 85%; /* Evita que balões enormes batam na borda oposta */
+    max-width: 85%;
+    /* Evita que balões enormes batam na borda oposta */
 }
 
 /* -----------------------------------------
@@ -564,28 +580,31 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
 ----------------------------------------- */
 .aiMessage {
     justify-content: flex-start;
-    gap: 1.2vw; 
+    gap: 1.2vw;
 }
 
 .aiAvatar {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.05); 
+    background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--borderColor);
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-shrink: 0; 
-    color: #3b82f6; 
-    overflow: hidden; /* NOVO: Garante que a imagem não vaze do círculo */
+    flex-shrink: 0;
+    color: #3b82f6;
+    overflow: hidden;
+    /* NOVO: Garante que a imagem não vaze do círculo */
 }
 
 /* NOVO: Estilo para a imagem do avatar */
 .aiAvatar img {
-    width: 33px; /* Mantém o mesmo tamanho interno que o SVG tinha */
+    width: 33px;
+    /* Mantém o mesmo tamanho interno que o SVG tinha */
     height: 33px;
-    object-fit: cover; /* Garante que a imagem não fique distorcida */
+    object-fit: cover;
+    /* Garante que a imagem não fique distorcida */
 }
 
 .aiMessage .messageContent {
@@ -615,43 +634,43 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
 /* Fundo escuro atrás do painel */
 .settingsOverlay {
     position: fixed;
-    top: 0; 
-    left: 0; 
-    width: 100vw; 
+    top: 0;
+    left: 0;
+    width: 100vw;
     height: 100vh;
     background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(2px);
     -webkit-backdrop-filter: blur(2px);
     z-index: 40;
-    
-    opacity: 0; 
+
+    opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
 }
 
 .settingsOverlay.active {
-    opacity: 1; 
+    opacity: 1;
     visibility: visible;
 }
 
 /* O Painel em si */
 .settingsDrawer {
     position: fixed;
-    top: 0; 
+    top: 0;
     right: 0;
-    width: 320px; 
+    width: 320px;
     height: 100vh;
     background: var(--bgPanel);
     border-left: 1px solid var(--borderColor);
     z-index: 50;
     padding: 2vw;
-    display: flex; 
+    display: flex;
     flex-direction: column;
-    
+
     /* O painel começa 100% para fora da tela (escondido à direita) */
     transform: translateX(100%);
     transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-    box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
 }
 
 /* Quando o JS injetar esta classe, ele desliza para dentro */
@@ -660,49 +679,50 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
 }
 
 .drawerHeader {
-    display: flex; 
-    justify-content: space-between; 
+    display: flex;
+    justify-content: space-between;
     align-items: center;
     margin-bottom: 2vw;
     border-bottom: 1px solid var(--borderColor);
     padding-bottom: 1vw;
 }
 
-.drawerHeader h2 { 
-    font-size: 1.1rem; 
-    font-weight: 500; 
+.drawerHeader h2 {
+    font-size: 1.1rem;
+    font-weight: 500;
     color: var(--textMain);
 }
 
-.settingGroup { 
-    margin-bottom: 1.5vw; 
+.settingGroup {
+    margin-bottom: 1.5vw;
 }
 
-.settingGroup label { 
-    display: block; 
-    margin-bottom: 0.5vw; 
-    color: var(--textMuted); 
+.settingGroup label {
+    display: block;
+    margin-bottom: 0.5vw;
+    color: var(--textMuted);
     font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
 .settingSelect {
-    width: 100%; 
-    background: var(--bgDark); 
+    width: 100%;
+    background: var(--bgDark);
     color: var(--textMain);
-    border: 1px solid var(--borderColor); 
-    padding: 0.8vw; 
+    border: 1px solid var(--borderColor);
+    padding: 0.8vw;
     border-radius: 8px;
-    outline: none; 
+    outline: none;
     font-family: inherit;
     font-size: 1rem;
     cursor: pointer;
     transition: border-color 0.2s ease;
 }
 
-.settingSelect:hover, .settingSelect:focus {
-    border-color: rgba(255,255,255,0.3);
+.settingSelect:hover,
+.settingSelect:focus {
+    border-color: rgba(255, 255, 255, 0.3);
 }
 
 /* =========================================
@@ -710,17 +730,21 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
 ========================================= */
 
 @keyframes pulseGlow {
-    0% { 
-        opacity: 0.45; 
-        transform: scale(1); 
+    0% {
+        opacity: 0.45;
+        transform: scale(1);
     }
-    50% { 
-        opacity: 0.85; /* Fica mais forte */
-        transform: scale(1.15); /* Expande levemente */
+
+    50% {
+        opacity: 0.85;
+        /* Fica mais forte */
+        transform: scale(1.15);
+        /* Expande levemente */
     }
-    100% { 
-        opacity: 0.45; 
-        transform: scale(1); 
+
+    100% {
+        opacity: 0.45;
+        transform: scale(1);
     }
 }
 
@@ -738,7 +762,8 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
     width: 100vw;
     height: 100vh;
     background-color: #000000;
-    z-index: 9999; /* Fica por cima de absolutamente tudo */
+    z-index: 9999;
+    /* Fica por cima de absolutamente tudo */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -753,7 +778,8 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
 }
 
 .welcomeSubtitle {
-    color: #3b82f6; /* Azul do sabre de luz */
+    color: #3b82f6;
+    /* Azul do sabre de luz */
     font-size: 0.9rem;
     text-transform: uppercase;
     letter-spacing: 0.3em;
@@ -766,8 +792,9 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
     font-size: 2.5rem;
     font-weight: 300;
     letter-spacing: 0.1em;
-    min-height: 3rem; /* Mantém a altura para a tela não pular */
-    
+    min-height: 3rem;
+    /* Mantém a altura para a tela não pular */
+
     /* Efeito do cursor azul piscando no final da letra */
     border-right: 3px solid #3b82f6;
     padding-right: 5px;
@@ -776,16 +803,42 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
 
 /* Animação apenas para o cursor piscar */
 @keyframes blinkCursor {
-    from, to { border-color: transparent; }
-    50% { border-color: #3b82f6; }
+
+    from,
+    to {
+        border-color: transparent;
+    }
+
+    50% {
+        border-color: #3b82f6;
+    }
 }
 
 /* Animação que faz o texto aparecer suavemente e depois sumir */
 @keyframes fadeInFadeOut {
-    0% { opacity: 0; transform: translateY(10px); filter: blur(4px); }
-    30% { opacity: 1; transform: translateY(0); filter: blur(0); }
-    70% { opacity: 1; transform: translateY(0); filter: blur(0); }
-    100% { opacity: 0; transform: translateY(-10px); filter: blur(4px); }
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
+        filter: blur(4px);
+    }
+
+    30% {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+    }
+
+    70% {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-10px);
+        filter: blur(4px);
+    }
 }
 
 /* Classe que o JS vai usar para sumir com o fundo preto inteiro */
@@ -801,31 +854,45 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
     display: flex;
     align-items: center;
     gap: 0.4vw;
-    padding: 0.8vw 0; /* Alinha com a altura do texto padrão */
+    padding: 0.8vw 0;
+    /* Alinha com a altura do texto padrão */
 }
 
 .typingDot {
     width: 6px;
     height: 6px;
-    background-color: #3b82f6; /* Azul Jedi */
+    background-color: #3b82f6;
+    /* Azul Jedi */
     border-radius: 50%;
     opacity: 0.5;
     animation: typingBounce 1.4s infinite ease-in-out both;
 }
 
 /* Criando o efeito de onda atrasando a animação de cada ponto */
-.typingDot:nth-child(1) { animation-delay: -0.32s; }
-.typingDot:nth-child(2) { animation-delay: -0.16s; }
-.typingDot:nth-child(3) { animation-delay: 0s; }
+.typingDot:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.typingDot:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+.typingDot:nth-child(3) {
+    animation-delay: 0s;
+}
 
 @keyframes typingBounce {
-    0%, 80%, 100% { 
-        transform: scale(0.6); 
-        opacity: 0.4; 
+
+    0%,
+    80%,
+    100% {
+        transform: scale(0.6);
+        opacity: 0.4;
     }
-    40% { 
-        transform: scale(1.2); 
-        opacity: 1; 
+
+    40% {
+        transform: scale(1.2);
+        opacity: 1;
     }
 }
 
@@ -833,7 +900,8 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
    HISTÓRICO DE CONVERSAS & DROPDOWN
 ========================================= */
 .historyItem {
-    position: relative; /* Necessário para ancorar o dropdown */
+    position: relative;
+    /* Necessário para ancorar o dropdown */
     display: flex;
     align-items: center;
     gap: 0.6vw;
@@ -853,7 +921,8 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
 .chatIcon {
     display: flex;
     align-items: center;
-    flex-shrink: 0; /* Impede o ícone de amassar */
+    flex-shrink: 0;
+    /* Impede o ícone de amassar */
 }
 
 /* Corte de texto longo (Reticências) */
@@ -874,7 +943,8 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 0; /* Invisível... */
+    opacity: 0;
+    /* Invisível... */
     transition: opacity 0.2s, color 0.2s;
     padding: 0.2vw;
     border-radius: 0.3vw;
@@ -893,7 +963,8 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
 /* Dropdown Menu Glassmorphism */
 .chatDropdown {
     position: absolute;
-    top: 2.2vw; /* Desce um pouco a partir dos 3 pontinhos */
+    top: 2.2vw;
+    /* Desce um pouco a partir dos 3 pontinhos */
     right: 0.5vw;
     background: var(--glassBg);
     border: 1px solid var(--glassBorder);
@@ -906,7 +977,7 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
     display: flex;
     flex-direction: column;
     padding: 0.3vw;
-    
+
     /* Estado inicial fechado */
     opacity: 0;
     visibility: hidden;
@@ -942,8 +1013,10 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
 
 /* Destaque vermelho para a exclusão */
 .dropdownItem.danger {
-    color: #ef4444; /* Vermelho Sith */
+    color: #ef4444;
+    /* Vermelho Sith */
 }
+
 .dropdownItem.danger:hover {
     background: rgba(239, 68, 68, 0.15);
 }
@@ -984,7 +1057,7 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
     max-width: 400px;
     padding: 1.5rem;
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
-    
+
     /* O modal nasce um pouco mais para baixo e menor */
     transform: translateY(20px) scale(0.95);
     transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -1002,7 +1075,8 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
 }
 
 .dangerTitle {
-    color: #ef4444; /* Vermelho Sith */
+    color: #ef4444;
+    /* Vermelho Sith */
 }
 
 .modalText {
@@ -1027,7 +1101,8 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
 }
 
 .modalInput:focus {
-    border-color: #3b82f6; /* Azul Obi-Wan */
+    border-color: #3b82f6;
+    /* Azul Obi-Wan */
 }
 
 .modalFooter {
@@ -1081,9 +1156,10 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
 ========================================= */
 .markdown-body {
     /* Cor de texto levemente acinzentada para leitura longa não cansar, igual ao Gemini */
-    color: #e3e3e3; 
+    color: #e3e3e3;
     font-size: 1rem;
-    line-height: 1.7; /* Respiro maior entre as linhas da narrativa */
+    line-height: 1.7;
+    /* Respiro maior entre as linhas da narrativa */
     font-weight: 300;
 }
 
@@ -1098,12 +1174,12 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
 
 /* Destacando os negritos com branco puro para criar contraste */
 .markdown-body strong {
-    color: #ffffff; 
+    color: #ffffff;
     font-weight: 600;
 }
 
 /* Tratamento de Listas (Para ficar igual à imagem do Arsenal de Nayla) */
-.markdown-body ul, 
+.markdown-body ul,
 .markdown-body ol {
     margin-top: 0.5rem;
     margin-bottom: 1.5rem;
@@ -1117,7 +1193,7 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
 
 /* Bolinha vazada para listas não ordenadas */
 .markdown-body ul li {
-    list-style-type: circle; 
+    list-style-type: circle;
 }
 
 /* Listas numéricas alinhadas */
@@ -1126,14 +1202,14 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
 }
 
 /* Correção de bug do Marked.js que às vezes quebra o alinhamento da lista */
-.markdown-body li > p {
+.markdown-body li>p {
     margin-bottom: 0;
     display: inline;
 }
 
 /* Títulos nativos (caso a IA use # ou ##) */
-.markdown-body h1, 
-.markdown-body h2, 
+.markdown-body h1,
+.markdown-body h2,
 .markdown-body h3,
 .markdown-body h4 {
     color: #ffffff;
@@ -1153,21 +1229,33 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
 }
 
 /* =========================================
-   BOTÃO DE EDITAR MENSAGEM (PODA DO TEMPO)
+   AÇÕES DAS MENSAGENS (EDITAR / COPIAR)
 ========================================= */
 .userMessage {
-    align-items: center; /* Centraliza o botão horizontalmente com o balão */
-    gap: 0.8rem; /* Dá um respiro entre o balão e o botão de lápis */
+    align-items: center;
+    gap: 0.8rem;
 }
 
-.userMessage .messageContent {
-    position: relative;
-    /* O padding-right gigante foi removido daqui! */
+/* Container que guarda a IA e os botões dela alinhados à esquerda */
+.aiContentWrapper {
+    display: flex;
+    flex-direction: column;
+    max-width: 90%;
+    gap: 0.5rem;
 }
 
-.editMsgBtn {
-    position: static; /* Sai do modo absolute */
-    background: rgba(255, 255, 255, 0.05); /* Fundo circular igual ao Gemini */
+/* Container geral dos botões */
+.msgActions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    opacity: 0; /* Escondido por padrão */
+    transition: opacity 0.2s ease;
+}
+
+/* Botão universal (Lápis e Cópia) */
+.actionIconBtn {
+    background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 50%;
     width: 36px;
@@ -1176,40 +1264,38 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    opacity: 0; /* Escondido por padrão para manter a tela limpa */
     transition: all 0.2s ease;
-    flex-shrink: 0; /* Impede o botão de amassar caso o texto seja gigante */
+    flex-shrink: 0;
+    color: #ffffff;
 }
 
-.editMsgBtn img {
+.actionIconBtn svg {
     width: 16px;
     height: 16px;
-    opacity: 0.8;
-    filter: brightness(0) invert(1);
+    opacity: 0.6;
+    transition: 0.2s;
 }
 
-/* O botão só aparece quando passamos o mouse na mensagem toda */
-.userMessage:hover .editMsgBtn {
+/* A CORREÇÃO: Revela o container de botões quando o mouse passa na linha (User ou IA) */
+.message:hover .msgActions {
+    opacity: 1;
+}
+
+/* O botão do usuário fica um pouco mais "apagado" até passar o mouse diretamente nele */
+.userMessage .actionIconBtn {
     opacity: 0.6;
 }
 
-/* Quando passamos o mouse especificamente no botão */
-.editMsgBtn:hover {
+/* Hover direto em qualquer botão (faz ele acender) */
+.actionIconBtn:hover {
     background: rgba(255, 255, 255, 0.15);
     opacity: 1 !important;
 }
 
-/* Quando passamos o mouse especificamente no botão... */
-.editMsgBtn:hover {
-    background: rgba(255, 255, 255, 0.15);
-    opacity: 1 !important;
-}
-
-/* ... a imagem (ícone) dentro dele fica 100% branca e opaca! */
-.editMsgBtn:hover img {
+.actionIconBtn:hover svg {
     opacity: 1;
-    filter: brightness(0) invert(1);
 }
+
 
 /* =========================================
    INLINE EDIT FORM (PODA DA LINHA DO TEMPO)
@@ -1219,7 +1305,8 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
     flex-direction: column;
     gap: 0.8rem;
     width: 100%;
-    min-width: 250px; /* Garante que não fique esmagado */
+    min-width: 250px;
+    /* Garante que não fique esmagado */
 }
 
 .inlineEditTextarea {
@@ -1232,14 +1319,16 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
     font-family: inherit;
     font-size: 1rem;
     line-height: 1.5;
-    resize: none; /* O JS controla a altura automaticamente */
+    resize: none;
+    /* O JS controla a altura automaticamente */
     outline: none;
     overflow: hidden;
     transition: border-color 0.2s;
 }
 
 .inlineEditTextarea:focus {
-    border-color: #3b82f6; /* Foco azul Obi-Wan */
+    border-color: #3b82f6;
+    /* Foco azul Obi-Wan */
 }
 
 .inlineEditActions {
@@ -1248,7 +1337,8 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
     gap: 0.5rem;
 }
 
-.cancelEditBtn, .saveEditBtn {
+.cancelEditBtn,
+.saveEditBtn {
     padding: 0.4rem 0.8rem;
     font-size: 0.85rem;
     border-radius: 6px;
@@ -1284,11 +1374,61 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
 }
 
 /* =========================================
+   TRATAMENTO DE TABELAS (MARKDOWN)
+========================================= */
+.markdown-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    overflow: hidden;
+    /* Mantém as bordas arredondadas intactas */
+    display: block;
+    /* Essencial para criar scroll no celular */
+    overflow-x: auto;
+}
+
+/* Scrollbar invisível e fina para a tabela no celular */
+.markdown-body table::-webkit-scrollbar {
+    height: 6px;
+}
+
+.markdown-body table::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.markdown-body table::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+}
+
+.markdown-body th,
+.markdown-body td {
+    border: 1px solid var(--borderColor);
+    padding: 0.8rem 1rem;
+    text-align: left;
+}
+
+.markdown-body th {
+    background: rgba(255, 255, 255, 0.05);
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.markdown-body tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+
+
+/* =========================================
    ESTADO RETRÁTIL (COLLAPSED) NO DESKTOP
 ========================================= */
 @media screen and (min-width: 769px) {
     .sidebar.collapsed {
-        width: 80px; /* Largura fina idêntica ao Gemini */
+        width: 80px;
+        /* Largura fina idêntica ao Gemini */
         padding: 1vw 0.5vw;
     }
 
@@ -1330,29 +1470,6 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
     }
 }
 
-/* No Mobile, como não há mouse para dar :hover, deixamos sempre visível */
-@media screen and (max-width: 768px) {
-    .editMsgBtn {
-        opacity: 0.8;
-        width: 36px;
-        height: 36px;
-    }
-}
-
-/* No Mobile, mantemos ele um pouco maior e sempre visível */
-@media screen and (max-width: 768px) {
-    .editMsgBtn {
-        opacity: 0.6;
-        width: 32px;
-        height: 32px;
-        bottom: 0.4rem;
-        right: 0.4rem;
-    }
-    .editMsgBtn img {
-        width: 18px;
-        height: 18px;
-    }
-}
 
 /* Cabeçalho Mobile (Escondido no Desktop por padrão) */
 .mobileHeader {
@@ -1364,14 +1481,25 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
    Ponto de quebra: 768px
 ========================================= */
 @media screen and (max-width: 768px) {
-    
 
-.appLayout {
-    display: flex;
-    height: 100dvh; /* Substitui o vh por dvh (Dynamic Viewport Height) */
-    width: 100vw;
-    overflow: hidden; /* Trava qualquer scroll fora do lugar */
-}
+    .appLayout {
+        display: flex;
+        height: 100dvh; /* Substitui o vh por dvh (Dynamic Viewport Height) */
+        width: 100vw;
+        overflow: hidden; /* Trava qualquer scroll fora do lugar */
+    }
+
+    .userMessage .actionIconBtn,
+    .msgActions {
+        opacity: 0.8 !important;
+    }
+
+    .actionIconBtn {
+        width: 32px;
+        height: 32px;
+    }
+
+    /* A CHAVE INTRUSA ESTAVA AQUI. FOI REMOVIDA! */
 
     /* 2. MENU LATERAL (SIDEBAR) ESCONDIDO */
     .sidebar {
@@ -1385,7 +1513,7 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
         padding: 1.5rem; /* Substituindo vw por rem */
         transform: translateX(-100%); /* Começa fora da tela */
         transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-        box-shadow: 10px 0 30px rgba(0,0,0,0.8);
+        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.8);
     }
 
     /* Classe que o JS vai adicionar para abrir o menu no celular */
@@ -1394,23 +1522,52 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
     }
 
     /* Conversão dos vws do menu lateral para medidas absolutas */
-    .sidebarHeader { margin-bottom: 2rem; padding: 0; }
-    .sidebarActions { gap: 0.5rem; margin-bottom: 2.5rem; }
-    .navBtn { padding: 1rem; gap: 1rem; font-size: 1rem; border-radius: 8px; }
-    .historyItem { padding: 1rem; gap: 0.8rem; font-size: 1rem; border-radius: 8px; }
-    .sidebarBottom { gap: 0.8rem; padding-top: 1.5rem; }
+    .sidebarHeader {
+        margin-bottom: 2rem;
+        padding: 0;
+    }
+
+    .sidebarActions {
+        gap: 0.5rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .navBtn {
+        padding: 1rem;
+        gap: 1rem;
+        font-size: 1rem;
+        border-radius: 8px;
+    }
+
+    .historyItem {
+        padding: 1rem;
+        gap: 0.8rem;
+        font-size: 1rem;
+        border-radius: 8px;
+    }
+
+    .sidebarBottom {
+        gap: 0.8rem;
+        padding-top: 1.5rem;
+    }
 
     /* 3. MENU DROPDOWN DO HISTÓRICO (3 PONTINHOS) */
     /* Os botões de opção devem estar sempre visíveis no mobile, pois não existe :hover */
     .optionsBtn {
-        opacity: 1; 
+        opacity: 1;
         padding: 0.5rem;
     }
+
     .chatDropdown {
         top: 3rem; /* Ajuste para não bugar com os rems novos */
         right: 0;
     }
-    .dropdownItem { padding: 0.8rem; font-size: 1rem; gap: 0.8rem; }
+
+    .dropdownItem {
+        padding: 0.8rem;
+        font-size: 1rem;
+        gap: 0.8rem;
+    }
 
     /* 4. ÁREA DE MENSAGENS E CHAT */
     .messagesContainer {
@@ -1422,21 +1579,24 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
     .message {
         max-width: 100%;
     }
+
     .userMessage .messageContent {
         max-width: 95%; /* Ocupa mais espaço na tela fina */
         padding: 1rem 1.2rem;
         border-radius: 18px;
     }
+
     .aiMessage {
         gap: 0.8rem;
     }
+
     .aiMessage .messageContent {
         max-width: 100%;
         padding: 0; /* O Glassmorphism já não tem padding de fundo aqui */
     }
 
     /* Reduzindo o padding nativo das listas Markdown da IA no mobile */
-    .markdown-body ul, 
+    .markdown-body ul,
     .markdown-body ol {
         padding-left: 1rem;
     }
@@ -1444,7 +1604,7 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
     /* 5. INPUT E BARRA DE DIGITAÇÃO */
     .inputSection {
         /* O 'env' cria uma margem segura para os iPhones modernos */
-        padding: 0 0.5rem calc(1rem + env(safe-area-inset-bottom)) 0.5rem; 
+        padding: 0 0.5rem calc(1rem + env(safe-area-inset-bottom)) 0.5rem;
         flex-shrink: 0; /* Impede o input de ser esmagado pelo chat */
         z-index: 10;
     }
@@ -1460,11 +1620,29 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
     }
 
     /* Botões de Ação do Input em tamanho de toque amigável */
-    .actionsLeft, .actionsRight { gap: 0.8rem; }
-    .actionBtn { gap: 0.5rem; font-size: 0.9rem; }
-    .pillBtn { padding: 0.6rem 1rem; }
-    .iconOnly { width: 40px; height: 40px; }
-    .sendBtn { width: 44px; height: 44px; } /* 44px: Regra da Apple para touch */
+    .actionsLeft,
+    .actionsRight {
+        gap: 0.8rem;
+    }
+
+    .actionBtn {
+        gap: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .pillBtn {
+        padding: 0.6rem 1rem;
+    }
+
+    .iconOnly {
+        width: 40px;
+        height: 40px;
+    }
+
+    .sendBtn {
+        width: 44px;
+        height: 44px; /* 44px: Regra da Apple para touch */
+    }
 
     /* 6. MODAL EXPANDIDO (FULLSCREEN MOBILE) */
     .inputSection.expandedMode .inputContainer {
@@ -1482,8 +1660,6 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
         padding: 1.5rem;
     }
 
-    
-    
     /* Mostra o cabeçalho no celular */
     .mobileHeader {
         display: flex;
@@ -1503,9 +1679,10 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
         font-weight: 500;
         color: var(--textMain);
     }
-    
+
     /* E para evitar que a primeira mensagem fique grudada no teto do mobile: */
     .messagesContainer {
-        padding-top: 1rem; 
+        padding-top: 1rem;
     }
-}
+
+} /* ESTA É A VERDADEIRA CHAVE QUE FECHA O BLOCO MOBILE, MANTENHA ELA! */
