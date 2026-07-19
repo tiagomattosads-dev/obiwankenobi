@@ -298,10 +298,15 @@ document.addEventListener('DOMContentLoaded', () => {
             // A MÁGICA DA INJEÇÃO ACONTECE AQUI
             // ====================================================
 
-            // Se recebemos um ID válido, injetamos no balão e revelamos o lápis!
+            // Se recebemos um ID válido, injetamos no balão e revelamos os botões!
             if (idMensagemUsuario && balaoUsuarioAtual) {
                 balaoUsuarioAtual.setAttribute('data-id', idMensagemUsuario);
+                
+                // Mapeia os dois botões corretamente
                 const btnEditar = balaoUsuarioAtual.querySelector('.editMsgBtn');
+                const btnCopiar = balaoUsuarioAtual.querySelector('.copyMsgBtn'); 
+                
+                // Exibe os dois
                 if (btnEditar) btnEditar.style.display = 'flex';
                 if (btnCopiar) btnCopiar.style.display = 'flex';
             }

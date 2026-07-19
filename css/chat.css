@@ -1232,8 +1232,9 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
    AÇÕES DAS MENSAGENS (EDITAR / COPIAR)
 ========================================= */
 .userMessage {
-    align-items: center;
-    gap: 0.8rem;
+    flex-direction: column; /* Joga os botões para debaixo do balão */
+    align-items: flex-end;  /* Mantém o balão e os botões grudados à direita */
+    gap: 0.4rem;            /* Dá um respiro suave entre o balão e os botões */
 }
 
 /* Container que guarda a IA e os botões dela alinhados à esquerda */
