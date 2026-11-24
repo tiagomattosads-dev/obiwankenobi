@@ -229,9 +229,189 @@ document.addEventListener('DOMContentLoaded', () => {
     let physRollMode = 'numeric'; // 'numeric' | 'symbols'
     let physNumericPool = []; // [{ id, type: 'yellow'|..., rolledValue: null | 1..12 }]
     let physActiveCardId = null;
+    let physActiveDraftKey = 'free';
+    let physPartyPools = []; // [{ characterId, characterName, skillName, yellow, green, blue, purple, red, black, white, difficultyLabel, formattedSummary }]
+    let physActiveCharIdx = 0;
+    let physDraftsByKey = {}; // { [draftKey]: { cardId, skill, narrative, activeCharIdx, charStates: [...] } }
+    let suppressNextCoopBroadcast = false;
+    let coopBroadcastTimer = null;
+    let coopCampaignChannel = null;
+    let fichasAtivasEmCenaCache = []; // Cache das fichas ativas na mesa (ex: Kilian, Nayla)
+    const myClientInstanceId = `client-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+
     const physNumericSection = document.getElementById('physNumericSection');
     const physSymbolsSection = document.getElementById('physSymbolsSection');
     const physNumericDiceList = document.getElementById('physNumericDiceList');
+    const physRollNarrativeInput = document.getElementById('physRollNarrativeInput');
+    const physCharacterTabs = document.getElementById('physCharacterTabs');
+    const physActiveCharBadge = document.getElementById('physActiveCharBadge');
+    const minimizePhysRollBtn = document.getElementById('minimizePhysRollBtn');
+    const physDraftFloatingPill = document.getElementById('physDraftFloatingPill');
+    const physDraftPillLabel = document.getElementById('physDraftPillLabel');
+    const resumePhysDraftBtn = document.getElementById('resumePhysDraftBtn');
+    const physCoopSyncBadge = document.getElementById('physCoopSyncBadge');
+
+    const criarNumericPoolAPartirDePoolObj = (poolObj) => {
+        const list = [];
+        const addCount = (type, count) => {
+            const n = Math.max(0, Math.min(12, Number(count || 0)));
+            for (let i = 0; i < n; i++) {
+                list.push({
+                    id: `die-${type}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}-${i}`,
+                    type,
+                    rolledValue: null
+                });
+            }
+        };
+        if (poolObj && typeof poolObj === 'object') {
+            addCount('yellow', poolObj.yellow);
+            addCount('green', poolObj.green);
+            addCount('blue', poolObj.blue);
+            addCount('purple', poolObj.purple);
+            addCount('red', poolObj.red);
+            addCount('black', poolObj.black);
+            addCount('white', poolObj.white);
+        } else {
+            addCount('yellow', 1);
+            addCount('green', 1);
+            addCount('purple', 2);
+        }
+        return list;
+    };
+
+    const rascunhoTemConteudo = (draft) => {
+        if (!draft) return false;
+        if ((draft.narrative || '').trim().length > 0) return true;
+        return (draft.charStates || []).some((cs) => {
+            const hasRolledDie = (cs.numericPool || []).some((d) => d.rolledValue !== null);
+            const hasSym = Object.values(cs.symbolsState || {}).some((v) => Number(v) > 0);
+            return hasRolledDie || hasSym;
+        });
+    };
+
+    const atualizarPilulaRascunhoFlutuante = () => {
+        const draft = physDraftsByKey[physActiveDraftKey];
+        const modalAberto = physicalRollModal && physicalRollModal.classList.contains('show');
+        const temConteudo = rascunhoTemConteudo(draft);
+
+        if (physDraftFloatingPill) {
+            if (!modalAberto && temConteudo) {
+                const charName = draft?.charStates?.[draft.activeCharIdx || 0]?.characterName || 'Operativo';
+                const sk = draft?.skill || 'Teste';
+                if (physDraftPillLabel) {
+                    physDraftPillLabel.textContent = `Rascunho salvo (${charName} • ${sk})`;
+                }
+                physDraftFloatingPill.classList.remove('hidden');
+            } else {
+                physDraftFloatingPill.classList.add('hidden');
+            }
+        }
+
+        // Atualiza texto do botão no Card caso haja rascunho em andamento
+        if (draft?.cardId && messagesArea) {
+            const physBtnSpan = messagesArea.querySelector(
+                `[data-card-action="roll_physical"][data-card-id="${draft.cardId}"] span`
+            );
+            if (physBtnSpan) {
+                physBtnSpan.textContent = temConteudo
+                    ? 'Continuar Rolagem (Rascunho Salvo)'
+                    : 'Digitar Dados Físicos';
+            }
+        }
+    };
+
+    const salvarEstadoAtualNoRascunho = (dispararBroadcast = true) => {
+        const draft = physDraftsByKey[physActiveDraftKey];
+        if (!draft) return;
+        draft.skill = (physRollSkillInput?.value || '').trim();
+        draft.narrative = physRollNarrativeInput ? physRollNarrativeInput.value : '';
+        draft.activeCharIdx = physActiveCharIdx;
+        if (draft.charStates && draft.charStates[physActiveCharIdx]) {
+            draft.charStates[physActiveCharIdx].mode = physRollMode;
+            draft.charStates[physActiveCharIdx].numericPool = JSON.parse(JSON.stringify(physNumericPool));
+            draft.charStates[physActiveCharIdx].symbolsState = { ...physRollState };
+        }
+        atualizarPilulaRascunhoFlutuante();
+
+        if (dispararBroadcast && !suppressNextCoopBroadcast && coopCampaignChannel) {
+            if (coopBroadcastTimer) clearTimeout(coopBroadcastTimer);
+            coopBroadcastTimer = setTimeout(() => {
+                coopCampaignChannel.send({
+                    type: 'broadcast',
+                    event: 'roll_station_sync',
+                    payload: {
+                        senderClientId: myClientInstanceId,
+                        senderName: localStorage.getItem('obiwan_user') || 'Parceiro',
+                        action: 'update',
+                        draftKey: physActiveDraftKey,
+                        draft: JSON.parse(JSON.stringify(draft))
+                    }
+                });
+            }, 180);
+        }
+    };
+
+    const carregarCharStateAtivoNaTela = () => {
+        const draft = physDraftsByKey[physActiveDraftKey];
+        if (!draft) return;
+        const cs = draft.charStates[physActiveCharIdx] || draft.charStates[0];
+        if (!cs) return;
+
+        if (physRollSkillInput) physRollSkillInput.value = draft.skill || cs.pool?.skillName || '';
+        if (physRollNarrativeInput && document.activeElement !== physRollNarrativeInput) {
+            physRollNarrativeInput.value = draft.narrative || '';
+        }
+        if (physActiveCharBadge) {
+            physActiveCharBadge.textContent = cs.characterName || 'Operativo';
+        }
+
+        physRollMode = cs.mode || 'numeric';
+        physNumericPool = JSON.parse(JSON.stringify(cs.numericPool || []));
+        Object.keys(physRollState).forEach((k) => {
+            physRollState[k] = Number(cs.symbolsState?.[k] || 0);
+        });
+
+        renderizarAbasPersonagensNoModal();
+        renderizarListaDadosNumericos();
+        document.querySelectorAll('.physRollModeTab').forEach((tab) => {
+            tab.classList.toggle('active', tab.getAttribute('data-phys-tab') === physRollMode);
+        });
+        if (physNumericSection) physNumericSection.classList.toggle('hidden', physRollMode !== 'numeric');
+        if (physSymbolsSection) physSymbolsSection.classList.toggle('hidden', physRollMode !== 'symbols');
+        if (physRollMode === 'numeric') {
+            recalcularSimbolosDosDadosNumericos();
+        }
+        atualizarPreviewRolagemFisica();
+    };
+
+    const renderizarAbasPersonagensNoModal = () => {
+        if (!physCharacterTabs) return;
+        const draft = physDraftsByKey[physActiveDraftKey];
+        const charStates = draft?.charStates || [];
+        if (charStates.length <= 1) {
+            physCharacterTabs.classList.add('hidden');
+            physCharacterTabs.innerHTML = '';
+            return;
+        }
+
+        physCharacterTabs.classList.remove('hidden');
+        physCharacterTabs.innerHTML = charStates
+            .map((cs, idx) => {
+                const isAct = idx === physActiveCharIdx;
+                const rolledCount = (cs.numericPool || []).filter((d) => d.rolledValue !== null).length;
+                const statusHint =
+                    rolledCount > 0
+                        ? `${rolledCount}/${cs.numericPool.length} dados marcados`
+                        : `${cs.pool?.yellow || 0}A + ${cs.pool?.green || 0}V`;
+                return `
+                    <button type="button" class="physCharTabBtn ${isAct ? 'active' : ''}" data-phys-char-idx="${idx}">
+                        <span>${cs.characterName || `Personagem ${idx + 1}`}</span>
+                        <span class="physCharTabPoolHint">(${statusHint})</span>
+                    </button>
+                `;
+            })
+            .join('');
+    };
 
     const recalcularSimbolosDosDadosNumericos = () => {
         Object.keys(physRollState).forEach((k) => {
@@ -298,20 +478,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    const formatarTextoRolagemFisica = () => {
+    const formatarRolagemDeUmCharState = (cs, skillLabel) => {
+        const s = cs.symbolsState || {};
         const partes = [];
-        if (physRollState.success > 0) partes.push(`${physRollState.success} ${physRollState.success === 1 ? 'Sucesso' : 'Sucessos'}`);
-        if (physRollState.advantage > 0) partes.push(`${physRollState.advantage} ${physRollState.advantage === 1 ? 'Vantagem' : 'Vantagens'}`);
-        if (physRollState.triumph > 0) partes.push(`${physRollState.triumph} ${physRollState.triumph === 1 ? 'Triunfo' : 'Triunfos'}`);
-        if (physRollState.failure > 0) partes.push(`${physRollState.failure} ${physRollState.failure === 1 ? 'Falha' : 'Falhas'}`);
-        if (physRollState.threat > 0) partes.push(`${physRollState.threat} ${physRollState.threat === 1 ? 'Ameaça' : 'Ameaças'}`);
-        if (physRollState.despair > 0) partes.push(`${physRollState.despair} ${physRollState.despair === 1 ? 'Desespero' : 'Desesperos'}`);
-        if (physRollState.lightPip > 0) partes.push(`${physRollState.lightPip} ${physRollState.lightPip === 1 ? 'Ponto de Luz' : 'Pontos de Luz'}`);
-        if (physRollState.darkPip > 0) partes.push(`${physRollState.darkPip} ${physRollState.darkPip === 1 ? 'Ponto Sombrio' : 'Pontos Sombrios'}`);
+        if (s.success > 0) partes.push(`${s.success} ${s.success === 1 ? 'Sucesso' : 'Sucessos'}`);
+        if (s.advantage > 0) partes.push(`${s.advantage} ${s.advantage === 1 ? 'Vantagem' : 'Vantagens'}`);
+        if (s.triumph > 0) partes.push(`${s.triumph} ${s.triumph === 1 ? 'Triunfo' : 'Triunfos'}`);
+        if (s.failure > 0) partes.push(`${s.failure} ${s.failure === 1 ? 'Falha' : 'Falhas'}`);
+        if (s.threat > 0) partes.push(`${s.threat} ${s.threat === 1 ? 'Ameaça' : 'Ameaças'}`);
+        if (s.despair > 0) partes.push(`${s.despair} ${s.despair === 1 ? 'Desespero' : 'Desesperos'}`);
+        if (s.lightPip > 0) partes.push(`${s.lightPip} ${s.lightPip === 1 ? 'Ponto de Luz' : 'Pontos de Luz'}`);
+        if (s.darkPip > 0) partes.push(`${s.darkPip} ${s.darkPip === 1 ? 'Ponto Sombrio' : 'Pontos Sombrios'}`);
 
         const rolledDiceDetails =
-            physRollMode === 'numeric'
-                ? physNumericPool
+            cs.mode === 'numeric'
+                ? (cs.numericPool || [])
                       .filter((d) => d.rolledValue !== null)
                       .map((d) => {
                           const def = NUMERIC_DIE_DEFINITIONS[d.type];
@@ -322,10 +503,34 @@ document.addEventListener('DOMContentLoaded', () => {
         if (partes.length === 0 && rolledDiceDetails.length === 0) return '';
 
         const textoSimbolos = partes.length > 0 ? partes.join(', ') : '0 Sucessos, 1 Falha';
-        const skill = (physRollSkillInput?.value || '').trim();
-        const prefixo = skill ? `Resultado da rolagem de ${skill}` : 'Resultado da rolagem';
+        const charTag = cs.characterName ? ` (${cs.characterName})` : '';
+        const prefixo = skillLabel
+            ? `Resultado da rolagem de ${skillLabel}${charTag}`
+            : `Resultado da rolagem${charTag}`;
         const detalheDados = rolledDiceDetails.length > 0 ? ` [Dados físicos: ${rolledDiceDetails.join(', ')}]` : '';
         return `${prefixo}: ${textoSimbolos}.${detalheDados}`;
+    };
+
+    const formatarTextoRolagemFisica = () => {
+        salvarEstadoAtualNoRascunho(false);
+        const draft = physDraftsByKey[physActiveDraftKey];
+        const skill = (physRollSkillInput?.value || draft?.skill || '').trim();
+        const narrativa = (physRollNarrativeInput?.value || draft?.narrative || '').trim();
+
+        // Inclui todos os personagens da aba que tiveram dados rolados (ex: Kilian e/ou Nayla!)
+        const linhasRolagem = [];
+        if (draft && Array.isArray(draft.charStates)) {
+            draft.charStates.forEach((cs) => {
+                const linha = formatarRolagemDeUmCharState(cs, skill);
+                if (linha) linhasRolagem.push(linha);
+            });
+        }
+
+        if (linhasRolagem.length === 0 && !narrativa) return '';
+        if (narrativa && linhasRolagem.length > 0) {
+            return `${narrativa}\n\n${linhasRolagem.join('\n')}`;
+        }
+        return narrativa || linhasRolagem.join('\n');
     };
 
     const atualizarPreviewRolagemFisica = () => {
@@ -334,15 +539,17 @@ document.addEventListener('DOMContentLoaded', () => {
             if (el) el.textContent = String(physRollState[k]);
         });
         if (physRollPreview) {
-            const txt = formatarTextoRolagemFisica();
-            if (!txt) {
+            const draft = physDraftsByKey[physActiveDraftKey];
+            const cs = draft?.charStates?.[physActiveCharIdx];
+            const skill = (physRollSkillInput?.value || '').trim();
+            const txtRollOnly = cs ? formatarRolagemDeUmCharState(cs, skill) : '';
+            if (!txtRollOnly) {
                 physRollPreview.textContent =
                     physRollMode === 'numeric'
                         ? 'Toque nos números tirados em cada dado para converter automaticamente pela Tabela 1-3.'
                         : 'Selecione os símbolos acima para montar o resultado.';
                 return;
             }
-            // Mostra também o saldo líquido já cancelado para o jogador conferir na hora!
             const netSucc = (physRollState.success + physRollState.triumph) - (physRollState.failure + physRollState.despair);
             const netAdv = physRollState.advantage - physRollState.threat;
             const ResumoLiquido = [];
@@ -364,7 +571,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (physRollState.darkPip > 0) ResumoLiquido.push(`${physRollState.darkPip} Sombrio`);
 
             physRollPreview.textContent =
-                ResumoLiquido.length > 0 ? `${txt} → Saldo Final: ${ResumoLiquido.join(' • ')}` : txt;
+                ResumoLiquido.length > 0 ? `${txtRollOnly} → Saldo Final: ${ResumoLiquido.join(' • ')}` : txtRollOnly;
         }
     };
 
@@ -378,51 +585,151 @@ document.addEventListener('DOMContentLoaded', () => {
         if (physRollMode === 'numeric') {
             recalcularSimbolosDosDadosNumericos();
         }
+        salvarEstadoAtualNoRascunho(true);
         atualizarPreviewRolagemFisica();
     };
 
-    const abrirModalRolagemFisica = (skillInicial = '', poolObj = null, cardId = null) => {
-        physActiveCardId = cardId || null;
-        Object.keys(physRollState).forEach((k) => {
-            physRollState[k] = 0;
-        });
-        if (physRollSkillInput) physRollSkillInput.value = skillInicial || poolObj?.skillName || '';
-
-        physNumericPool = [];
-        const addCount = (type, count) => {
-            const n = Math.max(0, Math.min(12, Number(count || 0)));
-            for (let i = 0; i < n; i++) {
-                physNumericPool.push({
-                    id: `die-${type}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}-${i}`,
-                    type,
-                    rolledValue: null
-                });
-            }
-        };
-
+    const construirPartyPoolsParaModal = (poolObj) => {
+        if (Array.isArray(poolObj?.partyPools) && poolObj.partyPools.length > 0) {
+            return poolObj.partyPools;
+        }
+        const charsEmCena = (fichasAtivasEmCenaCache || []).filter(
+            (f) => f?.entity && f.entity.entityType !== 'ship'
+        );
         if (poolObj && typeof poolObj === 'object') {
-            addCount('yellow', poolObj.yellow);
-            addCount('green', poolObj.green);
-            addCount('blue', poolObj.blue);
-            addCount('purple', poolObj.purple);
-            addCount('red', poolObj.red);
-            addCount('black', poolObj.black);
-            addCount('white', poolObj.white);
-        } else {
-            // Pool inicial padrão amigável (1 Amarelo d12 + 1 Verde d8 + 2 Roxos d8) quando aberto pelo botão +
-            addCount('yellow', 1);
-            addCount('green', 1);
-            addCount('purple', 2);
+            const lista = [poolObj];
+            charsEmCena.forEach((f) => {
+                if (f.entity.name && f.entity.name !== poolObj.characterName) {
+                    lista.push({
+                        ...poolObj,
+                        characterId: f.characterId,
+                        characterName: f.entity.name
+                    });
+                }
+            });
+            return lista;
+        }
+        if (charsEmCena.length > 0) {
+            return charsEmCena.map((f) => ({
+                characterId: f.characterId,
+                characterName: f.entity.name,
+                skillName: '',
+                yellow: 1,
+                green: 1,
+                blue: 0,
+                purple: 2,
+                red: 0,
+                black: 0,
+                white: 0
+            }));
+        }
+        return [
+            {
+                characterId: 'default',
+                characterName: 'Operativo',
+                skillName: '',
+                yellow: 1,
+                green: 1,
+                blue: 0,
+                purple: 2,
+                red: 0,
+                black: 0,
+                white: 0
+            }
+        ];
+    };
+
+    const abrirModalRolagemFisica = (skillInicial = '', poolObj = null, cardId = null, preferredCharIdx = null, fromRemote = false) => {
+        physActiveCardId = cardId || null;
+        physActiveDraftKey = cardId || 'free';
+
+        let draft = physDraftsByKey[physActiveDraftKey];
+        if (!draft) {
+            const pools = construirPartyPoolsParaModal(poolObj);
+            draft = {
+                cardId: physActiveCardId,
+                skill: skillInicial || poolObj?.skillName || '',
+                narrative: '',
+                activeCharIdx: typeof preferredCharIdx === 'number' ? preferredCharIdx : 0,
+                charStates: pools.map((p) => ({
+                    characterId: p.characterId,
+                    characterName: p.characterName || 'Operativo',
+                    pool: p,
+                    mode: 'numeric',
+                    numericPool: criarNumericPoolAPartirDePoolObj(p),
+                    symbolsState: {
+                        success: 0,
+                        advantage: 0,
+                        triumph: 0,
+                        failure: 0,
+                        threat: 0,
+                        despair: 0,
+                        lightPip: 0,
+                        darkPip: 0
+                    }
+                }))
+            };
+            physDraftsByKey[physActiveDraftKey] = draft;
+        } else if (typeof preferredCharIdx === 'number' && draft.charStates[preferredCharIdx]) {
+            draft.activeCharIdx = preferredCharIdx;
         }
 
-        renderizarListaDadosNumericos();
-        alternarAbaRolagemFisica('numeric');
+        physActiveCharIdx = draft.activeCharIdx || 0;
+        carregarCharStateAtivoNaTela();
         fecharTodosOsModais();
         if (physicalRollModal) physicalRollModal.classList.add('show');
+        atualizarPilulaRascunhoFlutuante();
+
+        if (!fromRemote && coopCampaignChannel) {
+            if (physCoopSyncBadge) physCoopSyncBadge.classList.remove('hidden');
+            coopCampaignChannel.send({
+                type: 'broadcast',
+                event: 'roll_station_sync',
+                payload: {
+                    senderClientId: myClientInstanceId,
+                    senderName: localStorage.getItem('obiwan_user') || 'Parceiro',
+                    action: 'open',
+                    draftKey: physActiveDraftKey,
+                    draft: JSON.parse(JSON.stringify(draft))
+                }
+            });
+        }
     };
+
+    const minimizarModalRolagemFisica = () => {
+        salvarEstadoAtualNoRascunho(false);
+        if (physicalRollModal) physicalRollModal.classList.remove('show');
+        atualizarPilulaRascunhoFlutuante();
+    };
+
+    if (minimizePhysRollBtn) {
+        minimizePhysRollBtn.addEventListener('click', minimizarModalRolagemFisica);
+    }
+
+    if (resumePhysDraftBtn) {
+        resumePhysDraftBtn.addEventListener('click', () => {
+            const draft = physDraftsByKey[physActiveDraftKey];
+            if (draft) {
+                abrirModalRolagemFisica(draft.skill, null, draft.cardId, draft.activeCharIdx);
+            }
+        });
+    }
 
     if (physicalRollModal) {
         physicalRollModal.addEventListener('click', (e) => {
+            const charTabBtn = e.target.closest('[data-phys-char-idx]');
+            if (charTabBtn) {
+                salvarEstadoAtualNoRascunho(false);
+                const nextIdx = parseInt(charTabBtn.getAttribute('data-phys-char-idx') || '0', 10);
+                physActiveCharIdx = nextIdx;
+                if (physDraftsByKey[physActiveDraftKey]) {
+                    physDraftsByKey[physActiveDraftKey].activeCharIdx = nextIdx;
+                }
+                carregarCharStateAtivoNaTela();
+                salvarEstadoAtualNoRascunho(true);
+                return;
+            }
+
             const tabBtn = e.target.closest('[data-phys-tab]');
             if (tabBtn) {
                 alternarAbaRolagemFisica(tabBtn.getAttribute('data-phys-tab'));
@@ -440,6 +747,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                     renderizarListaDadosNumericos();
                     recalcularSimbolosDosDadosNumericos();
+                    salvarEstadoAtualNoRascunho(true);
+                    renderizarAbasPersonagensNoModal();
                     atualizarPreviewRolagemFisica();
                 }
                 return;
@@ -451,6 +760,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 physNumericPool = physNumericPool.filter((d) => d.id !== dieId);
                 renderizarListaDadosNumericos();
                 recalcularSimbolosDosDadosNumericos();
+                salvarEstadoAtualNoRascunho(true);
+                renderizarAbasPersonagensNoModal();
                 atualizarPreviewRolagemFisica();
                 return;
             }
@@ -464,6 +775,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     targetDie.rolledValue = targetDie.rolledValue === numVal ? null : numVal;
                     renderizarListaDadosNumericos();
                     recalcularSimbolosDosDadosNumericos();
+                    salvarEstadoAtualNoRascunho(true);
+                    renderizarAbasPersonagensNoModal();
                     atualizarPreviewRolagemFisica();
                 }
                 return;
@@ -476,12 +789,22 @@ document.addEventListener('DOMContentLoaded', () => {
             const step = parseInt(btn.getAttribute('data-step') || '0', 10);
             if (!sym || !(sym in physRollState)) return;
             physRollState[sym] = Math.max(0, Math.min(20, physRollState[sym] + step));
+            salvarEstadoAtualNoRascunho(true);
             atualizarPreviewRolagemFisica();
         });
     }
 
     if (physRollSkillInput) {
-        physRollSkillInput.addEventListener('input', atualizarPreviewRolagemFisica);
+        physRollSkillInput.addEventListener('input', () => {
+            salvarEstadoAtualNoRascunho(true);
+            atualizarPreviewRolagemFisica();
+        });
+    }
+
+    if (physRollNarrativeInput) {
+        physRollNarrativeInput.addEventListener('input', () => {
+            salvarEstadoAtualNoRascunho(true);
+        });
     }
 
     if (resetPhysRollBtn) {
@@ -492,7 +815,22 @@ document.addEventListener('DOMContentLoaded', () => {
             physNumericPool.forEach((d) => {
                 d.rolledValue = null;
             });
+            if (physRollNarrativeInput) physRollNarrativeInput.value = '';
+            const draft = physDraftsByKey[physActiveDraftKey];
+            if (draft) {
+                draft.narrative = '';
+                (draft.charStates || []).forEach((cs) => {
+                    (cs.numericPool || []).forEach((d) => {
+                        d.rolledValue = null;
+                    });
+                    Object.keys(cs.symbolsState || {}).forEach((k) => {
+                        cs.symbolsState[k] = 0;
+                    });
+                });
+            }
+            renderizarAbasPersonagensNoModal();
             renderizarListaDadosNumericos();
+            salvarEstadoAtualNoRascunho(true);
             atualizarPreviewRolagemFisica();
         });
     }
@@ -501,9 +839,10 @@ document.addEventListener('DOMContentLoaded', () => {
         insertPhysRollBtn.addEventListener('click', () => {
             const txt = formatarTextoRolagemFisica();
             if (!txt || !chatInput) return;
-            chatInput.value = chatInput.value.trim() ? `${chatInput.value.trim()} ${txt}` : txt;
+            chatInput.value = chatInput.value.trim() ? `${chatInput.value.trim()}\n${txt}` : txt;
             handleInputResize();
             physicalRollModal.classList.remove('show');
+            atualizarPilulaRascunhoFlutuante();
             chatInput.focus();
         });
     }
@@ -522,11 +861,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     controlsDiv.innerHTML = `
                         <div class="kenobiAutoLogPill">
                             ${SVG_ICONS.dice}
-                            <span>${txt}</span>
+                            <span>${txt.replace(/\n+/g, ' • ')}</span>
                         </div>
                     `;
                 }
             }
+            delete physDraftsByKey[physActiveDraftKey];
+            atualizarPilulaRascunhoFlutuante();
             chatInput.value = txt;
             handleInputResize();
             physicalRollModal.classList.remove('show');
@@ -727,9 +1068,42 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+        const settingsProfileNameInput = document.getElementById('settingsProfileNameInput');
+        const settingsProfileTreatmentSelect = document.getElementById('settingsProfileTreatmentSelect');
+        const settingsNameCooldownHint = document.getElementById('settingsNameCooldownHint');
+        const saveSettingsProfileBtn = document.getElementById('saveSettingsProfileBtn');
+
+        const atualizarEstadoCooldownIdentidade = (nomeAtual, tratamentoAtual, lastUpdatedTs) => {
+            if (settingsProfileNameInput) settingsProfileNameInput.value = nomeAtual || '';
+            if (settingsProfileTreatmentSelect) settingsProfileTreatmentSelect.value = tratamentoAtual || 'M';
+            if (profileNameInput) profileNameInput.value = nomeAtual || '';
+            setObiSelectValue('profileTreatmentInput', tratamentoAtual || 'M');
+
+            const ts = Number(lastUpdatedTs || localStorage.getItem('obiwan_nome_updated_at') || 0);
+            const elapsed = ts > 0 ? Date.now() - ts : SEVEN_DAYS_MS + 1;
+            const emCooldown = ts > 0 && elapsed < SEVEN_DAYS_MS;
+
+            if (settingsNameCooldownHint) {
+                if (emCooldown) {
+                    const dias = Math.max(1, Math.ceil((SEVEN_DAYS_MS - elapsed) / (24 * 60 * 60 * 1000)));
+                    settingsNameCooldownHint.textContent = `Nome bloqueado para alteração por mais ${dias} dia(s) (limite de 7 dias). Você ainda pode alterar o título Mestre/Mestra.`;
+                    settingsNameCooldownHint.classList.add('locked');
+                } else {
+                    settingsNameCooldownHint.textContent = 'Troca de nome disponível (limite de 1 alteração a cada 7 dias).';
+                    settingsNameCooldownHint.classList.remove('locked');
+                }
+            }
+        };
+
+        if (user.user_metadata?.nome_updated_at) {
+            localStorage.setItem('obiwan_nome_updated_at', String(user.user_metadata.nome_updated_at));
+        }
+
         localStorage.setItem('obiwan_user', nome);
         localStorage.setItem('obiwan_tratamento', tratamento);
         atualizarExibicaoUsuario(nome, tratamento);
+        atualizarEstadoCooldownIdentidade(nome, tratamento, user.user_metadata?.nome_updated_at);
         dispararBoasVindasCinematica(nome, tratamento);
 
         // Se o metadata do Supabase Auth ainda não tinha nome_operativo válido, abre o modal de confirmação
@@ -760,11 +1134,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
             saveProfileBtn.textContent = 'Salvando...';
             saveProfileBtn.disabled = true;
-            await API.atualizarPerfilUsuario(novoNome, novoTratamento);
-            atualizarExibicaoUsuario(novoNome, novoTratamento);
+            const res = await API.atualizarPerfilUsuario(novoNome, novoTratamento);
             saveProfileBtn.textContent = 'Salvar Identificação';
             saveProfileBtn.disabled = false;
+
+            if (!res.sucesso) {
+                alert(res.erro || 'Não foi possível atualizar o nome agora.');
+                return;
+            }
+            atualizarExibicaoUsuario(novoNome, novoTratamento);
+            const sName = document.getElementById('settingsProfileNameInput');
+            const sTrat = document.getElementById('settingsProfileTreatmentSelect');
+            if (sName) sName.value = novoNome;
+            if (sTrat) sTrat.value = novoTratamento;
             if (profileModal) profileModal.classList.remove('show');
+        });
+    }
+
+    const saveSettingsProfileBtn = document.getElementById('saveSettingsProfileBtn');
+    if (saveSettingsProfileBtn) {
+        saveSettingsProfileBtn.addEventListener('click', async () => {
+            const sName = document.getElementById('settingsProfileNameInput');
+            const sTrat = document.getElementById('settingsProfileTreatmentSelect');
+            const hint = document.getElementById('settingsNameCooldownHint');
+            const novoNome = (sName?.value || '').trim();
+            const novoTratamento = sTrat?.value || 'M';
+            if (!novoNome) return;
+
+            saveSettingsProfileBtn.textContent = 'Salvando...';
+            saveSettingsProfileBtn.disabled = true;
+            const res = await API.atualizarPerfilUsuario(novoNome, novoTratamento);
+            saveSettingsProfileBtn.textContent = 'Salvar Identificação';
+            saveSettingsProfileBtn.disabled = false;
+
+            if (!res.sucesso) {
+                if (hint) {
+                    hint.textContent = res.erro;
+                    hint.classList.add('locked');
+                } else {
+                    alert(res.erro);
+                }
+                if (sName) sName.value = localStorage.getItem('obiwan_user') || '';
+                return;
+            }
+
+            atualizarExibicaoUsuario(novoNome, novoTratamento);
+            if (hint) {
+                hint.textContent = 'Identificação atualizada! Próxima troca de nome disponível em 7 dias.';
+                hint.classList.add('locked');
+            }
         });
     }
 
@@ -893,6 +1311,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!scenePartyPills) return;
 
         const ativas = (fichasRes.vinculadas || []).filter((f) => f.activeInScene);
+        fichasAtivasEmCenaCache = ativas;
         if (ativas.length === 0) {
             scenePartyPills.innerHTML =
                 '<span class="emptyPartyHint">Nenhuma ficha vinculada — clique em "Fichas" para adicionar.</span>';
@@ -1017,9 +1436,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const isCombatPrompt = card.action_type === 'combat_mode_prompt';
             const isTradeOrCredits = card.action_type === 'trade' || card.action_type === 'credits';
 
-            let dicePillsHtml = '';
-            if (isSkillCheck && card.payload) {
-                const p = card.payload;
+            const montarPillsDePool = (p) => {
+                if (!p) return '';
                 const pills = [];
                 if (p.yellow > 0) pills.push(`<span class="dicePill yellow">${p.yellow} Amarelo(s) [Proficiência]</span>`);
                 if (p.green > 0) pills.push(`<span class="dicePill green">${p.green} Verde(s) [Habilidade]</span>`);
@@ -1028,8 +1446,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (p.purple > 0) pills.push(`<span class="dicePill purple">${p.purple} Roxo(s) [Dificuldade]</span>`);
                 if (p.black > 0) pills.push(`<span class="dicePill black">${p.black} Preto(s) [Contratempo]</span>`);
                 if (p.white > 0) pills.push(`<span class="dicePill white">${p.white} Branco(s) [Força]</span>`);
-                if (pills.length > 0) {
-                    dicePillsHtml = `<div class="kenobiDicePills">${pills.join('')}</div>`;
+                return pills.join('');
+            };
+
+            let cardCharTabsHtml = '';
+            let dicePillsHtml = '';
+            if (isSkillCheck && card.payload) {
+                const partyPools =
+                    Array.isArray(card.payload.partyPools) && card.payload.partyPools.length > 0
+                        ? card.payload.partyPools
+                        : [card.payload];
+
+                if (partyPools.length > 1) {
+                    const tabsBtns = partyPools
+                        .map((pp, idx) => {
+                            const encodedSingle = encodeURIComponent(
+                                JSON.stringify({ ...pp, partyPools })
+                            );
+                            return `
+                                <button type="button" class="cardCharTabBtn ${idx === 0 ? 'active' : ''}" data-card-char-tab="${card.id}" data-char-idx="${idx}" data-char-pool="${encodedSingle}">
+                                    <span>${pp.characterName || `Personagem ${idx + 1}`}</span>
+                                    <span class="physCharTabPoolHint">(${pp.yellow || 0}A + ${pp.green || 0}V)</span>
+                                </button>
+                            `;
+                        })
+                        .join('');
+                    cardCharTabsHtml = `<div class="cardCharacterTabs" data-card-tabs="${card.id}">${tabsBtns}</div>`;
+                }
+
+                const initialPills = montarPillsDePool(partyPools[0]);
+                if (initialPills) {
+                    dicePillsHtml = `<div class="kenobiDicePills" data-card-pills="${card.id}">${initialPills}</div>`;
                 }
             }
 
@@ -1055,15 +1502,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     `;
                 } else if (isSkillCheck) {
                     const encodedPool = encodeURIComponent(JSON.stringify(card.payload || {}));
+                    const hasDraft = rascunhoTemConteudo(physDraftsByKey[card.id]);
+                    const physBtnLabel = hasDraft ? 'Continuar Rolagem (Rascunho Salvo)' : 'Digitar Dados Físicos';
                     buttonsHtml = `
                         <div class="kenobiCardButtons">
-                            <button class="kenobiCardBtn roll" data-card-action="roll_digital" data-card-id="${card.id}" data-pool="${encodedPool}">
+                            <button class="kenobiCardBtn roll" data-card-action="roll_digital" data-card-id="${card.id}" data-pool="${encodedPool}" data-char-idx="0">
                                 ${SVG_ICONS.dice}
                                 <span>Rolar Dados no Sistema</span>
                             </button>
-                            <button class="kenobiCardBtn negotiate" data-card-action="roll_physical" data-card-id="${card.id}" data-skill="${card.payload?.skillName || 'Perícia'}" data-pool="${encodedPool}">
+                            <button class="kenobiCardBtn negotiate" data-card-action="roll_physical" data-card-id="${card.id}" data-skill="${card.payload?.skillName || 'Perícia'}" data-pool="${encodedPool}" data-char-idx="0">
                                 ${SVG_ICONS.edit}
-                                <span>Digitar Dados Físicos</span>
+                                <span>${physBtnLabel}</span>
                             </button>
                         </div>
                     `;
@@ -1114,10 +1563,11 @@ document.addEventListener('DOMContentLoaded', () => {
             html += `
                 <div class="kenobiActionCard ${isSkillCheck ? 'skillCheckCard' : ''} ${!isPending ? 'resolvedCard' : ''}" data-card-box="${card.id}">
                     <div class="kenobiCardHeader">
-                        <span class="kenobiCardTitle">${cardIcon} <span>${limparPrefixoEmoji(card.title)}</span></span>
+                        <span class="kenobiCardTitle">${cardIcon} <span data-card-title-text="${card.id}">${limparPrefixoEmoji(card.title)}</span></span>
                         <span class="kenobiCardBadge" data-card-badge="${card.id}">${badgeLabel}</span>
                     </div>
                     <p class="kenobiCardDesc">${card.description}</p>
+                    ${cardCharTabsHtml}
                     ${dicePillsHtml}
                     <div data-card-controls="${card.id}">
                         ${buttonsHtml}
@@ -1147,8 +1597,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (isUser) {
             const displayBtn = messageId ? 'flex' : 'none';
+            const speakerLabel = extraMeta.senderLabel || '';
             messageDiv.innerHTML = `
                 <div class="messageContent">
+                    ${speakerLabel ? `<span class="coopSpeakerTag">${speakerLabel}</span>` : ''}
                     <span class="textContent">${textoSeguro.replace(/\n/g, '<br>')}</span>
                 </div>
                 <div class="msgActions">
@@ -1362,8 +1814,134 @@ document.addEventListener('DOMContentLoaded', () => {
     const newChatBtn = document.getElementById('newChatBtn');
     const chatHistoryList = document.getElementById('chatHistoryList');
 
+    const conectarCanalRealtimeDaCampanha = (idCampanha) => {
+        if (coopCampaignChannel) {
+            API.clienteSupabase.removeChannel(coopCampaignChannel);
+            coopCampaignChannel = null;
+        }
+        if (!idCampanha) return;
+
+        coopCampaignChannel = API.clienteSupabase
+            .channel(`kenobi-coop-room-${idCampanha}`, {
+                config: { broadcast: { self: false } }
+            })
+            // 1. Novas mensagens enviadas pelo parceiro (Mestre Tiago / Mestra Helo) ou pelo Mestre Kenobi
+            .on(
+                'postgres_changes',
+                {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'messages',
+                    filter: `campaign_id=eq.${idCampanha}`
+                },
+                async (payload) => {
+                    const novaMsg = payload.new;
+                    if (!novaMsg || novaMsg.campaign_id !== conversaAtualId || !messagesArea) return;
+                    // Se a mensagem já foi desenhada localmente nesta aba, ignora
+                    if (messagesArea.querySelector(`.message[data-id="${novaMsg.id}"]`)) return;
+
+                    // Para mensagens da IA, aguarda breve instante caso o UPDATE de metadata (actionCards) venha logo em seguida
+                    if (novaMsg.autor === 'ia') {
+                        await new Promise((r) => setTimeout(r, 450));
+                        const { data: freshMsg } = await API.clienteSupabase
+                            .from('messages')
+                            .select('*')
+                            .eq('id', novaMsg.id)
+                            .single();
+                        const { data: cards } = await API.clienteSupabase
+                            .from('pending_actions')
+                            .select('*')
+                            .eq('message_id', novaMsg.id)
+                            .order('created_at', { ascending: true });
+
+                        if (messagesArea.querySelector(`.message[data-id="${novaMsg.id}"]`)) return;
+                        removeTypingIndicator();
+                        const mUse = freshMsg || novaMsg;
+                        appendMessage(mUse.conteudo, false, mUse.id, {
+                            actionCards: (cards && cards.length > 0) ? cards : mUse.metadata?.actionCards || [],
+                            autoAppliedLogs: mUse.metadata?.autoAppliedLogs || []
+                        });
+                        atualizarBarraTatica();
+                    } else {
+                        appendMessage(novaMsg.conteudo, true, novaMsg.id, {
+                            senderLabel: novaMsg.metadata?.senderLabel || novaMsg.metadata?.senderName || ''
+                        });
+                    }
+                }
+            )
+            // 2. Atualização de Action Cards (quando o parceiro confirma/cancela/rola um card)
+            .on(
+                'postgres_changes',
+                {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: 'pending_actions',
+                    filter: `campaign_id=eq.${idCampanha}`
+                },
+                (payload) => {
+                    const updatedCard = payload.new;
+                    if (!updatedCard || !messagesArea) return;
+                    const badgeEl = messagesArea.querySelector(`[data-card-badge="${updatedCard.id}"]`);
+                    const cardBox = messagesArea.querySelector(`[data-card-box="${updatedCard.id}"]`);
+                    const controlsDiv = messagesArea.querySelector(`[data-card-controls="${updatedCard.id}"]`);
+                    if (updatedCard.status !== 'pending') {
+                        if (cardBox) cardBox.classList.add('resolvedCard');
+                        if (badgeEl) {
+                            badgeEl.textContent =
+                                updatedCard.status === 'confirmed'
+                                    ? 'CONFIRMADO NA MESA'
+                                    : updatedCard.status === 'cancelled'
+                                    ? 'CANCELADO'
+                                    : 'EM NEGOCIAÇÃO';
+                        }
+                        if (controlsDiv && updatedCard.payload?.rollResult?.summaryPtBr) {
+                            controlsDiv.innerHTML = `
+                                <div class="kenobiAutoLogPill">
+                                    ${SVG_ICONS.dice}
+                                    <span>${limparPrefixoEmoji(updatedCard.payload.rollResult.summaryPtBr)}</span>
+                                </div>
+                            `;
+                        }
+                        atualizarBarraTatica();
+                    }
+                }
+            )
+            // 3. Sincronização ao Vivo da Estação de Rolagem (abre e atualiza na tela da Mestra Helo / Mestre Tiago)
+            .on('broadcast', { event: 'roll_station_sync' }, (eventPayload) => {
+                const data = eventPayload?.payload;
+                if (!data || data.senderClientId === myClientInstanceId || !data.draft) return;
+
+                suppressNextCoopBroadcast = true;
+                try {
+                    physDraftsByKey[data.draftKey || 'free'] = data.draft;
+                    physActiveDraftKey = data.draftKey || 'free';
+                    physActiveCardId = data.draft.cardId || null;
+                    physActiveCharIdx = data.draft.activeCharIdx || 0;
+
+                    if (physCoopSyncBadge) {
+                        physCoopSyncBadge.textContent = `Sincronizado com ${data.senderName || 'Mesa'}`;
+                        physCoopSyncBadge.classList.remove('hidden');
+                    }
+
+                    if (data.action === 'open') {
+                        fecharTodosOsModais();
+                        if (physicalRollModal) physicalRollModal.classList.add('show');
+                    }
+
+                    if (physicalRollModal && physicalRollModal.classList.contains('show')) {
+                        carregarCharStateAtivoNaTela();
+                    }
+                    atualizarPilulaRascunhoFlutuante();
+                } finally {
+                    suppressNextCoopBroadcast = false;
+                }
+            })
+            .subscribe();
+    };
+
     const carregarConversa = async (id) => {
         conversaAtualId = id;
+        conectarCanalRealtimeDaCampanha(id);
         renderizarHistorico();
         atualizarBarraTatica();
 
@@ -1378,7 +1956,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const isUser = msg.autor === 'user';
                 appendMessage(msg.conteudo, isUser, msg.id, {
                     actionCards: msg.actionCards || [],
-                    autoAppliedLogs: msg.autoAppliedLogs || []
+                    autoAppliedLogs: msg.autoAppliedLogs || [],
+                    senderLabel: msg.metadata?.senderLabel || msg.metadata?.senderName || ''
                 });
             });
         }
@@ -1489,20 +2068,115 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.cancelModalBtn').forEach((btn) => {
         btn.addEventListener('click', () => {
+            if (physicalRollModal && physicalRollModal.classList.contains('show')) {
+                salvarEstadoAtualNoRascunho(false);
+            }
             fecharTodosOsModais();
+            atualizarPilulaRascunhoFlutuante();
             chatAlvoId = null;
         });
     });
 
-    // Fecha Bottom Sheets / Modais ao tocar no fundo escuro (backdrop)
+    // Fecha Bottom Sheets / Modais ao tocar no fundo escuro (backdrop) preservando rascunho da rolagem
     document.querySelectorAll('.customModalOverlay').forEach((overlay) => {
         overlay.addEventListener('click', (e) => {
             if (e.target === overlay) {
+                if (overlay.id === 'physicalRollModal') {
+                    salvarEstadoAtualNoRascunho(false);
+                }
                 overlay.classList.remove('show');
+                atualizarPilulaRascunhoFlutuante();
                 chatAlvoId = null;
             }
         });
     });
+
+    // 9A. Modal: Entrar em Mesa Compartilhada por Código (#7FFEDA)
+    const joinTableSidebarBtn = document.getElementById('joinTableSidebarBtn');
+    const joinCampaignModal = document.getElementById('joinCampaignModal');
+    const joinCampaignCodeInput = document.getElementById('joinCampaignCodeInput');
+    const joinCampaignCharSelect = document.getElementById('joinCampaignCharSelect');
+    const joinCampaignStatusMsg = document.getElementById('joinCampaignStatusMsg');
+    const confirmJoinCampaignBtn = document.getElementById('confirmJoinCampaignBtn');
+
+    const abrirModalEntrarPorCodigo = async () => {
+        if (!joinCampaignModal) return;
+        fecharTodosOsModais();
+        if (joinCampaignCodeInput) joinCampaignCodeInput.value = '';
+        if (joinCampaignStatusMsg) joinCampaignStatusMsg.textContent = '';
+        joinCampaignModal.classList.add('show');
+
+        if (joinCampaignCharSelect) {
+            joinCampaignCharSelect.innerHTML = '<option value="">Carregando suas fichas do Datapad...</option>';
+            try {
+                const { data: userData } = await API.clienteSupabase.auth.getUser();
+                const uid = userData?.user?.id;
+                const { data: chars } = uid
+                    ? await API.clienteSupabase.from('characters').select('id, data').eq('user_id', uid)
+                    : { data: [] };
+
+                if (!chars || chars.length === 0) {
+                    joinCampaignCharSelect.innerHTML =
+                        '<option value="">Nenhuma ficha encontrada (crie sua ficha no Datapad primeiro)</option>';
+                } else {
+                    joinCampaignCharSelect.innerHTML = chars
+                        .map((c) => {
+                            const ent = c.data || {};
+                            const t =
+                                ent.entityType === 'ship'
+                                    ? 'Nave'
+                                    : ent.entityType === 'npc'
+                                    ? 'NPC'
+                                    : 'Operativo';
+                            return `<option value="${c.id}">${ent.name || 'Sem Nome'} (${t})</option>`;
+                        })
+                        .join('');
+                }
+            } catch {
+                joinCampaignCharSelect.innerHTML = '<option value="">Usar ficha principal da conta</option>';
+            }
+        }
+        setTimeout(() => joinCampaignCodeInput?.focus(), 100);
+    };
+
+    if (joinTableSidebarBtn) {
+        joinTableSidebarBtn.addEventListener('click', abrirModalEntrarPorCodigo);
+    }
+
+    if (confirmJoinCampaignBtn) {
+        confirmJoinCampaignBtn.addEventListener('click', async () => {
+            const code = (joinCampaignCodeInput?.value || '').trim();
+            const charId = joinCampaignCharSelect?.value || null;
+            if (!code) {
+                if (joinCampaignStatusMsg) {
+                    joinCampaignStatusMsg.textContent = 'Digite o código de 6 caracteres da mesa (ex: 7FFEDA).';
+                    joinCampaignStatusMsg.style.color = '#f87171';
+                }
+                return;
+            }
+
+            confirmJoinCampaignBtn.disabled = true;
+            confirmJoinCampaignBtn.textContent = 'Conectando...';
+            const res = await API.entrarCampanhaPorCodigo(code, charId);
+            confirmJoinCampaignBtn.disabled = false;
+            confirmJoinCampaignBtn.textContent = 'Conectar à Mesa';
+
+            if (!res.sucesso) {
+                if (joinCampaignStatusMsg) {
+                    joinCampaignStatusMsg.textContent = res.erro || 'Não foi possível entrar na mesa.';
+                    joinCampaignStatusMsg.style.color = '#f87171';
+                }
+                return;
+            }
+
+            joinCampaignModal.classList.remove('show');
+            if (res.dados?.campaignId) {
+                conversaAtualId = res.dados.campaignId;
+                await renderizarHistorico();
+                await carregarConversa(conversaAtualId);
+            }
+        });
+    }
 
     const renomearConversa = (id) => {
         chatAlvoId = id;
@@ -1746,6 +2420,50 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     if (messagesArea) {
         messagesArea.addEventListener('click', async (e) => {
+            // A0. Alternar aba de personagem dentro do próprio Action Card ([Kilian] [Nayla])
+            const cardCharTab = e.target.closest('[data-card-char-tab]');
+            if (cardCharTab) {
+                const cardId = cardCharTab.getAttribute('data-card-char-tab');
+                const charIdx = parseInt(cardCharTab.getAttribute('data-char-idx') || '0', 10);
+                const encodedCharPool = cardCharTab.getAttribute('data-char-pool') || '';
+                const cardBox = messagesArea.querySelector(`[data-card-box="${cardId}"]`);
+                if (cardBox) {
+                    cardBox.querySelectorAll('.cardCharTabBtn').forEach((b) => {
+                        b.classList.toggle('active', b === cardCharTab);
+                    });
+                }
+                try {
+                    const p = JSON.parse(decodeURIComponent(encodedCharPool));
+                    const pillsContainer = messagesArea.querySelector(`[data-card-pills="${cardId}"]`);
+                    if (pillsContainer && p) {
+                        const pills = [];
+                        if (p.yellow > 0) pills.push(`<span class="dicePill yellow">${p.yellow} Amarelo(s) [Proficiência]</span>`);
+                        if (p.green > 0) pills.push(`<span class="dicePill green">${p.green} Verde(s) [Habilidade]</span>`);
+                        if (p.blue > 0) pills.push(`<span class="dicePill blue">${p.blue} Azul(is) [Ampliação]</span>`);
+                        if (p.red > 0) pills.push(`<span class="dicePill red">${p.red} Vermelho(s) [Desafio]</span>`);
+                        if (p.purple > 0) pills.push(`<span class="dicePill purple">${p.purple} Roxo(s) [Dificuldade]</span>`);
+                        if (p.black > 0) pills.push(`<span class="dicePill black">${p.black} Preto(s) [Contratempo]</span>`);
+                        if (p.white > 0) pills.push(`<span class="dicePill white">${p.white} Branco(s) [Força]</span>`);
+                        pillsContainer.innerHTML = pills.join('');
+                    }
+                    const titleSpan = messagesArea.querySelector(`[data-card-title-text="${cardId}"]`);
+                    if (titleSpan && p?.skillName && p?.characterName) {
+                        titleSpan.textContent = `Teste de ${p.skillName} (${p.characterName})`;
+                    }
+                    const digitalBtn = messagesArea.querySelector(`[data-card-action="roll_digital"][data-card-id="${cardId}"]`);
+                    const physBtn = messagesArea.querySelector(`[data-card-action="roll_physical"][data-card-id="${cardId}"]`);
+                    if (digitalBtn) {
+                        digitalBtn.setAttribute('data-pool', encodedCharPool);
+                        digitalBtn.setAttribute('data-char-idx', String(charIdx));
+                    }
+                    if (physBtn) {
+                        physBtn.setAttribute('data-pool', encodedCharPool);
+                        physBtn.setAttribute('data-char-idx', String(charIdx));
+                    }
+                } catch {}
+                return;
+            }
+
             const cardBtn = e.target.closest('[data-card-action]');
             if (cardBtn) {
                 const cardAction = cardBtn.getAttribute('data-card-action');
@@ -1757,13 +2475,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (cardAction === 'roll_physical') {
                     const skillName = cardBtn.getAttribute('data-skill') || '';
                     const encodedPool = cardBtn.getAttribute('data-pool') || '';
+                    const charIdx = parseInt(cardBtn.getAttribute('data-char-idx') || '0', 10);
                     let pool = null;
                     try {
                         pool = encodedPool ? JSON.parse(decodeURIComponent(encodedPool)) : null;
                     } catch {
                         pool = null;
                     }
-                    abrirModalRolagemFisica(skillName, pool, cardId);
+                    abrirModalRolagemFisica(skillName, pool, cardId, charIdx);
                     return;
                 }
 

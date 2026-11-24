@@ -145,21 +145,111 @@ const API = {
         }
     },
 
-    // 3B. Atualizar Perfil do Operativo no Supabase Auth (nome_operativo + tratamento)
-    async atualizarPerfilUsuario(nomeOperativo, tratamento) {
+    // 3B. Atualizar Perfil do Operativo no Supabase Auth (nome_operativo + tratamento + trava de 7 dias para troca de nome)
+    async atualizarPerfilUsuario(nomeOperativo, tratamento, opcoes = {}) {
         try {
+            const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+            const { data: userData } = await clienteSupabase.auth.getUser();
+            const user = userData?.user;
+            const meta = user?.user_metadata || {};
+
+            const nomeAnterior = (meta.nome_operativo || "").trim();
+            const novoNomeLimpo = (nomeOperativo || "").trim();
+            const lastUpdated = Number(meta.nome_updated_at || localStorage.getItem("obiwan_nome_updated_at") || 0);
+            const mudandoNome =
+                nomeAnterior &&
+                novoNomeLimpo.toLowerCase() !== nomeAnterior.toLowerCase() &&
+                !opcoes.isInitialSetup;
+
+            if (mudandoNome && lastUpdated > 0) {
+                const elapsed = Date.now() - lastUpdated;
+                if (elapsed < SEVEN_DAYS_MS) {
+                    const restanteMs = SEVEN_DAYS_MS - elapsed;
+                    const diasRestantes = Math.max(1, Math.ceil(restanteMs / (24 * 60 * 60 * 1000)));
+                    return {
+                        sucesso: false,
+                        cooldown: true,
+                        diasRestantes,
+                        erro: `Você alterou seu Nome de Operativo recentemente. Próxima troca disponível em ${diasRestantes} dia(s).`
+                    };
+                }
+            }
+
+            const nextUpdatedAt =
+                mudandoNome || (!lastUpdated && !opcoes.isInitialSetup) ? Date.now() : lastUpdated || Date.now();
+
             const { data, error } = await clienteSupabase.auth.updateUser({
                 data: {
-                    nome_operativo: nomeOperativo,
-                    tratamento: tratamento
+                    nome_operativo: novoNomeLimpo,
+                    tratamento: tratamento,
+                    nome_updated_at: nextUpdatedAt
                 }
             });
             if (error) throw error;
-            localStorage.setItem("obiwan_user", nomeOperativo);
+            localStorage.setItem("obiwan_user", novoNomeLimpo);
             localStorage.setItem("obiwan_tratamento", tratamento);
-            return { sucesso: true, dados: data };
+            localStorage.setItem("obiwan_nome_updated_at", String(nextUpdatedAt));
+            return { sucesso: true, dados: data, nome_updated_at: nextUpdatedAt };
         } catch (erro) {
             console.error("Erro ao atualizar perfil:", erro.message);
+            return { sucesso: false, erro: erro.message };
+        }
+    },
+
+    // 3C. Entrar em uma Mesa Compartilhada usando Código de 6 caracteres (#7FFEDA) + Vincular Ficha
+    async entrarCampanhaPorCodigo(joinCode, characterIdOpcional = null) {
+        try {
+            const cleanCode = String(joinCode || "").replace(/^#/, "").trim().toUpperCase();
+            if (!cleanCode || cleanCode.length < 4) {
+                throw new Error("Informe o código de 6 caracteres da mesa (ex: 7FFEDA).");
+            }
+
+            const { data: userData } = await clienteSupabase.auth.getUser();
+            const userId = userData?.user?.id;
+            if (!userId) throw new Error("Sessão expirada. Faça login novamente.");
+
+            let targetCharId = characterIdOpcional;
+            let targetRole = "party";
+
+            const { data: ownChars } = await clienteSupabase
+                .from("characters")
+                .select("id, data")
+                .eq("user_id", userId);
+
+            if (!targetCharId && Array.isArray(ownChars) && ownChars.length > 0) {
+                const firstPc = ownChars.find((c) => !c.data?.entityType || c.data?.entityType === "pc") || ownChars[0];
+                targetCharId = firstPc?.id || null;
+                targetRole = firstPc?.data?.entityType === "ship" ? "ship" : firstPc?.data?.entityType === "npc" ? "npc_active" : "party";
+            } else if (targetCharId && Array.isArray(ownChars)) {
+                const found = ownChars.find((c) => c.id === targetCharId);
+                if (found) {
+                    targetRole = found.data?.entityType === "ship" ? "ship" : found.data?.entityType === "npc" ? "npc_active" : "party";
+                }
+            }
+
+            if (!targetCharId) {
+                throw new Error("Crie ou selecione pelo menos uma ficha no Datapad (ou peça ao Mestre Kenobi para criar sua ficha) antes de vincular à mesa.");
+            }
+
+            const { data: rpcRes, error: rpcErr } = await clienteSupabase.rpc("join_campaign_by_code", {
+                p_join_code: cleanCode,
+                p_character_id: targetCharId,
+                p_role: targetRole
+            });
+
+            if (rpcErr) throw rpcErr;
+
+            return {
+                sucesso: true,
+                dados: {
+                    campaignId: rpcRes?.campaign_id,
+                    title: rpcRes?.title,
+                    joinCode: rpcRes?.join_code,
+                    characterId: rpcRes?.character_id
+                }
+            };
+        } catch (erro) {
+            console.error("Erro ao entrar na mesa por código:", erro.message);
             return { sucesso: false, erro: erro.message };
         }
     },

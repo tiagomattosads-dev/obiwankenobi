@@ -2906,3 +2906,252 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
     font-weight: 700;
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.25);
 }
+
+/* =========================================================================
+   FASE CO-OP & ESTAÇÃO DE ROLAGEM AMPLA (MULTI-PERSONAGEM + AUTO-DRAFT)
+========================================================================= */
+.obiWideRollStation {
+    max-width: 860px !important;
+    width: 94vw !important;
+}
+
+.physStationHeaderLeft {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.physStationTitleRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.physCoopSyncBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    background: rgba(34, 197, 94, 0.14);
+    border: 1px solid rgba(34, 197, 94, 0.4);
+    color: #86efac;
+}
+
+.physCoopSyncBadge.hidden {
+    display: none !important;
+}
+
+.physStationHeaderActions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.physMinimizeBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #e4e4e7;
+    font-size: 0.76rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.16s ease;
+}
+
+.physMinimizeBtn:hover {
+    background: rgba(255, 255, 255, 0.13);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+}
+
+/* Abas de Personagens (no Action Card e dentro do Modal de Rolagem) */
+.physCharacterTabs,
+.cardCharacterTabs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+    padding: 5px;
+    border-radius: 11px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.physCharacterTabs.hidden {
+    display: none !important;
+}
+
+.physCharTabBtn,
+.cardCharTabBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 13px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: #a1a1aa;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.16s ease;
+}
+
+.physCharTabBtn:hover,
+.cardCharTabBtn:hover {
+    color: #f4f4f5;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.physCharTabBtn.active,
+.cardCharTabBtn.active {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.24);
+    color: #ffffff;
+}
+
+.physCharTabPoolHint {
+    font-family: monospace;
+    font-size: 0.7rem;
+    opacity: 0.75;
+}
+
+/* Layout Dividido em 2 Colunas no Desktop */
+.physSplitLayout {
+    display: grid;
+    grid-template-columns: minmax(260px, 0.95fr) minmax(320px, 1.25fr);
+    gap: 18px;
+    align-items: start;
+}
+
+.physNarrativeCol,
+.physDiceCol {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.physSkillHeaderRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.physNarrativeTextarea {
+    min-height: 170px;
+    line-height: 1.55;
+    font-size: 0.88rem;
+    resize: vertical;
+}
+
+/* Pílula Flutuante de Rascunho Salvo acima do Input do Chat */
+.physDraftFloatingPill {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    max-width: 780px;
+    width: 100%;
+    margin: 0 auto 8px auto;
+    padding: 8px 14px;
+    border-radius: 12px;
+    background: rgba(14, 14, 18, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(14px);
+    z-index: 12;
+}
+
+.physDraftFloatingPill.hidden {
+    display: none !important;
+}
+
+.physDraftPillText {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #e4e4e7;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.physDraftResumeBtn {
+    padding: 5px 12px;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #070709;
+    border: none;
+    font-size: 0.76rem;
+    font-weight: 700;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: opacity 0.15s ease;
+}
+
+.physDraftResumeBtn:hover {
+    opacity: 0.9;
+}
+
+/* Rótulo de Identificação nos Balões Co-op (Mestre Tiago • Kilian / Mestra Helo • Nayla) */
+.coopSpeakerTag {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: #a1a1aa;
+    margin-bottom: 4px;
+}
+
+/* Caixa de Identidade nas Configurações + Cooldown 7 dias */
+.settingIdentityBox {
+    padding: 12px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 16px;
+}
+
+.settingsCooldownHint {
+    font-size: 0.73rem;
+    color: #9ca3af;
+    margin: 4px 0 6px 0;
+    line-height: 1.35;
+}
+
+.settingsCooldownHint.locked {
+    color: #fbbf24;
+}
+
+@media (max-width: 768px) {
+    .obiWideRollStation {
+        width: 100% !important;
+        max-width: 100% !important;
+        max-height: 90dvh !important;
+    }
+
+    .physSplitLayout {
+        grid-template-columns: 1fr !important;
+        gap: 14px;
+    }
+
+    .physNarrativeTextarea {
+        min-height: 105px;
+    }
+
+    .physNumericDiceList {
+        max-height: 220px;
+    }
+}
