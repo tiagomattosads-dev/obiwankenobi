@@ -1687,3 +1687,401 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
     }
 
 } /* ESTA É A VERDADEIRA CHAVE QUE FECHA O BLOCO MOBILE, MANTENHA ELA! */
+
+/* =========================================================================
+   FASE 5: BARRA TÁTICA DA MESA, MODAIS DE CAMPANHA E ACTION CARDS KENOBI
+========================================================================= */
+.tacticalCampaignBar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 20px;
+    background: rgba(14, 15, 20, 0.88);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    z-index: 15;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+}
+
+.tacticalLeft,
+.tacticalRight {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.tacticalCodeBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: 8px;
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.38);
+    color: #fcd34d;
+    font-family: monospace;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tacticalCodeBtn:hover {
+    background: rgba(245, 158, 11, 0.22);
+    border-color: rgba(245, 158, 11, 0.65);
+}
+
+.tacticalCodeBtn .codeLabel {
+    font-size: 0.65rem;
+    opacity: 0.75;
+    letter-spacing: 1px;
+}
+
+.scenePartyPills {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.partySheetPill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(59, 130, 246, 0.12);
+    border: 1px solid rgba(59, 130, 246, 0.35);
+    color: #e2e8f0;
+    font-size: 0.78rem;
+    white-space: nowrap;
+}
+
+.partySheetPill.partnerPill {
+    background: rgba(168, 85, 247, 0.14);
+    border-color: rgba(168, 85, 247, 0.42);
+}
+
+.partySheetPill.shipPill {
+    background: rgba(16, 185, 129, 0.12);
+    border-color: rgba(16, 185, 129, 0.38);
+}
+
+.partySheetStats {
+    font-family: monospace;
+    font-size: 0.72rem;
+    color: #94a3b8;
+}
+
+.emptyPartyHint {
+    font-size: 0.78rem;
+    color: var(--textMuted);
+    font-style: italic;
+}
+
+.tacticalActionBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 11px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #d4d4d8;
+    font-size: 0.78rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tacticalActionBtn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.24);
+    color: #ffffff;
+}
+
+.datapadLinkBtn {
+    border-color: rgba(59, 130, 246, 0.4);
+    color: #93c5fd;
+}
+
+/* ACTION CARDS DENTRO DAS MENSAGENS DO MESTRE KENOBI */
+.kenobiCardsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.kenobiActionCard {
+    background: linear-gradient(135deg, rgba(22, 24, 34, 0.95), rgba(14, 16, 24, 0.98));
+    border: 1px solid rgba(245, 158, 11, 0.38);
+    border-radius: 14px;
+    padding: 14px 16px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.45);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.kenobiActionCard.skillCheckCard {
+    border-color: rgba(59, 130, 246, 0.45);
+}
+
+.kenobiActionCard.resolvedCard {
+    opacity: 0.75;
+    border-color: rgba(255, 255, 255, 0.14);
+}
+
+.kenobiCardHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.kenobiCardTitle {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #fef3c7;
+}
+
+.skillCheckCard .kenobiCardTitle {
+    color: #bfdbfe;
+}
+
+.kenobiCardBadge {
+    font-family: monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(245, 158, 11, 0.16);
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    color: #fde68a;
+}
+
+.kenobiCardDesc {
+    font-size: 0.88rem;
+    color: #d4d4d8;
+    line-height: 1.45;
+}
+
+.kenobiDicePills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.dicePill {
+    font-family: monospace;
+    font-size: 0.75rem;
+    padding: 3px 9px;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.dicePill.yellow { background: rgba(234, 179, 8, 0.2); border: 1px solid rgba(234, 179, 8, 0.55); color: #fef08a; }
+.dicePill.green { background: rgba(34, 197, 94, 0.2); border: 1px solid rgba(34, 197, 94, 0.55); color: #bbf7d0; }
+.dicePill.blue { background: rgba(56, 189, 248, 0.2); border: 1px solid rgba(56, 189, 248, 0.55); color: #bae6fd; }
+.dicePill.purple { background: rgba(168, 85, 247, 0.22); border: 1px solid rgba(168, 85, 247, 0.55); color: #e9d5ff; }
+.dicePill.red { background: rgba(239, 68, 68, 0.22); border: 1px solid rgba(239, 68, 68, 0.55); color: #fecaca; }
+.dicePill.black { background: rgba(82, 82, 91, 0.35); border: 1px solid rgba(161, 161, 170, 0.45); color: #e4e4e7; }
+.dicePill.white { background: rgba(255, 255, 255, 0.16); border: 1px solid rgba(255, 255, 255, 0.5); color: #ffffff; }
+
+.kenobiCardButtons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 2px;
+}
+
+.kenobiCardBtn {
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.kenobiCardBtn.confirm {
+    background: rgba(16, 185, 129, 0.2);
+    border-color: rgba(16, 185, 129, 0.55);
+    color: #a7f3d0;
+}
+.kenobiCardBtn.confirm:hover {
+    background: rgba(16, 185, 129, 0.35);
+    color: #ffffff;
+}
+
+.kenobiCardBtn.cancel {
+    background: rgba(239, 68, 68, 0.14);
+    border-color: rgba(239, 68, 68, 0.45);
+    color: #fca5a5;
+}
+.kenobiCardBtn.cancel:hover {
+    background: rgba(239, 68, 68, 0.28);
+    color: #ffffff;
+}
+
+.kenobiCardBtn.negotiate {
+    background: rgba(245, 158, 11, 0.18);
+    border-color: rgba(245, 158, 11, 0.5);
+    color: #fde68a;
+}
+.kenobiCardBtn.negotiate:hover {
+    background: rgba(245, 158, 11, 0.32);
+    color: #ffffff;
+}
+
+.kenobiCardBtn.roll {
+    background: rgba(59, 130, 246, 0.22);
+    border-color: rgba(59, 130, 246, 0.55);
+    color: #bfdbfe;
+}
+.kenobiCardBtn.roll:hover {
+    background: rgba(59, 130, 246, 0.38);
+    color: #ffffff;
+}
+
+.kenobiAutoLogPill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.38);
+    color: #a7f3d0;
+    font-size: 0.8rem;
+}
+
+/* MODAIS LARGOS (FICHAS, DIÁRIO CANÔNICO, AUTOMAÇÃO) */
+.wideModalBox {
+    max-width: 580px !important;
+    width: 92% !important;
+}
+
+.modalTextarea {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 10px;
+    padding: 12px;
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    resize: vertical;
+    outline: none;
+}
+
+.modalTextarea:focus {
+    border-color: #3b82f6;
+}
+
+.coopCodeBanner {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.coopBannerLabel {
+    font-size: 0.72rem;
+    color: #fcd34d;
+    letter-spacing: 0.8px;
+}
+
+.coopCodeBanner strong {
+    font-family: monospace;
+    font-size: 1.1rem;
+    color: #ffffff;
+    margin-left: 6px;
+}
+
+.coopBannerSub {
+    font-size: 0.78rem;
+    color: #a1a1aa;
+}
+
+.sheetsModalList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+.sheetModalRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sheetModalInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.sheetModalName {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #ffffff;
+}
+
+.sheetModalMeta {
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
+.automationGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.settingRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.settingRow strong {
+    font-size: 0.88rem;
+    color: #f4f4f5;
+}
+
+.settingHint {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin-top: 2px;
+}
+
+.compactSelect {
+    min-width: 210px;
+    max-width: 240px;
+}

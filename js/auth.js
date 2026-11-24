@@ -1,12 +1,20 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-// === AUTH GUARD: Verifica se já está logado ===
-    const usuarioLogado = localStorage.getItem('obiwan_user');
-    
-    // Se a chave existir e não for "Visitante" (ou se tiver um token no futuro), manda pro chat
-    if (usuarioLogado && usuarioLogado !== "Visitante") {
-        window.location.href = 'chat.html';
-        return; // Para a execução do resto do script nesta página
+// === AUTH GUARD: Verifica se já possui sessão real ativa no Supabase Unificado ===
+    if (typeof API !== 'undefined' && API.clienteSupabase) {
+        API.clienteSupabase.auth.getSession().then(({ data }) => {
+            if (data?.session?.user) {
+                const u = data.session.user;
+                const nome =
+                    u.user_metadata?.nome_operativo ||
+                    u.user_metadata?.full_name ||
+                    (u.email ? u.email.split('@')[0] : 'Mestre Jedi');
+                localStorage.setItem('obiwan_user', nome);
+                window.location.href = 'chat.html';
+            } else {
+                localStorage.removeItem('obiwan_user');
+            }
+        });
     }
 
     const bgVideo = document.getElementById('bgVideo');
@@ -126,8 +134,12 @@ if (loginForm) {
             const resposta = await API.login(emailInput, senhaInput);
 
             if (resposta.sucesso) {
-                const nomeCadastrado = resposta.dados.user.user_metadata.nome_operativo || "Mestre Jedi";
-                const tratamentoCadastrado = resposta.dados.user.user_metadata.tratamento || "M";
+                const u = resposta.dados.user;
+                const nomeCadastrado =
+                    u.user_metadata?.nome_operativo ||
+                    u.user_metadata?.full_name ||
+                    (u.email ? u.email.split('@')[0] : "Mestre Jedi");
+                const tratamentoCadastrado = u.user_metadata?.tratamento || "M";
                 localStorage.setItem('obiwan_user', nomeCadastrado);
                 localStorage.setItem('obiwan_tratamento', tratamentoCadastrado);
                 

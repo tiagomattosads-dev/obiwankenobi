@@ -255,36 +255,40 @@
                     </svg>
                 </button>
                 <span class="mobileTitle">Mestre Kenobi</span>
-            </header>   
+            </header>
+
+            <!-- BARRA TÁTICA DA MESA (INTEGRAÇÃO NOCTURNE DATAPAD & DUPLA) -->
+            <div id="tacticalCampaignBar" class="tacticalCampaignBar">
+                <div class="tacticalLeft">
+                    <button id="campaignCodePill" class="tacticalCodeBtn" title="Clique para copiar o Código da Aventura (para vincular a ficha da Nayla ou no Datapad)">
+                        <span class="codeLabel">MESA</span>
+                        <strong id="campaignJoinCodeText">#------</strong>
+                    </button>
+                    <div id="scenePartyPills" class="scenePartyPills">
+                        <span class="emptyPartyHint">Selecione ou inicie uma aventura...</span>
+                    </div>
+                </div>
+                <div class="tacticalRight">
+                    <button id="manageSheetsBtn" class="tacticalActionBtn" title="Vincular ou gerenciar fichas do Datapad nesta aventura">
+                        <span>👥 Fichas</span>
+                    </button>
+                    <button id="openCanonBtn" class="tacticalActionBtn" title="Ver ou editar o Diário Canônico (Memória de Médio Prazo)">
+                        <span>📜 Diário</span>
+                    </button>
+                    <button id="openAutomationBtn" class="tacticalActionBtn" title="Configurar permissões e automação entre Mestre Kenobi e Datapad">
+                        <span>⚙️ Automação</span>
+                    </button>
+                    <a href="https://swdatapad.vercel.app" target="_blank" rel="noopener noreferrer" class="tacticalActionBtn datapadLinkBtn" title="Abrir Nocturne Datapad em nova aba">
+                        <span>📱 Datapad</span>
+                    </a>
+                </div>
+            </div>
 
             <!-- Fundo escuro para quando o chat expandir -->
             <div id="chatOverlay" class="chatOverlay hidden"></div>
 
             <!-- Área de Rolagem das Mensagens -->
-            <div id="messagesArea" class="messagesContainer">
-
-
-                <!-- Exemplo de Mensagem do Usuário (Fundo Cinza) -->
-                <div class="message userMessage">
-                    <div class="messageContent">
-                        Mestre, eu atiro no Stormtrooper usando meu Blaster! Rolo quantos dados?
-                    </div>
-                </div>
-
-                <!-- Exemplo de Mensagem da IA (Sem fundo, com avatar) -->
-                <!-- Exemplo de Mensagem da IA (Sem fundo, com avatar) -->
-                <div class="message aiMessage">
-                    <div class="aiAvatar">
-                        <img src="assets/img/obiwankenobiprofile.webp" alt="Kenobi">
-                    </div>
-                    <div class="messageContent">
-                        <p>O Stormtrooper está a média distância e em cobertura parcial.</p>
-                        <p>Você precisa rolar <strong>2 Dados de Proficiência (Amarelos)</strong> e <strong>1 Dado de
-                                Dificuldade (Roxo)</strong>. Que a Força esteja com você.</p>
-                    </div>
-                </div>
-
-            </div>
+            <div id="messagesArea" class="messagesContainer"></div>
 
             <!-- =========================================
                  BARRA DE DIGITAÇÃO FLUTUANTE
@@ -431,14 +435,118 @@
         </div>
     </div>
 
+    <!-- Modal: Gerenciar Fichas Vinculadas do Datapad (Solo & Dupla com Nayla) -->
+    <div id="sheetsModal" class="customModalOverlay">
+        <div class="customModalBox wideModalBox">
+            <h3 class="modalTitle">👥 Fichas do Datapad na Aventura</h3>
+            <div class="modalBody">
+                <div class="coopCodeBanner">
+                    <div>
+                        <span class="coopBannerLabel">CÓDIGO PARA VINCULAR EM OUTRA CONTA (EX: NAYLA):</span>
+                        <strong id="modalJoinCodeDisplay">#------</strong>
+                    </div>
+                    <span class="coopBannerSub">No Datapad dela, basta abrir o botão de Histórico/Enlace no topo da ficha e digitar este código.</span>
+                </div>
+                <div id="sheetsModalList" class="sheetsModalList"></div>
+            </div>
+            <div class="modalFooter">
+                <button class="modalBtn modalBtnOutline cancelModalBtn">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Diário Canônico da Campanha (Camada 2 de Memória Editável) -->
+    <div id="canonModal" class="customModalOverlay">
+        <div class="customModalBox wideModalBox">
+            <h3 class="modalTitle">📜 Diário Canônico da Aventura</h3>
+            <div class="modalBody">
+                <p class="modalText" style="margin-bottom: 10px;">
+                    Este resumo vivo é atualizado automaticamente pelo Mestre Kenobi e injetado em todas as respostas para que ele nunca esqueça onde vocês estão. Você pode editar livremente para fixar fatos importantes:
+                </p>
+                <textarea id="canonSummaryTextarea" class="modalTextarea" rows="7" placeholder="Ex: Kaiden Arvek e Nayla estão em Byss investigando o Templo Imperial..."></textarea>
+            </div>
+            <div class="modalFooter">
+                <button class="modalBtn modalBtnOutline cancelModalBtn">Cancelar</button>
+                <button id="saveCanonBtn" class="modalBtn modalBtnSolid">Salvar no Holocron</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Preferências de Automação (Mestre Kenobi <-> Datapad) -->
+    <div id="automationModal" class="customModalOverlay">
+        <div class="customModalBox wideModalBox">
+            <h3 class="modalTitle">⚙️ Automação & Permissões da Ficha</h3>
+            <div class="modalBody automationGrid">
+                <div class="settingRow">
+                    <div>
+                        <strong>Interação Mestre Kenobi ↔ Datapad</strong>
+                        <p class="settingHint">Desative se quiser jogar 100% manualmente sem cards de alteração de ficha.</p>
+                    </div>
+                    <select id="prefEnabled" class="settingSelect compactSelect">
+                        <option value="true">Ativada (Modo Assistido)</option>
+                        <option value="false">Desativada (100% Manual)</option>
+                    </select>
+                </div>
+
+                <div class="settingRow">
+                    <div>
+                        <strong>Ferimentos e Fadiga em Combate</strong>
+                        <p class="settingHint">Define se o Mestre pergunta ao iniciar combate, aplica direto ou deixa manual.</p>
+                    </div>
+                    <select id="prefCombat" class="settingSelect compactSelect">
+                        <option value="ask_on_combat_start">Perguntar ao entrar em combate</option>
+                        <option value="confirm_card">Sempre mostrar Card [CONFIRMAR]</option>
+                        <option value="auto">Automático em combate</option>
+                        <option value="manual">100% Manual</option>
+                    </select>
+                </div>
+
+                <div class="settingRow">
+                    <div>
+                        <strong>Receber / Remover Itens</strong>
+                        <p class="settingHint">Quando o Mestre entrega recompensas ou itens encontrados na cena.</p>
+                    </div>
+                    <select id="prefItems" class="settingSelect compactSelect">
+                        <option value="confirm_card">Mostrar Card [CONFIRMAR / CANCELAR]</option>
+                        <option value="auto">Enviar direto para o Inventário</option>
+                        <option value="manual">100% Manual</option>
+                    </select>
+                </div>
+
+                <div class="settingRow">
+                    <div>
+                        <strong>Créditos e Comércio (Mercadores)</strong>
+                        <p class="settingHint">Propostas com botões [CONFIRMAR] [CANCELAR] [NEGOCIAR].</p>
+                    </div>
+                    <select id="prefCredits" class="settingSelect compactSelect">
+                        <option value="confirm_card">Card Interativo [CONFIRMAR / NEGOCIAR]</option>
+                        <option value="manual">100% Manual</option>
+                    </select>
+                </div>
+
+                <div class="settingRow">
+                    <div>
+                        <strong>Experiência (XP)</strong>
+                        <p class="settingHint">Você comentou que prefere gerenciar e gastar XP manualmente.</p>
+                    </div>
+                    <select id="prefXp" class="settingSelect compactSelect">
+                        <option value="manual">100% Manual</option>
+                        <option value="confirm_card">Mostrar Card [CONFIRMAR]</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modalFooter">
+                <button class="modalBtn modalBtnOutline cancelModalBtn">Cancelar</button>
+                <button id="saveAutomationBtn" class="modalBtn modalBtnSolid">Salvar Preferências</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Script Oficial do Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <!-- Biblioteca para renderizar Markdown da IA -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
-    <!-- Script Oficial do Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script src="js/config.js"></script>
     <script src="js/api.js"></script>
