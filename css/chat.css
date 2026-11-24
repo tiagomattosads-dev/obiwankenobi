@@ -2696,3 +2696,213 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
 .kenobiRetryBtn:active {
     transform: scale(0.98);
 }
+
+/* =========================================================================
+   CONVERSOR OFICIAL DE DADOS NUMÉRICOS FÍSICOS (TABELA 1-3 — d6 / d8 / d12)
+========================================================================= */
+.obiNumericRollModal {
+    max-width: 610px !important;
+}
+
+.physRollModeTabs {
+    display: flex;
+    gap: 6px;
+    padding: 4px;
+    border-radius: 11px;
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.physRollModeTab {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: #9ca3af;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.16s ease;
+}
+
+.physRollModeTab.active {
+    background: rgba(255, 255, 255, 0.11);
+    color: #ffffff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+
+.physNumericSection.hidden,
+.physicalRollGrid.hidden {
+    display: none !important;
+}
+
+.physNumericSection {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.physAddDiceBar {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px 12px;
+    border-radius: 11px;
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.physAddDiceLabel {
+    font-size: 0.67rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: #8b8f98;
+}
+
+.physAddDiceChips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.physAddDieChip {
+    padding: 5px 10px;
+    border-radius: 7px;
+    font-size: 0.73rem;
+    font-weight: 600;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.13);
+    color: #e4e4e7;
+    transition: all 0.15s ease;
+}
+
+.physAddDieChip:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.physAddDieChip.yellow { border-color: rgba(234, 179, 8, 0.45); color: #fde047; }
+.physAddDieChip.green  { border-color: rgba(34, 197, 94, 0.45); color: #86efac; }
+.physAddDieChip.blue   { border-color: rgba(56, 189, 248, 0.45); color: #7dd3fc; }
+.physAddDieChip.purple { border-color: rgba(168, 85, 247, 0.45); color: #d8b4fe; }
+.physAddDieChip.red    { border-color: rgba(239, 68, 68, 0.45); color: #fca5a5; }
+.physAddDieChip.black  { border-color: rgba(161, 161, 170, 0.38); color: #d4d4d8; }
+.physAddDieChip.white  { border-color: rgba(255, 255, 255, 0.45); color: #ffffff; }
+
+.physNumericDiceList {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    max-height: 290px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.physDieRow {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 11px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.physDieRow.yellow { border-left: 3px solid #eab308; }
+.physDieRow.green  { border-left: 3px solid #22c55e; }
+.physDieRow.blue   { border-left: 3px solid #38bdf8; }
+.physDieRow.purple { border-left: 3px solid #a855f7; }
+.physDieRow.red    { border-left: 3px solid #ef4444; }
+.physDieRow.black  { border-left: 3px solid #71717a; }
+.physDieRow.white  { border-left: 3px solid #f4f4f5; }
+
+.physDieRowHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.physDieTitleGroup {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.physDieName {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #f4f4f5;
+}
+
+.physDiePolyBadge {
+    font-family: monospace;
+    font-size: 0.7rem;
+    padding: 2px 7px;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #d4d4d8;
+}
+
+.physDieResultTag {
+    font-size: 0.74rem;
+    color: #a1a1aa;
+    font-weight: 500;
+}
+
+.physDieResultTag.rolled {
+    color: #f4f4f5;
+}
+
+.physDieRemoveBtn {
+    background: transparent;
+    border: none;
+    color: #71717a;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 5px;
+    font-size: 0.85rem;
+    line-height: 1;
+}
+
+.physDieRemoveBtn:hover {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.physDieNumbersGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.physDieNumBtn {
+    min-width: 34px;
+    height: 32px;
+    padding: 0 6px;
+    border-radius: 7px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.04);
+    color: #d4d4d8;
+    font-family: monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.14s ease;
+}
+
+.physDieNumBtn:hover {
+    background: rgba(255, 255, 255, 0.11);
+    border-color: rgba(255, 255, 255, 0.28);
+    color: #ffffff;
+}
+
+.physDieNumBtn.selected {
+    background: #ffffff;
+    color: #070709;
+    border-color: #ffffff;
+    font-weight: 700;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.25);
+}

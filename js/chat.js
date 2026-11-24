@@ -107,6 +107,197 @@ document.addEventListener('DOMContentLoaded', () => {
         if (quickToolsMenu) quickToolsMenu.classList.remove('open');
     };
 
+    // =========================================================================
+    // TABELA 1-3 OFICIAL DO LIVRO BÁSICO (PÁG. 18) — CONVERSÃO DE DADOS NUMÉRICOS
+    // =========================================================================
+    const NUMERIC_DIE_DEFINITIONS = {
+        yellow: {
+            label: 'Amarelo (Proficiência)',
+            poly: 'Role 1d12',
+            sides: 12,
+            faces: {
+                1:  { text: 'Vazio', symbols: {} },
+                2:  { text: '1 Sucesso', symbols: { success: 1 } },
+                3:  { text: '1 Sucesso', symbols: { success: 1 } },
+                4:  { text: '2 Sucessos', symbols: { success: 2 } },
+                5:  { text: '2 Sucessos', symbols: { success: 2 } },
+                6:  { text: '1 Vantagem', symbols: { advantage: 1 } },
+                7:  { text: '1 Sucesso + 1 Vantagem', symbols: { success: 1, advantage: 1 } },
+                8:  { text: '1 Sucesso + 1 Vantagem', symbols: { success: 1, advantage: 1 } },
+                9:  { text: '1 Sucesso + 1 Vantagem', symbols: { success: 1, advantage: 1 } },
+                10: { text: '2 Vantagens', symbols: { advantage: 2 } },
+                11: { text: '2 Vantagens', symbols: { advantage: 2 } },
+                12: { text: '1 Triunfo (+1 Sucesso)', symbols: { triumph: 1 } }
+            }
+        },
+        green: {
+            label: 'Verde (Habilidade)',
+            poly: 'Role 1d8',
+            sides: 8,
+            faces: {
+                1: { text: 'Vazio', symbols: {} },
+                2: { text: '1 Sucesso', symbols: { success: 1 } },
+                3: { text: '1 Sucesso', symbols: { success: 1 } },
+                4: { text: '2 Sucessos', symbols: { success: 2 } },
+                5: { text: '1 Vantagem', symbols: { advantage: 1 } },
+                6: { text: '1 Vantagem', symbols: { advantage: 1 } },
+                7: { text: '1 Sucesso + 1 Vantagem', symbols: { success: 1, advantage: 1 } },
+                8: { text: '2 Vantagens', symbols: { advantage: 2 } }
+            }
+        },
+        blue: {
+            label: 'Azul (Ampliação)',
+            poly: 'Role 1d6',
+            sides: 6,
+            faces: {
+                1: { text: 'Vazio', symbols: {} },
+                2: { text: 'Vazio', symbols: {} },
+                3: { text: '1 Sucesso', symbols: { success: 1 } },
+                4: { text: '1 Sucesso + 1 Vantagem', symbols: { success: 1, advantage: 1 } },
+                5: { text: '2 Vantagens', symbols: { advantage: 2 } },
+                6: { text: '1 Vantagem', symbols: { advantage: 1 } }
+            }
+        },
+        purple: {
+            label: 'Roxo (Dificuldade)',
+            poly: 'Role 1d8',
+            sides: 8,
+            faces: {
+                1: { text: 'Vazio', symbols: {} },
+                2: { text: '1 Falha', symbols: { failure: 1 } },
+                3: { text: '2 Falhas', symbols: { failure: 2 } },
+                4: { text: '1 Ameaça', symbols: { threat: 1 } },
+                5: { text: '1 Ameaça', symbols: { threat: 1 } },
+                6: { text: '1 Ameaça', symbols: { threat: 1 } },
+                7: { text: '2 Ameaças', symbols: { threat: 2 } },
+                8: { text: '1 Falha + 1 Ameaça', symbols: { failure: 1, threat: 1 } }
+            }
+        },
+        red: {
+            label: 'Vermelho (Desafio)',
+            poly: 'Role 1d12',
+            sides: 12,
+            faces: {
+                1:  { text: 'Vazio', symbols: {} },
+                2:  { text: '1 Falha', symbols: { failure: 1 } },
+                3:  { text: '1 Falha', symbols: { failure: 1 } },
+                4:  { text: '2 Falhas', symbols: { failure: 2 } },
+                5:  { text: '2 Falhas', symbols: { failure: 2 } },
+                6:  { text: '1 Ameaça', symbols: { threat: 1 } },
+                7:  { text: '1 Ameaça', symbols: { threat: 1 } },
+                8:  { text: '1 Falha + 1 Ameaça', symbols: { failure: 1, threat: 1 } },
+                9:  { text: '1 Falha + 1 Ameaça', symbols: { failure: 1, threat: 1 } },
+                10: { text: '2 Ameaças', symbols: { threat: 2 } },
+                11: { text: '2 Ameaças', symbols: { threat: 2 } },
+                12: { text: '1 Desespero (+1 Falha)', symbols: { despair: 1 } }
+            }
+        },
+        black: {
+            label: 'Preto (Contratempo)',
+            poly: 'Role 1d6',
+            sides: 6,
+            faces: {
+                1: { text: 'Vazio', symbols: {} },
+                2: { text: 'Vazio', symbols: {} },
+                3: { text: '1 Falha', symbols: { failure: 1 } },
+                4: { text: '1 Falha', symbols: { failure: 1 } },
+                5: { text: '1 Ameaça', symbols: { threat: 1 } },
+                6: { text: '1 Ameaça', symbols: { threat: 1 } }
+            }
+        },
+        white: {
+            label: 'Branco (Força)',
+            poly: 'Role 1d12',
+            sides: 12,
+            faces: {
+                1:  { text: '1 Ponto Sombrio', symbols: { darkPip: 1 } },
+                2:  { text: '1 Ponto Sombrio', symbols: { darkPip: 1 } },
+                3:  { text: '1 Ponto Sombrio', symbols: { darkPip: 1 } },
+                4:  { text: '1 Ponto Sombrio', symbols: { darkPip: 1 } },
+                5:  { text: '1 Ponto Sombrio', symbols: { darkPip: 1 } },
+                6:  { text: '1 Ponto Sombrio', symbols: { darkPip: 1 } },
+                7:  { text: '2 Pontos Sombrios', symbols: { darkPip: 2 } },
+                8:  { text: '1 Ponto de Luz', symbols: { lightPip: 1 } },
+                9:  { text: '1 Ponto de Luz', symbols: { lightPip: 1 } },
+                10: { text: '2 Pontos de Luz', symbols: { lightPip: 2 } },
+                11: { text: '2 Pontos de Luz', symbols: { lightPip: 2 } },
+                12: { text: '2 Pontos de Luz', symbols: { lightPip: 2 } }
+            }
+        }
+    };
+
+    let physRollMode = 'numeric'; // 'numeric' | 'symbols'
+    let physNumericPool = []; // [{ id, type: 'yellow'|..., rolledValue: null | 1..12 }]
+    let physActiveCardId = null;
+    const physNumericSection = document.getElementById('physNumericSection');
+    const physSymbolsSection = document.getElementById('physSymbolsSection');
+    const physNumericDiceList = document.getElementById('physNumericDiceList');
+
+    const recalcularSimbolosDosDadosNumericos = () => {
+        Object.keys(physRollState).forEach((k) => {
+            physRollState[k] = 0;
+        });
+        physNumericPool.forEach((die) => {
+            if (!die.rolledValue) return;
+            const def = NUMERIC_DIE_DEFINITIONS[die.type];
+            const face = def?.faces?.[die.rolledValue];
+            if (!face?.symbols) return;
+            Object.entries(face.symbols).forEach(([sym, val]) => {
+                if (sym in physRollState) {
+                    physRollState[sym] += val;
+                }
+            });
+        });
+    };
+
+    const renderizarListaDadosNumericos = () => {
+        if (!physNumericDiceList) return;
+        if (physNumericPool.length === 0) {
+            physNumericDiceList.innerHTML =
+                '<p class="obiModalSubtitle" style="padding: 8px 4px;">Clique nos botões acima (+ Amarelo, + Verde, + Roxo...) para montar os dados que você vai rolar na mesa.</p>';
+            return;
+        }
+
+        const countsByType = {};
+        physNumericDiceList.innerHTML = '';
+
+        physNumericPool.forEach((die) => {
+            const def = NUMERIC_DIE_DEFINITIONS[die.type];
+            if (!def) return;
+            countsByType[die.type] = (countsByType[die.type] || 0) + 1;
+            const totalOfType = physNumericPool.filter((d) => d.type === die.type).length;
+            const idxLabel = totalOfType > 1 ? ` #${countsByType[die.type]}` : '';
+
+            const faceInfo = die.rolledValue ? def.faces[die.rolledValue] : null;
+            const resultText = faceInfo
+                ? `Caiu ${die.rolledValue} → ${faceInfo.text}`
+                : 'Toque no número rolado';
+
+            let btnsHtml = '';
+            for (let n = 1; n <= def.sides; n++) {
+                const isSel = die.rolledValue === n;
+                btnsHtml += `<button type="button" class="physDieNumBtn ${isSel ? 'selected' : ''}" data-die-id="${die.id}" data-die-num="${n}">${n}</button>`;
+            }
+
+            const row = document.createElement('div');
+            row.className = `physDieRow ${die.type}`;
+            row.innerHTML = `
+                <div class="physDieRowHeader">
+                    <div class="physDieTitleGroup">
+                        <span class="physDieName">${def.label}${idxLabel}</span>
+                        <span class="physDiePolyBadge">${def.poly}</span>
+                        <span class="physDieResultTag ${faceInfo ? 'rolled' : ''}">${resultText}</span>
+                    </div>
+                    <button type="button" class="physDieRemoveBtn" data-remove-die="${die.id}" title="Remover este dado">×</button>
+                </div>
+                <div class="physDieNumbersGrid">
+                    ${btnsHtml}
+                </div>
+            `;
+            physNumericDiceList.appendChild(row);
+        });
+    };
+
     const formatarTextoRolagemFisica = () => {
         const partes = [];
         if (physRollState.success > 0) partes.push(`${physRollState.success} ${physRollState.success === 1 ? 'Sucesso' : 'Sucessos'}`);
@@ -118,11 +309,23 @@ document.addEventListener('DOMContentLoaded', () => {
         if (physRollState.lightPip > 0) partes.push(`${physRollState.lightPip} ${physRollState.lightPip === 1 ? 'Ponto de Luz' : 'Pontos de Luz'}`);
         if (physRollState.darkPip > 0) partes.push(`${physRollState.darkPip} ${physRollState.darkPip === 1 ? 'Ponto Sombrio' : 'Pontos Sombrios'}`);
 
-        if (partes.length === 0) return '';
+        const rolledDiceDetails =
+            physRollMode === 'numeric'
+                ? physNumericPool
+                      .filter((d) => d.rolledValue !== null)
+                      .map((d) => {
+                          const def = NUMERIC_DIE_DEFINITIONS[d.type];
+                          return `${def.label.split(' ')[0]}(d${def.sides}=${d.rolledValue})`;
+                      })
+                : [];
+
+        if (partes.length === 0 && rolledDiceDetails.length === 0) return '';
+
+        const textoSimbolos = partes.length > 0 ? partes.join(', ') : '0 Sucessos, 1 Falha';
         const skill = (physRollSkillInput?.value || '').trim();
-        return skill
-            ? `Resultado da rolagem de ${skill}: ${partes.join(', ')}.`
-            : `Resultado da rolagem: ${partes.join(', ')}.`;
+        const prefixo = skill ? `Resultado da rolagem de ${skill}` : 'Resultado da rolagem';
+        const detalheDados = rolledDiceDetails.length > 0 ? ` [Dados físicos: ${rolledDiceDetails.join(', ')}]` : '';
+        return `${prefixo}: ${textoSimbolos}.${detalheDados}`;
     };
 
     const atualizarPreviewRolagemFisica = () => {
@@ -132,22 +335,140 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         if (physRollPreview) {
             const txt = formatarTextoRolagemFisica();
-            physRollPreview.textContent = txt || 'Selecione os símbolos acima para montar o resultado.';
+            if (!txt) {
+                physRollPreview.textContent =
+                    physRollMode === 'numeric'
+                        ? 'Toque nos números tirados em cada dado para converter automaticamente pela Tabela 1-3.'
+                        : 'Selecione os símbolos acima para montar o resultado.';
+                return;
+            }
+            // Mostra também o saldo líquido já cancelado para o jogador conferir na hora!
+            const netSucc = (physRollState.success + physRollState.triumph) - (physRollState.failure + physRollState.despair);
+            const netAdv = physRollState.advantage - physRollState.threat;
+            const ResumoLiquido = [];
+            if (
+                physRollState.success > 0 ||
+                physRollState.failure > 0 ||
+                physRollState.triumph > 0 ||
+                physRollState.despair > 0 ||
+                physRollState.advantage > 0 ||
+                physRollState.threat > 0
+            ) {
+                ResumoLiquido.push(netSucc >= 1 ? `SUCESSO (${netSucc} líquido)` : `FALHA (${netSucc} líquido)`);
+                if (netAdv > 0) ResumoLiquido.push(`${netAdv} Vantagem líquida`);
+                else if (netAdv < 0) ResumoLiquido.push(`${Math.abs(netAdv)} Ameaça líquida`);
+                if (physRollState.triumph > 0) ResumoLiquido.push(`${physRollState.triumph} Triunfo`);
+                if (physRollState.despair > 0) ResumoLiquido.push(`${physRollState.despair} Desespero`);
+            }
+            if (physRollState.lightPip > 0) ResumoLiquido.push(`${physRollState.lightPip} Luz`);
+            if (physRollState.darkPip > 0) ResumoLiquido.push(`${physRollState.darkPip} Sombrio`);
+
+            physRollPreview.textContent =
+                ResumoLiquido.length > 0 ? `${txt} → Saldo Final: ${ResumoLiquido.join(' • ')}` : txt;
         }
     };
 
-    const abrirModalRolagemFisica = (skillInicial = '') => {
+    const alternarAbaRolagemFisica = (modo) => {
+        physRollMode = modo === 'symbols' ? 'symbols' : 'numeric';
+        document.querySelectorAll('.physRollModeTab').forEach((tab) => {
+            tab.classList.toggle('active', tab.getAttribute('data-phys-tab') === physRollMode);
+        });
+        if (physNumericSection) physNumericSection.classList.toggle('hidden', physRollMode !== 'numeric');
+        if (physSymbolsSection) physSymbolsSection.classList.toggle('hidden', physRollMode !== 'symbols');
+        if (physRollMode === 'numeric') {
+            recalcularSimbolosDosDadosNumericos();
+        }
+        atualizarPreviewRolagemFisica();
+    };
+
+    const abrirModalRolagemFisica = (skillInicial = '', poolObj = null, cardId = null) => {
+        physActiveCardId = cardId || null;
         Object.keys(physRollState).forEach((k) => {
             physRollState[k] = 0;
         });
-        if (physRollSkillInput) physRollSkillInput.value = skillInicial;
-        atualizarPreviewRolagemFisica();
+        if (physRollSkillInput) physRollSkillInput.value = skillInicial || poolObj?.skillName || '';
+
+        physNumericPool = [];
+        const addCount = (type, count) => {
+            const n = Math.max(0, Math.min(12, Number(count || 0)));
+            for (let i = 0; i < n; i++) {
+                physNumericPool.push({
+                    id: `die-${type}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}-${i}`,
+                    type,
+                    rolledValue: null
+                });
+            }
+        };
+
+        if (poolObj && typeof poolObj === 'object') {
+            addCount('yellow', poolObj.yellow);
+            addCount('green', poolObj.green);
+            addCount('blue', poolObj.blue);
+            addCount('purple', poolObj.purple);
+            addCount('red', poolObj.red);
+            addCount('black', poolObj.black);
+            addCount('white', poolObj.white);
+        } else {
+            // Pool inicial padrão amigável (1 Amarelo d12 + 1 Verde d8 + 2 Roxos d8) quando aberto pelo botão +
+            addCount('yellow', 1);
+            addCount('green', 1);
+            addCount('purple', 2);
+        }
+
+        renderizarListaDadosNumericos();
+        alternarAbaRolagemFisica('numeric');
         fecharTodosOsModais();
         if (physicalRollModal) physicalRollModal.classList.add('show');
     };
 
     if (physicalRollModal) {
         physicalRollModal.addEventListener('click', (e) => {
+            const tabBtn = e.target.closest('[data-phys-tab]');
+            if (tabBtn) {
+                alternarAbaRolagemFisica(tabBtn.getAttribute('data-phys-tab'));
+                return;
+            }
+
+            const addDieBtn = e.target.closest('[data-add-die]');
+            if (addDieBtn) {
+                const type = addDieBtn.getAttribute('data-add-die');
+                if (NUMERIC_DIE_DEFINITIONS[type]) {
+                    physNumericPool.push({
+                        id: `die-${type}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+                        type,
+                        rolledValue: null
+                    });
+                    renderizarListaDadosNumericos();
+                    recalcularSimbolosDosDadosNumericos();
+                    atualizarPreviewRolagemFisica();
+                }
+                return;
+            }
+
+            const removeDieBtn = e.target.closest('[data-remove-die]');
+            if (removeDieBtn) {
+                const dieId = removeDieBtn.getAttribute('data-remove-die');
+                physNumericPool = physNumericPool.filter((d) => d.id !== dieId);
+                renderizarListaDadosNumericos();
+                recalcularSimbolosDosDadosNumericos();
+                atualizarPreviewRolagemFisica();
+                return;
+            }
+
+            const numBtn = e.target.closest('[data-die-num]');
+            if (numBtn) {
+                const dieId = numBtn.getAttribute('data-die-id');
+                const numVal = parseInt(numBtn.getAttribute('data-die-num') || '0', 10);
+                const targetDie = physNumericPool.find((d) => d.id === dieId);
+                if (targetDie && numVal >= 1) {
+                    targetDie.rolledValue = targetDie.rolledValue === numVal ? null : numVal;
+                    renderizarListaDadosNumericos();
+                    recalcularSimbolosDosDadosNumericos();
+                    atualizarPreviewRolagemFisica();
+                }
+                return;
+            }
+
             const btn = e.target.closest('.rollStepBtn');
             if (!btn) return;
             const card = btn.closest('.rollCounterCard');
@@ -168,7 +489,10 @@ document.addEventListener('DOMContentLoaded', () => {
             Object.keys(physRollState).forEach((k) => {
                 physRollState[k] = 0;
             });
-            if (physRollSkillInput) physRollSkillInput.value = '';
+            physNumericPool.forEach((d) => {
+                d.rolledValue = null;
+            });
+            renderizarListaDadosNumericos();
             atualizarPreviewRolagemFisica();
         });
     }
@@ -188,6 +512,21 @@ document.addEventListener('DOMContentLoaded', () => {
         sendPhysRollBtn.addEventListener('click', async () => {
             const txt = formatarTextoRolagemFisica();
             if (!txt || !chatInput) return;
+            if (physActiveCardId && messagesArea) {
+                const badgeEl = messagesArea.querySelector(`[data-card-badge="${physActiveCardId}"]`);
+                const cardBox = messagesArea.querySelector(`[data-card-box="${physActiveCardId}"]`);
+                const controlsDiv = messagesArea.querySelector(`[data-card-controls="${physActiveCardId}"]`);
+                if (badgeEl) badgeEl.textContent = 'ROLADO';
+                if (cardBox) cardBox.classList.add('resolvedCard');
+                if (controlsDiv) {
+                    controlsDiv.innerHTML = `
+                        <div class="kenobiAutoLogPill">
+                            ${SVG_ICONS.dice}
+                            <span>${txt}</span>
+                        </div>
+                    `;
+                }
+            }
             chatInput.value = txt;
             handleInputResize();
             physicalRollModal.classList.remove('show');
@@ -722,7 +1061,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 ${SVG_ICONS.dice}
                                 <span>Rolar Dados no Sistema</span>
                             </button>
-                            <button class="kenobiCardBtn negotiate" data-card-action="roll_physical" data-card-id="${card.id}" data-skill="${card.payload?.skillName || 'Perícia'}">
+                            <button class="kenobiCardBtn negotiate" data-card-action="roll_physical" data-card-id="${card.id}" data-skill="${card.payload?.skillName || 'Perícia'}" data-pool="${encodedPool}">
                                 ${SVG_ICONS.edit}
                                 <span>Digitar Dados Físicos</span>
                             </button>
@@ -1417,7 +1756,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (cardAction === 'roll_physical') {
                     const skillName = cardBtn.getAttribute('data-skill') || '';
-                    abrirModalRolagemFisica(skillName);
+                    const encodedPool = cardBtn.getAttribute('data-pool') || '';
+                    let pool = null;
+                    try {
+                        pool = encodedPool ? JSON.parse(decodeURIComponent(encodedPool)) : null;
+                    } catch {
+                        pool = null;
+                    }
+                    abrirModalRolagemFisica(skillName, pool, cardId);
                     return;
                 }
 

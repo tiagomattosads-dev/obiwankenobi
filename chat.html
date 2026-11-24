@@ -863,13 +863,13 @@
         </div>
     </div>
 
-    <!-- Modal / Bottom Sheet: Construtor Rápido de Rolagem Física (Força e Destino) -->
+    <!-- Modal / Bottom Sheet: Construtor Rápido de Rolagem Física (Dados Numéricos d6/d8/d12 + Símbolos) -->
     <div id="physicalRollModal" class="customModalOverlay">
-        <div class="customModalBox obiMinimalModal">
+        <div class="customModalBox obiMinimalModal obiNumericRollModal">
             <div class="obiModalHeader">
                 <div>
                     <h3 class="obiModalTitle">Informar Rolagem Física</h3>
-                    <p class="obiModalSubtitle">Toque nos símbolos obtidos nos seus dados físicos na mesa.</p>
+                    <p class="obiModalSubtitle">Role seus dados numéricos (d6, d8, d12) na mesa e toque nos números obtidos.</p>
                 </div>
                 <button type="button" class="obiModalClose cancelModalBtn" aria-label="Fechar">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -881,11 +881,40 @@
 
             <div class="obiModalBody obiFieldsStack">
                 <div class="obiFieldGroup">
-                    <label class="obiFieldLabel" for="physRollSkillInput">PERÍCIA / AÇÃO (OPCIONAL)</label>
+                    <label class="obiFieldLabel" for="physRollSkillInput">PERÍCIA / AÇÃO</label>
                     <input type="text" id="physRollSkillInput" class="obiTextInput" placeholder="Ex: Sabre de Luz, Percepção, Pilotar (Espaço)">
                 </div>
 
-                <div class="physicalRollGrid">
+                <!-- Seletor de Modo: Dados Numéricos (Tabela 1-3) vs Símbolos Diretos -->
+                <div class="physRollModeTabs" role="tablist">
+                    <button type="button" class="physRollModeTab active" data-phys-tab="numeric">
+                        Dados Numéricos (d6 / d8 / d12)
+                    </button>
+                    <button type="button" class="physRollModeTab" data-phys-tab="symbols">
+                        Símbolos Diretos
+                    </button>
+                </div>
+
+                <!-- ABA 1: Conversor Oficial de Dados Numéricos (Tabela 1-3 do Livro Básico) -->
+                <div id="physNumericSection" class="physNumericSection">
+                    <div class="physAddDiceBar">
+                        <span class="physAddDiceLabel">ADICIONAR DADO À POOL:</span>
+                        <div class="physAddDiceChips">
+                            <button type="button" class="physAddDieChip yellow" data-add-die="yellow">+ Amarelo (d12)</button>
+                            <button type="button" class="physAddDieChip green" data-add-die="green">+ Verde (d8)</button>
+                            <button type="button" class="physAddDieChip blue" data-add-die="blue">+ Azul (d6)</button>
+                            <button type="button" class="physAddDieChip purple" data-add-die="purple">+ Roxo (d8)</button>
+                            <button type="button" class="physAddDieChip red" data-add-die="red">+ Vermelho (d12)</button>
+                            <button type="button" class="physAddDieChip black" data-add-die="black">+ Preto (d6)</button>
+                            <button type="button" class="physAddDieChip white" data-add-die="white">+ Branco / Força (d12)</button>
+                        </div>
+                    </div>
+
+                    <div id="physNumericDiceList" class="physNumericDiceList"></div>
+                </div>
+
+                <!-- ABA 2: Contadores de Símbolos Diretos -->
+                <div id="physSymbolsSection" class="physicalRollGrid hidden">
                     <div class="rollCounterCard pos" data-symbol="success">
                         <span class="rollCounterLabel">Sucessos</span>
                         <div class="rollCounterControls">
@@ -952,7 +981,7 @@
                     </div>
                 </div>
 
-                <div id="physRollPreview" class="physRollPreview">Selecione os símbolos acima para montar o resultado.</div>
+                <div id="physRollPreview" class="physRollPreview">Toque nos números rolados em cada dado para converter automaticamente pela Tabela 1-3.</div>
             </div>
 
             <div class="obiModalFooter">
