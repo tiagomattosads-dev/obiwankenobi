@@ -680,18 +680,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const text = chatInput.value.trim();
         if (!text) return;
 
-        if (!conversaAtualId) {
-            const respostaNova = await API.criarConversa('Nova Transmissão...');
-            if (respostaNova.sucesso) {
-                conversaAtualId = respostaNova.dados.id;
-                await renderizarHistorico();
-                await atualizarBarraTatica();
-            } else {
-                console.error('Erro ao criar campanha para a mensagem.');
-                return;
-            }
-        }
-
+        // 1. Feedback visual instantâneo: desenha o balão do usuário e limpa o input na hora
         const balaoUsuarioAtual = appendMessage(text, true);
 
         chatInput.value = '';
@@ -706,6 +695,18 @@ document.addEventListener('DOMContentLoaded', () => {
         showTypingIndicator();
 
         try {
+            // 2. Se ainda não havia aventura ativa, cria agora no banco unificado
+            if (!conversaAtualId) {
+                const respostaNova = await API.criarConversa('Nova Transmissão...');
+                if (!respostaNova.sucesso || !respostaNova.dados?.id) {
+                    throw new Error(respostaNova.erro || 'Não foi possível iniciar a aventura no banco de dados.');
+                }
+                conversaAtualId = respostaNova.dados.id;
+                await renderizarHistorico();
+                await atualizarBarraTatica();
+            }
+
+            // 3. Envia para o cérebro /api/kenobi
             const dadosIA = await API.enviarMensagemParaKenobi(conversaAtualId, text);
             const textoIA = dadosIA.resposta || dadosIA.narrative;
             const idMensagemUsuario = dadosIA.userMessageId;

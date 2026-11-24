@@ -153,15 +153,33 @@ const API = {
             const { data: userData, error: userError } = await clienteSupabase.auth.getUser();
             if (userError || !userData?.user) throw userError || new Error("Não autenticado");
 
-            const { data, error } = await clienteSupabase
+            const campaignId =
+                typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+                    ? crypto.randomUUID()
+                    : "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+                          const r = (Math.random() * 16) | 0;
+                          const v = c === "x" ? r : (r & 0x3) | 0x8;
+                          return v.toString(16);
+                      });
+
+            // Passo 1: INSERT sem RETURNING (evita que a função STABLE de RLS rode antes do commit da linha)
+            const { error: insertError } = await clienteSupabase
                 .from("campaigns")
                 .insert([
                     {
+                        id: campaignId,
                         title: titulo || "Nova Aventura...",
                         owner_id: userData.user.id
                     }
-                ])
+                ]);
+
+            if (insertError) throw insertError;
+
+            // Passo 2: SELECT em statement separado (linha já comitada no snapshot)
+            const { data, error } = await clienteSupabase
+                .from("campaigns")
                 .select("*")
+                .eq("id", campaignId)
                 .single();
 
             if (error) throw error;
