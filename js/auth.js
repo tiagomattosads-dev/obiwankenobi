@@ -5,11 +5,13 @@ document.addEventListener('DOMContentLoaded', () => {
         API.clienteSupabase.auth.getSession().then(({ data }) => {
             if (data?.session?.user) {
                 const u = data.session.user;
-                const nome =
-                    u.user_metadata?.nome_operativo ||
-                    u.user_metadata?.full_name ||
-                    (u.email ? u.email.split('@')[0] : 'Mestre Jedi');
-                localStorage.setItem('obiwan_user', nome);
+                const nomeMeta = u.user_metadata?.nome_operativo || u.user_metadata?.full_name;
+                if (nomeMeta) {
+                    localStorage.setItem('obiwan_user', nomeMeta);
+                }
+                if (u.user_metadata?.tratamento) {
+                    localStorage.setItem('obiwan_tratamento', u.user_metadata.tratamento);
+                }
                 window.location.href = 'chat.html';
             } else {
                 localStorage.removeItem('obiwan_user');
@@ -138,9 +140,13 @@ if (loginForm) {
                 const nomeCadastrado =
                     u.user_metadata?.nome_operativo ||
                     u.user_metadata?.full_name ||
-                    (u.email ? u.email.split('@')[0] : "Mestre Jedi");
+                    "";
                 const tratamentoCadastrado = u.user_metadata?.tratamento || "M";
-                localStorage.setItem('obiwan_user', nomeCadastrado);
+                if (nomeCadastrado) {
+                    localStorage.setItem('obiwan_user', nomeCadastrado);
+                } else {
+                    localStorage.removeItem('obiwan_user');
+                }
                 localStorage.setItem('obiwan_tratamento', tratamentoCadastrado);
                 
                 showToast("Acesso autorizado. Preparando contato com mestre Kenobi...", false);

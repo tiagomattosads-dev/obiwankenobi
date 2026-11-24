@@ -1,4 +1,27 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // === ÍCONES VETORIAIS MINIMALISTAS (ESTILO FLATICON / FEATHER MONOCHROME) ===
+    const SVG_ICONS = {
+        user: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`,
+        partner: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>`,
+        ship: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>`,
+        npc: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`,
+        heart: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>`,
+        zap: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>`,
+        coins: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>`,
+        check: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`,
+        close: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`,
+        chat: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>`,
+        dice: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3" ry="3"></rect><circle cx="8.5" cy="8.5" r="1.2"></circle><circle cx="15.5" cy="8.5" r="1.2"></circle><circle cx="15.5" cy="15.5" r="1.2"></circle><circle cx="8.5" cy="15.5" r="1.2"></circle><circle cx="12" cy="12" r="1.2"></circle></svg>`,
+        edit: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`,
+        shield: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`,
+        terminal: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>`
+    };
+
+    const limparPrefixoEmoji = (str = '') =>
+        String(str)
+            .replace(/^[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\s]+/u, '')
+            .trim();
+
     // === ELEMENTOS DO CHAT EXPANSÍVEL ===
     const chatInput = document.getElementById('chatInput');
     const expandBtn = document.getElementById('expandBtn');
@@ -12,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const settingsDrawer = document.getElementById('settingsDrawer');
     const closeSettingsBtn = document.getElementById('closeSettingsBtn');
     const settingsOverlay = document.getElementById('settingsOverlay');
+    const profileBtn = document.getElementById('profileBtn');
 
     // === ELEMENTOS DE ENVIO E MENSAGENS ===
     const sendBtn = document.getElementById('sendBtn');
@@ -42,19 +66,189 @@ document.addEventListener('DOMContentLoaded', () => {
     const prefXp = document.getElementById('prefXp');
     const saveAutomationBtn = document.getElementById('saveAutomationBtn');
 
+    const profileModal = document.getElementById('profileModal');
+    const profileNameInput = document.getElementById('profileNameInput');
+    const profileTreatmentInput = document.getElementById('profileTreatmentInput');
+    const saveProfileBtn = document.getElementById('saveProfileBtn');
+
     let conversaAtualId = null;
     let campanhaAtualObj = null;
 
-    // Garante que existe uma sessão válida no Supabase unificado do Datapad
-    API.clienteSupabase.auth.getSession().then(({ data }) => {
-        if (!data?.session?.user) {
-            localStorage.removeItem('obiwan_user');
-            window.location.href = 'index.html';
+    // ==========================================
+    // 0. LÓGICA DOS CUSTOM SELECTS (.obiCustomSelect)
+    // ==========================================
+    const setObiSelectValue = (inputId, value) => {
+        const wrapper = document.querySelector(`.obiCustomSelect[data-target-input="${inputId}"]`);
+        const hiddenInput = document.getElementById(inputId);
+        if (!wrapper || !hiddenInput) return;
+
+        hiddenInput.value = String(value);
+        const textSpan = wrapper.querySelector('.obiSelectText');
+        const options = wrapper.querySelectorAll('.obiSelectOptions li');
+        options.forEach((li) => {
+            if (li.getAttribute('data-value') === String(value)) {
+                li.classList.add('selected');
+                if (textSpan) textSpan.textContent = li.textContent;
+            } else {
+                li.classList.remove('selected');
+            }
+        });
+    };
+
+    document.querySelectorAll('.obiCustomSelect').forEach((wrapper) => {
+        const trigger = wrapper.querySelector('.obiSelectTrigger');
+        const options = wrapper.querySelectorAll('.obiSelectOptions li');
+        const inputId = wrapper.getAttribute('data-target-input');
+
+        if (trigger) {
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                document.querySelectorAll('.obiCustomSelect.open').forEach((other) => {
+                    if (other !== wrapper) other.classList.remove('open');
+                });
+                wrapper.classList.toggle('open');
+            });
         }
+
+        options.forEach((option) => {
+            option.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const val = option.getAttribute('data-value');
+                setObiSelectValue(inputId, val);
+                wrapper.classList.remove('open');
+            });
+        });
+    });
+
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.obiCustomSelect.open').forEach((w) => w.classList.remove('open'));
+        document.querySelectorAll('.chatDropdown.show').forEach((menu) => menu.classList.remove('show'));
     });
 
     // ==========================================
-    // 1. LÓGICA DO AUTO-RESIZE E EXPANSÃO DO CHAT
+    // 1. IDENTIDADE DO OPERATIVO & BOAS-VINDAS (CORRIGE "estudio.tiago.web")
+    // ==========================================
+    const sidebarUserName = document.getElementById('sidebarUserName');
+    const cinematicWelcome = document.getElementById('cinematicWelcome');
+    const welcomeTitle = document.getElementById('welcomeTitle');
+
+    const atualizarExibicaoUsuario = (nome, tratamento) => {
+        const tituloSideBar = tratamento === 'F' ? 'Mestra' : 'Mestre';
+        if (sidebarUserName) {
+            sidebarUserName.textContent = `${tituloSideBar} (${nome})`;
+        }
+    };
+
+    const dispararBoasVindasCinematica = (nome, tratamento) => {
+        if (!cinematicWelcome || !welcomeTitle) return;
+        const saudacao = tratamento === 'F' ? 'Bem-vinda' : 'Bem-vindo';
+        const titulo = tratamento === 'F' ? 'Mestra' : 'Mestre';
+        const textToType = `${saudacao}, ${titulo} ${nome}.`;
+        welcomeTitle.textContent = '';
+        let charIndex = 0;
+
+        setTimeout(() => {
+            const typingInterval = setInterval(() => {
+                if (charIndex < textToType.length) {
+                    welcomeTitle.textContent += textToType.charAt(charIndex);
+                    charIndex++;
+                } else {
+                    clearInterval(typingInterval);
+                    setTimeout(() => {
+                        cinematicWelcome.classList.add('hide');
+                        if (chatInput) chatInput.focus();
+                    }, 1200);
+                }
+            }, 65);
+        }, 600);
+    };
+
+    const parecePrefixoDeEmail = (nome, email) => {
+        if (!nome) return true;
+        const prefixo = email ? email.split('@')[0].toLowerCase() : '';
+        const n = nome.trim().toLowerCase();
+        return n === prefixo || n.includes('.') || n.includes('@');
+    };
+
+    const sincronizarIdentidadeOperativo = async () => {
+        const { data } = await API.clienteSupabase.auth.getSession();
+        const user = data?.session?.user;
+        if (!user) {
+            localStorage.removeItem('obiwan_user');
+            window.location.href = 'index.html';
+            return;
+        }
+
+        let nome = user.user_metadata?.nome_operativo || localStorage.getItem('obiwan_user') || '';
+        let tratamento = user.user_metadata?.tratamento || localStorage.getItem('obiwan_tratamento') || 'M';
+        let precisaConfigurarPerfil = parecePrefixoDeEmail(nome, user.email);
+
+        // Se a conta veio do Datapad sem 'nome_operativo' no Auth (ex: "estudio.tiago.web"),
+        // busca o nome do primeiro Operativo salvo no Datapad ou sugere um nome limpo
+        if (precisaConfigurarPerfil) {
+            try {
+                const { data: chars } = await API.clienteSupabase
+                    .from('characters')
+                    .select('data')
+                    .eq('user_id', user.id);
+
+                const firstPc = (chars || [])
+                    .map((r) => r.data)
+                    .find((d) => d && (!d.entityType || d.entityType === 'pc') && d.name && d.name !== 'Novo Personagem');
+
+                if (firstPc?.name) {
+                    nome = firstPc.name;
+                } else {
+                    nome = 'Tiago';
+                }
+            } catch {
+                nome = 'Operativo';
+            }
+        }
+
+        localStorage.setItem('obiwan_user', nome);
+        localStorage.setItem('obiwan_tratamento', tratamento);
+        atualizarExibicaoUsuario(nome, tratamento);
+        dispararBoasVindasCinematica(nome, tratamento);
+
+        // Se o metadata do Supabase Auth ainda não tinha nome_operativo válido, abre o modal de confirmação
+        if (!user.user_metadata?.nome_operativo || parecePrefixoDeEmail(user.user_metadata?.nome_operativo, user.email)) {
+            if (profileNameInput) profileNameInput.value = nome;
+            setObiSelectValue('profileTreatmentInput', tratamento);
+            if (profileModal) profileModal.classList.add('show');
+        }
+    };
+
+    sincronizarIdentidadeOperativo();
+
+    if (profileBtn && profileModal) {
+        profileBtn.addEventListener('click', () => {
+            const atualNome = localStorage.getItem('obiwan_user') || '';
+            const atualTrat = localStorage.getItem('obiwan_tratamento') || 'M';
+            if (profileNameInput) profileNameInput.value = atualNome;
+            setObiSelectValue('profileTreatmentInput', atualTrat);
+            profileModal.classList.add('show');
+        });
+    }
+
+    if (saveProfileBtn) {
+        saveProfileBtn.addEventListener('click', async () => {
+            const novoNome = (profileNameInput?.value || '').trim();
+            const novoTratamento = profileTreatmentInput?.value || 'M';
+            if (!novoNome) return;
+
+            saveProfileBtn.textContent = 'Salvando...';
+            saveProfileBtn.disabled = true;
+            await API.atualizarPerfilUsuario(novoNome, novoTratamento);
+            atualizarExibicaoUsuario(novoNome, novoTratamento);
+            saveProfileBtn.textContent = 'Salvar Identificação';
+            saveProfileBtn.disabled = false;
+            if (profileModal) profileModal.classList.remove('show');
+        });
+    }
+
+    // ==========================================
+    // 2. AUTO-RESIZE E EXPANSÃO DO CHAT
     // ==========================================
     const handleInputResize = () => {
         if (!chatInput) return;
@@ -112,7 +306,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 2. PAINEL LATERAL DE CONFIGURAÇÕES & SIDEBAR
+    // 3. PAINEL LATERAL DE CONFIGURAÇÕES & SIDEBAR
     // ==========================================
     if (settingsBtn && settingsDrawer && closeSettingsBtn && settingsOverlay) {
         const toggleSettingsDrawer = () => {
@@ -150,7 +344,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 2B. BARRA TÁTICA DA CAMPANHA & FICHAS EM TEMPO REAL
+    // 4. BARRA TÁTICA DA CAMPANHA (PURE SVG, ZERO EMOJIS)
     // ==========================================
     const atualizarBarraTatica = async () => {
         if (!conversaAtualId) {
@@ -178,7 +372,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const ativas = (fichasRes.vinculadas || []).filter((f) => f.activeInScene);
         if (ativas.length === 0) {
             scenePartyPills.innerHTML =
-                '<span class="emptyPartyHint">Nenhuma ficha vinculada ainda — clique em "👥 Fichas" para adicionar.</span>';
+                '<span class="emptyPartyHint">Nenhuma ficha vinculada — clique em "Fichas" para adicionar.</span>';
             return;
         }
 
@@ -190,17 +384,32 @@ document.addEventListener('DOMContentLoaded', () => {
             const isPartner = !item.isOwnCharacter;
             pill.className = `partySheetPill ${isShip ? 'shipPill' : isPartner ? 'partnerPill' : ''}`;
 
-            let statsText = '';
+            let statsHtml = '';
             if (isShip) {
-                statsText = `AC ${ent.hullTrauma?.current ?? 0}/${ent.hullTrauma?.threshold ?? 15} • FS ${ent.systemStrain?.current ?? 0}/${ent.systemStrain?.threshold ?? 15}`;
+                statsHtml = `
+                    <span class="statItem">AC ${ent.hullTrauma?.current ?? 0}/${ent.hullTrauma?.threshold ?? 15}</span>
+                    <span class="statItem">FS ${ent.systemStrain?.current ?? 0}/${ent.systemStrain?.threshold ?? 15}</span>
+                `;
             } else {
-                statsText = `❤️ ${ent.wounds?.current ?? 0}/${ent.wounds?.threshold ?? 10} • ⚡ ${ent.strain?.current ?? 0}/${ent.strain?.threshold ?? 10}${typeof ent.credits === 'number' ? ` • 💰 ${ent.credits} CR` : ''}`;
+                statsHtml = `
+                    <span class="statItem" title="Ferimentos">${SVG_ICONS.heart} ${ent.wounds?.current ?? 0}/${ent.wounds?.threshold ?? 10}</span>
+                    <span class="statItem" title="Fadiga">${SVG_ICONS.zap} ${ent.strain?.current ?? 0}/${ent.strain?.threshold ?? 10}</span>
+                    ${typeof ent.credits === 'number' ? `<span class="statItem" title="Créditos">${SVG_ICONS.coins} ${ent.credits} CR</span>` : ''}
+                `;
             }
 
-            const icon = isShip ? '🚀' : ent.entityType === 'npc' ? '🎭' : isPartner ? '✨' : '⚔️';
+            const svgIcon = isShip
+                ? SVG_ICONS.ship
+                : ent.entityType === 'npc'
+                ? SVG_ICONS.npc
+                : isPartner
+                ? SVG_ICONS.partner
+                : SVG_ICONS.user;
+
             pill.innerHTML = `
-                <strong>${icon} ${ent.name}</strong>
-                <span class="partySheetStats">${statsText}</span>
+                ${svgIcon}
+                <strong>${ent.name}</strong>
+                <span class="partySheetStats">${statsHtml}</span>
             `;
             scenePartyPills.appendChild(pill);
         });
@@ -212,7 +421,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 await navigator.clipboard.writeText(campanhaAtualObj.join_code);
                 const old = campaignJoinCodeText.textContent;
-                campaignJoinCodeText.textContent = 'COPIADO!';
+                campaignJoinCodeText.textContent = 'COPIADO';
                 setTimeout(() => {
                     campaignJoinCodeText.textContent = old;
                 }, 1500);
@@ -222,7 +431,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Escuta em Tempo Real no Supabase quando alguma ficha mudar no Datapad!
     API.clienteSupabase
         .channel('kenobi-live-sheets')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'characters' }, () => {
@@ -234,7 +442,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .subscribe();
 
     // ==========================================
-    // 3. RENDERIZAÇÃO DE ACTION CARDS INTERATIVOS DO MESTRE KENOBI
+    // 5. ACTION CARDS INTERATIVOS (PURE SVG, ZERO EMOJIS)
     // ==========================================
     const construirActionCardsHtml = (actionCards = [], autoAppliedLogs = []) => {
         if ((!actionCards || actionCards.length === 0) && (!autoAppliedLogs || autoAppliedLogs.length === 0)) {
@@ -243,16 +451,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let html = '<div class="kenobiCardsContainer">';
 
-        // 1. Logs aplicados automaticamente (ex: dano automático em combate)
         (autoAppliedLogs || []).forEach((log) => {
             html += `
                 <div class="kenobiAutoLogPill">
-                    <span>⚡ <strong>Aplicado no Datapad:</strong> ${log.summary}</span>
+                    ${SVG_ICONS.terminal}
+                    <span><strong>Sincronizado com Datapad:</strong> ${limparPrefixoEmoji(log.summary)}</span>
                 </div>
             `;
         });
 
-        // 2. Cards interativos
         (actionCards || []).forEach((card) => {
             const status = card.status || 'pending';
             const isPending = status === 'pending';
@@ -277,9 +484,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             let badgeLabel = 'AGUARDANDO DECISÃO';
-            if (status === 'confirmed') badgeLabel = '✓ CONFIRMADO';
-            if (status === 'cancelled') badgeLabel = '✕ CANCELADO';
-            if (status === 'negotiating') badgeLabel = '💬 EM NEGOCIAÇÃO';
+            if (status === 'confirmed') badgeLabel = 'CONFIRMADO';
+            if (status === 'cancelled') badgeLabel = 'CANCELADO';
+            if (status === 'negotiating') badgeLabel = 'EM NEGOCIAÇÃO';
 
             let buttonsHtml = '';
             if (isPending) {
@@ -287,10 +494,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     buttonsHtml = `
                         <div class="kenobiCardButtons">
                             <button class="kenobiCardBtn confirm" data-card-action="combat_auto" data-card-id="${card.id}">
-                                ⚔️ Automático nesta luta
+                                ${SVG_ICONS.check}
+                                <span>Automático nesta luta</span>
                             </button>
                             <button class="kenobiCardBtn negotiate" data-card-action="combat_manual" data-card-id="${card.id}">
-                                🛡️ Farei manualmente
+                                ${SVG_ICONS.shield}
+                                <span>Farei manualmente</span>
                             </button>
                         </div>
                     `;
@@ -299,10 +508,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     buttonsHtml = `
                         <div class="kenobiCardButtons">
                             <button class="kenobiCardBtn roll" data-card-action="roll_digital" data-card-id="${card.id}" data-pool="${encodedPool}">
-                                🎲 Rolar Dados no Sistema
+                                ${SVG_ICONS.dice}
+                                <span>Rolar Dados no Sistema</span>
                             </button>
                             <button class="kenobiCardBtn negotiate" data-card-action="roll_physical" data-card-id="${card.id}" data-skill="${card.payload?.skillName || 'Perícia'}">
-                                ✍️ Digitar Dados Físicos
+                                ${SVG_ICONS.edit}
+                                <span>Digitar Dados Físicos</span>
                             </button>
                         </div>
                     `;
@@ -310,15 +521,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     buttonsHtml = `
                         <div class="kenobiCardButtons">
                             <button class="kenobiCardBtn confirm" data-card-action="confirm" data-card-id="${card.id}">
-                                ✓ Confirmar
+                                ${SVG_ICONS.check}
+                                <span>Confirmar</span>
                             </button>
                             <button class="kenobiCardBtn cancel" data-card-action="cancel" data-card-id="${card.id}">
-                                ✕ Cancelar
+                                ${SVG_ICONS.close}
+                                <span>Cancelar</span>
                             </button>
                             ${
                                 isTradeOrCredits
                                     ? `<button class="kenobiCardBtn negotiate" data-card-action="negotiate" data-card-id="${card.id}">
-                                        💬 Negociar
+                                        ${SVG_ICONS.chat}
+                                        <span>Negociar</span>
                                        </button>`
                                     : ''
                             }
@@ -328,15 +542,22 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (card.payload?.rollResult?.summaryPtBr) {
                 buttonsHtml = `
                     <div class="kenobiAutoLogPill">
-                        <span>🎲 ${card.payload.rollResult.summaryPtBr}</span>
+                        ${SVG_ICONS.dice}
+                        <span>${limparPrefixoEmoji(card.payload.rollResult.summaryPtBr)}</span>
                     </div>
                 `;
             }
 
+            const cardIcon = isSkillCheck
+                ? SVG_ICONS.dice
+                : isCombatPrompt
+                ? SVG_ICONS.shield
+                : SVG_ICONS.terminal;
+
             html += `
                 <div class="kenobiActionCard ${isSkillCheck ? 'skillCheckCard' : ''} ${!isPending ? 'resolvedCard' : ''}" data-card-box="${card.id}">
                     <div class="kenobiCardHeader">
-                        <span class="kenobiCardTitle">${card.title}</span>
+                        <span class="kenobiCardTitle">${cardIcon} <span>${limparPrefixoEmoji(card.title)}</span></span>
                         <span class="kenobiCardBadge" data-card-badge="${card.id}">${badgeLabel}</span>
                     </div>
                     <p class="kenobiCardDesc">${card.description}</p>
@@ -353,7 +574,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ==========================================
-    // 4. LÓGICA DE ENVIO E LOADING DA IA
+    // 6. ENVIO E LOADING DA IA
     // ==========================================
     let typingBubble = null;
 
@@ -528,52 +749,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 5. USUÁRIO LOGADO E TELA DE BOAS-VINDAS
-    // ==========================================
-    const loggedInUser = localStorage.getItem('obiwan_user') || 'Visitante';
-    const loggedInTreatment = localStorage.getItem('obiwan_tratamento') || 'M';
-
-    let saudacao = 'Bem-vindo';
-    let tituloSideBar = 'Mestre';
-
-    if (loggedInTreatment === 'F') {
-        saudacao = 'Bem-vinda';
-        tituloSideBar = 'Mestra';
-    } else if (loggedInTreatment === 'N') {
-        saudacao = 'Boas-vindas';
-        tituloSideBar = 'Mestre(a)';
-    }
-
-    const sidebarUserName = document.getElementById('sidebarUserName');
-    if (sidebarUserName) {
-        sidebarUserName.textContent = `${tituloSideBar} (${loggedInUser})`;
-    }
-
-    const cinematicWelcome = document.getElementById('cinematicWelcome');
-    const welcomeTitle = document.getElementById('welcomeTitle');
-
-    if (cinematicWelcome && welcomeTitle) {
-        const textToType = `${saudacao}, ${tituloSideBar} ${loggedInUser}.`;
-        let charIndex = 0;
-
-        setTimeout(() => {
-            const typingInterval = setInterval(() => {
-                if (charIndex < textToType.length) {
-                    welcomeTitle.textContent += textToType.charAt(charIndex);
-                    charIndex++;
-                } else {
-                    clearInterval(typingInterval);
-                    setTimeout(() => {
-                        cinematicWelcome.classList.add('hide');
-                        if (chatInput) chatInput.focus();
-                    }, 1500);
-                }
-            }, 80);
-        }, 1200);
-    }
-
-    // ==========================================
-    // 6. LOGOUT
+    // 7. LOGOUT
     // ==========================================
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
@@ -589,7 +765,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 7. HISTÓRICO E CAMPANHAS (CONECTADO AO SUPABASE UNIFICADO)
+    // 8. HISTÓRICO E CAMPANHAS
     // ==========================================
     const newChatBtn = document.getElementById('newChatBtn');
     const chatHistoryList = document.getElementById('chatHistoryList');
@@ -636,7 +812,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Se nenhuma conversa estiver selecionada ainda, abre automaticamente a primeira!
         if (!conversaAtualId && resposta.dados.length > 0) {
             conversaAtualId = resposta.dados[0].id;
             carregarConversa(conversaAtualId);
@@ -713,7 +888,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ==========================================
-    // 8. MODAIS (RENOMEAR, EXCLUIR, FICHAS, DIÁRIO CANÔNICO, AUTOMAÇÃO)
+    // 9. MODAIS (RENOMEAR, EXCLUIR, FICHAS, DIÁRIO CANÔNICO, AUTOMAÇÃO, PERFIL)
     // ==========================================
     const renameModal = document.getElementById('renameModal');
     const deleteModal = document.getElementById('deleteModal');
@@ -727,6 +902,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (sheetsModal) sheetsModal.classList.remove('show');
             if (canonModal) canonModal.classList.remove('show');
             if (automationModal) automationModal.classList.remove('show');
+            if (profileModal) profileModal.classList.remove('show');
             chatAlvoId = null;
         });
     });
@@ -767,21 +943,20 @@ document.addEventListener('DOMContentLoaded', () => {
         chatAlvoId = null;
     });
 
-    // 8B. Modal de Fichas do Datapad na Campanha
+    // 9B. Modal de Fichas do Datapad na Campanha (Zero Emojis)
     const abrirModalFichas = async () => {
         if (!conversaAtualId) {
             await iniciarNovaConversa();
         }
         if (!sheetsModal || !sheetsModalList) return;
         sheetsModal.classList.add('show');
-        sheetsModalList.innerHTML = '<p class="modalText">Sincronizando fichas com o Nocturne Datapad...</p>';
+        sheetsModalList.innerHTML = '<p class="obiModalSubtitle">Sincronizando fichas com o Nocturne Datapad...</p>';
 
         const res = await API.obterFichasDaCampanha(conversaAtualId);
         const idsVinculados = new Set((res.vinculadas || []).map((v) => v.characterId));
 
         sheetsModalList.innerHTML = '';
 
-        // 1. Mostra fichas de parceiros (ex: Nayla) vinculadas pelo código
         (res.vinculadas || [])
             .filter((v) => !v.isOwnCharacter)
             .forEach((parceiro) => {
@@ -790,44 +965,49 @@ document.addEventListener('DOMContentLoaded', () => {
                 row.className = 'sheetModalRow';
                 row.innerHTML = `
                     <div class="sheetModalInfo">
-                        <span class="sheetModalName">✨ ${ent.name} (Conta Parceira)</span>
-                        <span class="sheetModalMeta">${ent.species || ''} ${ent.career || ''} • ❤️ ${ent.wounds?.current ?? 0}/${ent.wounds?.threshold ?? 10} • ⚡ ${ent.strain?.current ?? 0}/${ent.strain?.threshold ?? 10}</span>
+                        <span class="sheetModalName">${SVG_ICONS.partner} <span>${ent.name} (Conta Parceira)</span></span>
+                        <span class="sheetModalMeta">${ent.species || ''} ${ent.career || ''} • Ferimentos ${ent.wounds?.current ?? 0}/${ent.wounds?.threshold ?? 10} • Fadiga ${ent.strain?.current ?? 0}/${ent.strain?.threshold ?? 10}</span>
                     </div>
                     <span class="kenobiCardBadge">VINCULADA</span>
                 `;
                 sheetsModalList.appendChild(row);
             });
 
-        // 2. Mostra todas as fichas da própria conta do usuário para ligar/desligar com 1 clique
         if ((res.minhasFichas || []).length === 0) {
             sheetsModalList.innerHTML +=
-                '<p class="modalText">Nenhuma ficha encontrada na sua conta do Datapad.</p>';
+                '<p class="obiModalSubtitle">Nenhuma ficha encontrada na sua conta do Datapad.</p>';
             return;
         }
 
         res.minhasFichas.forEach((item) => {
             const ent = item.entity;
             const isLinked = idsVinculados.has(item.characterId);
+            const tipoIcon =
+                ent.entityType === 'ship'
+                    ? SVG_ICONS.ship
+                    : ent.entityType === 'npc'
+                    ? SVG_ICONS.npc
+                    : SVG_ICONS.user;
             const tipoLabel =
                 ent.entityType === 'ship'
-                    ? '🚀 Nave'
+                    ? 'Nave'
                     : ent.entityType === 'npc'
-                    ? '🎭 NPC'
-                    : '⚔️ Operativo';
+                    ? 'NPC'
+                    : 'Operativo';
 
             const row = document.createElement('div');
             row.className = 'sheetModalRow';
             row.innerHTML = `
                 <div class="sheetModalInfo">
-                    <span class="sheetModalName">${tipoLabel}: ${ent.name}</span>
-                    <span class="sheetModalMeta">${
+                    <span class="sheetModalName">${tipoIcon} <span>${ent.name}</span></span>
+                    <span class="sheetModalMeta">${tipoLabel} • ${
                         ent.entityType === 'ship'
                             ? `${ent.hullType || 'Nave'} • Casco ${ent.hullTrauma?.current ?? 0}/${ent.hullTrauma?.threshold ?? 15}`
                             : `${ent.species || ''} ${ent.career || ent.role || ''} • Ferimentos ${ent.wounds?.current ?? 0}/${ent.wounds?.threshold ?? 10}`
                     }</span>
                 </div>
                 <button class="kenobiCardBtn ${isLinked ? 'cancel' : 'confirm'}" data-toggle-sheet="${item.characterId}" data-entity-type="${ent.entityType || 'pc'}" data-linked="${isLinked}">
-                    ${isLinked ? 'Remover da Cena' : '+ Colocar em Cena'}
+                    ${isLinked ? `${SVG_ICONS.close} <span>Remover</span>` : `${SVG_ICONS.check} <span>Colocar em Cena</span>`}
                 </button>
             `;
             sheetsModalList.appendChild(row);
@@ -854,7 +1034,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 8C. Modal do Diário Canônico (Camada 2 de Memória)
+    // 9C. Modal do Diário Canônico
     if (openCanonBtn && canonModal) {
         openCanonBtn.addEventListener('click', async () => {
             if (!conversaAtualId) await iniciarNovaConversa();
@@ -874,13 +1054,13 @@ document.addEventListener('DOMContentLoaded', () => {
             await API.atualizarConversa(conversaAtualId, {
                 canon_summary: canonSummaryTextarea.value.trim()
             });
-            saveCanonBtn.textContent = 'Salvar no Holocron';
+            saveCanonBtn.textContent = 'Salvar Registro';
             canonModal.classList.remove('show');
             atualizarBarraTatica();
         });
     }
 
-    // 8D. Modal de Preferências de Automação (Mão Dupla Configurável)
+    // 9D. Modal de Preferências de Automação (Com Custom Select Minimalista)
     if (openAutomationBtn && automationModal) {
         openAutomationBtn.addEventListener('click', async () => {
             if (!conversaAtualId) await iniciarNovaConversa();
@@ -888,11 +1068,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (res.sucesso && res.dados) {
                 campanhaAtualObj = res.dados;
                 const prefs = res.dados.automation_prefs || {};
-                if (prefEnabled) prefEnabled.value = String(prefs.enabled !== false);
-                if (prefCombat) prefCombat.value = prefs.combat_damage || 'ask_on_combat_start';
-                if (prefItems) prefItems.value = prefs.items || 'confirm_card';
-                if (prefCredits) prefCredits.value = prefs.credits || 'confirm_card';
-                if (prefXp) prefXp.value = prefs.xp || 'manual';
+                setObiSelectValue('prefEnabled', String(prefs.enabled !== false));
+                setObiSelectValue('prefCombat', prefs.combat_damage || 'ask_on_combat_start');
+                setObiSelectValue('prefItems', prefs.items || 'confirm_card');
+                setObiSelectValue('prefCredits', prefs.credits || 'confirm_card');
+                setObiSelectValue('prefXp', prefs.xp || 'manual');
             }
             automationModal.classList.add('show');
         });
@@ -920,7 +1100,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 9. CLIQUES NA BARRA LATERAL
+    // 10. CLIQUES NA BARRA LATERAL
     // ==========================================
     if (chatHistoryList) {
         chatHistoryList.addEventListener('click', (e) => {
@@ -962,20 +1142,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    document.addEventListener('click', () => {
-        document.querySelectorAll('.chatDropdown.show').forEach((menu) => {
-            menu.classList.remove('show');
-        });
-    });
-
     // ==========================================
-    // 10. INTERAÇÃO NAS MENSAGENS (ACTION CARDS, MÁQUINA DO TEMPO E COPIAR)
+    // 11. INTERAÇÃO NAS MENSAGENS (ACTION CARDS, MÁQUINA DO TEMPO E COPIAR)
     // ==========================================
     if (messagesArea) {
         messagesArea.addEventListener('click', async (e) => {
-            // ----------------------------------------------------
-            // A. CLIQUE EM BOTÃO DE ACTION CARD DO MESTRE KENOBI
-            // ----------------------------------------------------
             const cardBtn = e.target.closest('[data-card-action]');
             if (cardBtn) {
                 const cardAction = cardBtn.getAttribute('data-card-action');
@@ -984,7 +1155,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const badgeEl = messagesArea.querySelector(`[data-card-badge="${cardId}"]`);
                 const cardBox = messagesArea.querySelector(`[data-card-box="${cardId}"]`);
 
-                // A.1 Digitar Rolagem Física (Preenche o input do chat para o jogador digitar os símbolos)
                 if (cardAction === 'roll_physical') {
                     const skillName = cardBtn.getAttribute('data-skill') || 'Perícia';
                     chatInput.value = `Rolagem de ${skillName}: `;
@@ -993,7 +1163,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
-                // A.2 Rolar Dados Digitais no Sistema
                 if (cardAction === 'roll_digital') {
                     const encodedPool = cardBtn.getAttribute('data-pool') || '';
                     let pool = null;
@@ -1003,32 +1172,32 @@ document.addEventListener('DOMContentLoaded', () => {
                         pool = null;
                     }
                     cardBtn.disabled = true;
-                    cardBtn.textContent = 'Rolando dados da Força...';
+                    cardBtn.textContent = 'Rolando dados...';
                     try {
                         const res = await API.rolarTesteDePericia(cardId, pool);
-                        if (badgeEl) badgeEl.textContent = '✓ ROLADO';
+                        const cleanMsg = limparPrefixoEmoji(res.suggestedPlayerMessage);
+                        if (badgeEl) badgeEl.textContent = 'ROLADO';
                         if (cardBox) cardBox.classList.add('resolvedCard');
                         if (controlsDiv) {
                             controlsDiv.innerHTML = `
                                 <div class="kenobiAutoLogPill">
-                                    <span>${res.suggestedPlayerMessage}</span>
+                                    ${SVG_ICONS.dice}
+                                    <span>${cleanMsg}</span>
                                 </div>
                             `;
                         }
-                        // Joga o resultado no chat e envia pro Mestre Kenobi narrar a consequência!
-                        chatInput.value = res.suggestedPlayerMessage;
+                        chatInput.value = cleanMsg;
                         await handleSendMessage();
                     } catch (err) {
                         cardBtn.disabled = false;
-                        cardBtn.textContent = '🎲 Rolar Dados no Sistema';
+                        cardBtn.innerHTML = `${SVG_ICONS.dice} <span>Rolar Dados no Sistema</span>`;
                         alert(err.message || 'Erro ao rolar dados.');
                     }
                     return;
                 }
 
-                // A.3 Confirmar / Cancelar / Negociar / Modo de Combate
                 cardBtn.disabled = true;
-                const oldLabel = cardBtn.textContent;
+                const oldHtml = cardBtn.innerHTML;
                 cardBtn.textContent = 'Processando...';
 
                 try {
@@ -1036,26 +1205,27 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (cardBox) cardBox.classList.add('resolvedCard');
 
                     if (cardAction === 'cancel') {
-                        if (badgeEl) badgeEl.textContent = '✕ CANCELADO';
+                        if (badgeEl) badgeEl.textContent = 'CANCELADO';
                         if (controlsDiv) {
-                            controlsDiv.innerHTML = `<span class="partySheetStats">${res.message}</span>`;
+                            controlsDiv.innerHTML = `<span class="partySheetStats">${limparPrefixoEmoji(res.message)}</span>`;
                         }
                     } else if (cardAction === 'negotiate') {
-                        if (badgeEl) badgeEl.textContent = '💬 NEGOCIANDO';
+                        if (badgeEl) badgeEl.textContent = 'NEGOCIANDO';
                         if (controlsDiv) {
-                            controlsDiv.innerHTML = `<span class="partySheetStats">${res.message}</span>`;
+                            controlsDiv.innerHTML = `<span class="partySheetStats">${limparPrefixoEmoji(res.message)}</span>`;
                         }
                         if (res.suggestedPlayerMessage) {
-                            chatInput.value = res.suggestedPlayerMessage;
+                            chatInput.value = limparPrefixoEmoji(res.suggestedPlayerMessage);
                             chatInput.focus();
                             handleInputResize();
                         }
                     } else {
-                        if (badgeEl) badgeEl.textContent = '✓ APLICADO NO DATAPAD';
+                        if (badgeEl) badgeEl.textContent = 'APLICADO NO DATAPAD';
                         if (controlsDiv) {
                             controlsDiv.innerHTML = `
                                 <div class="kenobiAutoLogPill">
-                                    <span>⚡ ${res.message}</span>
+                                    ${SVG_ICONS.check}
+                                    <span>${limparPrefixoEmoji(res.message)}</span>
                                 </div>
                             `;
                         }
@@ -1063,15 +1233,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 } catch (err) {
                     cardBtn.disabled = false;
-                    cardBtn.textContent = oldLabel;
+                    cardBtn.innerHTML = oldHtml;
                     alert(err.message || 'Erro ao aplicar ação na ficha.');
                 }
                 return;
             }
 
-            // ----------------------------------------------------
             // B. CLIQUE NO BOTÃO DE LÁPIS (Máquina do Tempo Inline)
-            // ----------------------------------------------------
             const editBtn = e.target.closest('.editMsgBtn');
             if (editBtn) {
                 const messageDiv = editBtn.closest('.message');
@@ -1108,9 +1276,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // ----------------------------------------------------
             // C. CLIQUE EM CANCELAR EDIÇÃO
-            // ----------------------------------------------------
             const cancelBtn = e.target.closest('.cancelEditBtn');
             if (cancelBtn) {
                 const messageDiv = cancelBtn.closest('.message');
@@ -1124,9 +1290,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // ----------------------------------------------------
             // D. CLIQUE EM ATUALIZAR (Poda o banco + memórias futuras e reenvia)
-            // ----------------------------------------------------
             const saveBtn = e.target.closest('.saveEditBtn');
             if (saveBtn) {
                 const messageDiv = saveBtn.closest('.message');
@@ -1167,9 +1331,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // ----------------------------------------------------
-            // E. CLIQUE NO BOTÃO DE COPIAR (USER & IA)
-            // ----------------------------------------------------
+            // E. CLIQUE NO BOTÃO DE COPIAR
             const copyBtn = e.target.closest('.copyMsgBtn');
             if (copyBtn) {
                 const messageDiv = copyBtn.closest('.message');

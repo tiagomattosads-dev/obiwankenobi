@@ -124,6 +124,25 @@ const API = {
         }
     },
 
+    // 3B. Atualizar Perfil do Operativo no Supabase Auth (nome_operativo + tratamento)
+    async atualizarPerfilUsuario(nomeOperativo, tratamento) {
+        try {
+            const { data, error } = await clienteSupabase.auth.updateUser({
+                data: {
+                    nome_operativo: nomeOperativo,
+                    tratamento: tratamento
+                }
+            });
+            if (error) throw error;
+            localStorage.setItem("obiwan_user", nomeOperativo);
+            localStorage.setItem("obiwan_tratamento", tratamento);
+            return { sucesso: true, dados: data };
+        } catch (erro) {
+            console.error("Erro ao atualizar perfil:", erro.message);
+            return { sucesso: false, erro: erro.message };
+        }
+    },
+
     // ==========================================
     // CAMPANHAS / CONVERSAS (Tabela public.campaigns)
     // ==========================================

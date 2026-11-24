@@ -257,10 +257,14 @@
                 <span class="mobileTitle">Mestre Kenobi</span>
             </header>
 
-            <!-- BARRA TÁTICA DA MESA (INTEGRAÇÃO NOCTURNE DATAPAD & DUPLA) -->
+            <!-- BARRA TÁTICA DA MESA (INTEGRAÇÃO NOCTURNE DATAPAD & DUPLA — ZERO EMOJIS, PURE SVG) -->
             <div id="tacticalCampaignBar" class="tacticalCampaignBar">
                 <div class="tacticalLeft">
                     <button id="campaignCodePill" class="tacticalCodeBtn" title="Clique para copiar o Código da Aventura (para vincular a ficha da Nayla ou no Datapad)">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                        </svg>
                         <span class="codeLabel">MESA</span>
                         <strong id="campaignJoinCodeText">#------</strong>
                     </button>
@@ -270,16 +274,46 @@
                 </div>
                 <div class="tacticalRight">
                     <button id="manageSheetsBtn" class="tacticalActionBtn" title="Vincular ou gerenciar fichas do Datapad nesta aventura">
-                        <span>👥 Fichas</span>
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        <span>Fichas</span>
                     </button>
                     <button id="openCanonBtn" class="tacticalActionBtn" title="Ver ou editar o Diário Canônico (Memória de Médio Prazo)">
-                        <span>📜 Diário</span>
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                        </svg>
+                        <span>Diário</span>
                     </button>
                     <button id="openAutomationBtn" class="tacticalActionBtn" title="Configurar permissões e automação entre Mestre Kenobi e Datapad">
-                        <span>⚙️ Automação</span>
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="4" y1="21" x2="4" y2="14"></line>
+                            <line x1="4" y1="10" x2="4" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12" y2="3"></line>
+                            <line x1="20" y1="21" x2="20" y2="16"></line>
+                            <line x1="20" y1="12" x2="20" y2="3"></line>
+                            <line x1="1" y1="14" x2="7" y2="14"></line>
+                            <line x1="9" y1="8" x2="15" y2="8"></line>
+                            <line x1="17" y1="16" x2="23" y2="16"></line>
+                        </svg>
+                        <span>Automação</span>
                     </button>
                     <a href="https://swdatapad.vercel.app" target="_blank" rel="noopener noreferrer" class="tacticalActionBtn datapadLinkBtn" title="Abrir Nocturne Datapad em nova aba">
-                        <span>📱 Datapad</span>
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+                            <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                        </svg>
+                        <span>Datapad</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.65;">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
                     </a>
                 </div>
             </div>
@@ -437,107 +471,228 @@
 
     <!-- Modal: Gerenciar Fichas Vinculadas do Datapad (Solo & Dupla com Nayla) -->
     <div id="sheetsModal" class="customModalOverlay">
-        <div class="customModalBox wideModalBox">
-            <h3 class="modalTitle">👥 Fichas do Datapad na Aventura</h3>
-            <div class="modalBody">
+        <div class="customModalBox obiMinimalModal">
+            <div class="obiModalHeader">
+                <div>
+                    <h3 class="obiModalTitle">Fichas na Aventura</h3>
+                    <p class="obiModalSubtitle">Selecione quais fichas do Datapad participam desta sessão.</p>
+                </div>
+                <button type="button" class="obiModalClose cancelModalBtn" aria-label="Fechar">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="obiModalBody">
                 <div class="coopCodeBanner">
-                    <div>
-                        <span class="coopBannerLabel">CÓDIGO PARA VINCULAR EM OUTRA CONTA (EX: NAYLA):</span>
+                    <div class="coopCodeRow">
+                        <span class="coopBannerLabel">CÓDIGO DE ENLACE (PARA CONTA PARCEIRA / NAYLA)</span>
                         <strong id="modalJoinCodeDisplay">#------</strong>
                     </div>
-                    <span class="coopBannerSub">No Datapad dela, basta abrir o botão de Histórico/Enlace no topo da ficha e digitar este código.</span>
+                    <span class="coopBannerSub">No Datapad dela, abra o painel de Enlace no topo da ficha e insira este código para entrar na mesma aventura.</span>
                 </div>
                 <div id="sheetsModalList" class="sheetsModalList"></div>
             </div>
-            <div class="modalFooter">
-                <button class="modalBtn modalBtnOutline cancelModalBtn">Fechar</button>
+
+            <div class="obiModalFooter">
+                <button type="button" class="obiBtnWhite cancelModalBtn">Concluir</button>
             </div>
         </div>
     </div>
 
     <!-- Modal: Diário Canônico da Campanha (Camada 2 de Memória Editável) -->
     <div id="canonModal" class="customModalOverlay">
-        <div class="customModalBox wideModalBox">
-            <h3 class="modalTitle">📜 Diário Canônico da Aventura</h3>
-            <div class="modalBody">
-                <p class="modalText" style="margin-bottom: 10px;">
-                    Este resumo vivo é atualizado automaticamente pelo Mestre Kenobi e injetado em todas as respostas para que ele nunca esqueça onde vocês estão. Você pode editar livremente para fixar fatos importantes:
-                </p>
-                <textarea id="canonSummaryTextarea" class="modalTextarea" rows="7" placeholder="Ex: Kaiden Arvek e Nayla estão em Byss investigando o Templo Imperial..."></textarea>
+        <div class="customModalBox obiMinimalModal">
+            <div class="obiModalHeader">
+                <div>
+                    <h3 class="obiModalTitle">Diário Canônico</h3>
+                    <p class="obiModalSubtitle">Memória estruturada que mantém o Mestre Kenobi fiel à história atual.</p>
+                </div>
+                <button type="button" class="obiModalClose cancelModalBtn" aria-label="Fechar">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
             </div>
-            <div class="modalFooter">
-                <button class="modalBtn modalBtnOutline cancelModalBtn">Cancelar</button>
-                <button id="saveCanonBtn" class="modalBtn modalBtnSolid">Salvar no Holocron</button>
+
+            <div class="obiModalBody">
+                <div class="obiFieldGroup">
+                    <label class="obiFieldLabel" for="canonSummaryTextarea">REGISTRO CANÔNICO ATUAL</label>
+                    <textarea id="canonSummaryTextarea" class="obiModalTextarea" rows="7" placeholder="Ex: Kaiden Arvek e Nayla estão em Byss investigando o Templo Imperial..."></textarea>
+                </div>
+            </div>
+
+            <div class="obiModalFooter">
+                <button type="button" class="obiBtnGhost cancelModalBtn">Cancelar</button>
+                <button type="button" id="saveCanonBtn" class="obiBtnWhite">Salvar Registro</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal: Preferências de Automação (Mestre Kenobi <-> Datapad) -->
+    <!-- Modal: Preferências de Automação (Estética Minimalista Obi-Wan + Custom Select) -->
     <div id="automationModal" class="customModalOverlay">
-        <div class="customModalBox wideModalBox">
-            <h3 class="modalTitle">⚙️ Automação & Permissões da Ficha</h3>
-            <div class="modalBody automationGrid">
-                <div class="settingRow">
-                    <div>
-                        <strong>Interação Mestre Kenobi ↔ Datapad</strong>
-                        <p class="settingHint">Desative se quiser jogar 100% manualmente sem cards de alteração de ficha.</p>
+        <div class="customModalBox obiMinimalModal">
+            <div class="obiModalHeader">
+                <div>
+                    <h3 class="obiModalTitle">Automação & Permissões</h3>
+                    <p class="obiModalSubtitle">Defina como o Mestre Kenobi interage com as fichas do Datapad.</p>
+                </div>
+                <button type="button" class="obiModalClose cancelModalBtn" aria-label="Fechar">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="obiModalBody obiFieldsStack">
+                <!-- 1. Chave Geral -->
+                <div class="obiFieldGroup">
+                    <label class="obiFieldLabel">INTERAÇÃO MESTRE KENOBI ↔ DATAPAD</label>
+                    <div class="obiCustomSelect" data-target-input="prefEnabled">
+                        <input type="hidden" id="prefEnabled" value="true">
+                        <button type="button" class="obiSelectTrigger">
+                            <span class="obiSelectText">Ativada (Modo Assistido)</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="obiChevron">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </button>
+                        <ul class="obiSelectOptions">
+                            <li data-value="true">Ativada (Modo Assistido)</li>
+                            <li data-value="false">Desativada (100% Manual — Apenas Narrativa)</li>
+                        </ul>
                     </div>
-                    <select id="prefEnabled" class="settingSelect compactSelect">
-                        <option value="true">Ativada (Modo Assistido)</option>
-                        <option value="false">Desativada (100% Manual)</option>
-                    </select>
                 </div>
 
-                <div class="settingRow">
-                    <div>
-                        <strong>Ferimentos e Fadiga em Combate</strong>
-                        <p class="settingHint">Define se o Mestre pergunta ao iniciar combate, aplica direto ou deixa manual.</p>
+                <!-- 2. Combate -->
+                <div class="obiFieldGroup">
+                    <label class="obiFieldLabel">FERIMENTOS E FADIGA EM COMBATE</label>
+                    <div class="obiCustomSelect" data-target-input="prefCombat">
+                        <input type="hidden" id="prefCombat" value="ask_on_combat_start">
+                        <button type="button" class="obiSelectTrigger">
+                            <span class="obiSelectText">Perguntar ao entrar em combate</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="obiChevron">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </button>
+                        <ul class="obiSelectOptions">
+                            <li data-value="ask_on_combat_start">Perguntar ao entrar em combate</li>
+                            <li data-value="confirm_card">Sempre pedir confirmação via Card</li>
+                            <li data-value="auto">Aplicar automaticamente na ficha</li>
+                            <li data-value="manual">100% Manual no Datapad</li>
+                        </ul>
                     </div>
-                    <select id="prefCombat" class="settingSelect compactSelect">
-                        <option value="ask_on_combat_start">Perguntar ao entrar em combate</option>
-                        <option value="confirm_card">Sempre mostrar Card [CONFIRMAR]</option>
-                        <option value="auto">Automático em combate</option>
-                        <option value="manual">100% Manual</option>
-                    </select>
                 </div>
 
-                <div class="settingRow">
-                    <div>
-                        <strong>Receber / Remover Itens</strong>
-                        <p class="settingHint">Quando o Mestre entrega recompensas ou itens encontrados na cena.</p>
+                <!-- 3. Itens -->
+                <div class="obiFieldGroup">
+                    <label class="obiFieldLabel">ENTREGA E REMOÇÃO DE ITENS</label>
+                    <div class="obiCustomSelect" data-target-input="prefItems">
+                        <input type="hidden" id="prefItems" value="confirm_card">
+                        <button type="button" class="obiSelectTrigger">
+                            <span class="obiSelectText">Pedir confirmação via Card [Confirmar / Cancelar]</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="obiChevron">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </button>
+                        <ul class="obiSelectOptions">
+                            <li data-value="confirm_card">Pedir confirmação via Card [Confirmar / Cancelar]</li>
+                            <li data-value="auto">Enviar automaticamente para o Inventário</li>
+                            <li data-value="manual">100% Manual no Datapad</li>
+                        </ul>
                     </div>
-                    <select id="prefItems" class="settingSelect compactSelect">
-                        <option value="confirm_card">Mostrar Card [CONFIRMAR / CANCELAR]</option>
-                        <option value="auto">Enviar direto para o Inventário</option>
-                        <option value="manual">100% Manual</option>
-                    </select>
                 </div>
 
-                <div class="settingRow">
-                    <div>
-                        <strong>Créditos e Comércio (Mercadores)</strong>
-                        <p class="settingHint">Propostas com botões [CONFIRMAR] [CANCELAR] [NEGOCIAR].</p>
+                <!-- 4. Créditos e Comércio -->
+                <div class="obiFieldGroup">
+                    <label class="obiFieldLabel">CRÉDITOS E COMÉRCIO (MERCADORES)</label>
+                    <div class="obiCustomSelect" data-target-input="prefCredits">
+                        <input type="hidden" id="prefCredits" value="confirm_card">
+                        <button type="button" class="obiSelectTrigger">
+                            <span class="obiSelectText">Card Interativo [Confirmar / Cancelar / Negociar]</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="obiChevron">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </button>
+                        <ul class="obiSelectOptions">
+                            <li data-value="confirm_card">Card Interativo [Confirmar / Cancelar / Negociar]</li>
+                            <li data-value="manual">100% Manual no Datapad</li>
+                        </ul>
                     </div>
-                    <select id="prefCredits" class="settingSelect compactSelect">
-                        <option value="confirm_card">Card Interativo [CONFIRMAR / NEGOCIAR]</option>
-                        <option value="manual">100% Manual</option>
-                    </select>
                 </div>
 
-                <div class="settingRow">
-                    <div>
-                        <strong>Experiência (XP)</strong>
-                        <p class="settingHint">Você comentou que prefere gerenciar e gastar XP manualmente.</p>
+                <!-- 5. Experiência (XP) -->
+                <div class="obiFieldGroup">
+                    <label class="obiFieldLabel">EXPERIÊNCIA (XP)</label>
+                    <div class="obiCustomSelect" data-target-input="prefXp">
+                        <input type="hidden" id="prefXp" value="manual">
+                        <button type="button" class="obiSelectTrigger">
+                            <span class="obiSelectText">100% Manual no Datapad</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="obiChevron">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </button>
+                        <ul class="obiSelectOptions">
+                            <li data-value="manual">100% Manual no Datapad</li>
+                            <li data-value="confirm_card">Pedir confirmação via Card</li>
+                        </ul>
                     </div>
-                    <select id="prefXp" class="settingSelect compactSelect">
-                        <option value="manual">100% Manual</option>
-                        <option value="confirm_card">Mostrar Card [CONFIRMAR]</option>
-                    </select>
                 </div>
             </div>
-            <div class="modalFooter">
-                <button class="modalBtn modalBtnOutline cancelModalBtn">Cancelar</button>
-                <button id="saveAutomationBtn" class="modalBtn modalBtnSolid">Salvar Preferências</button>
+
+            <div class="obiModalFooter">
+                <button type="button" class="obiBtnGhost cancelModalBtn">Cancelar</button>
+                <button type="button" id="saveAutomationBtn" class="obiBtnWhite">Salvar Preferências</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Identificação do Operativo (Corrige o nome e título na conta unificada) -->
+    <div id="profileModal" class="customModalOverlay">
+        <div class="customModalBox obiMinimalModal">
+            <div class="obiModalHeader">
+                <div>
+                    <h3 class="obiModalTitle">Identificação do Operativo</h3>
+                    <p class="obiModalSubtitle">Como o Mestre Kenobi deve se dirigir a você nas transmissões.</p>
+                </div>
+                <button type="button" class="obiModalClose cancelModalBtn" aria-label="Fechar">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="obiModalBody obiFieldsStack">
+                <div class="obiFieldGroup">
+                    <label class="obiFieldLabel" for="profileNameInput">NOME DE OPERATIVO</label>
+                    <input type="text" id="profileNameInput" class="obiTextInput" placeholder="Ex: Tiago / Kaiden Arvek">
+                </div>
+
+                <div class="obiFieldGroup">
+                    <label class="obiFieldLabel">TÍTULO DE TRATAMENTO</label>
+                    <div class="obiCustomSelect" data-target-input="profileTreatmentInput">
+                        <input type="hidden" id="profileTreatmentInput" value="M">
+                        <button type="button" class="obiSelectTrigger">
+                            <span class="obiSelectText">Mestre (Masculino)</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="obiChevron">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </button>
+                        <ul class="obiSelectOptions">
+                            <li data-value="M">Mestre (Masculino)</li>
+                            <li data-value="F">Mestra (Feminino)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="obiModalFooter">
+                <button type="button" class="obiBtnGhost cancelModalBtn">Cancelar</button>
+                <button type="button" id="saveProfileBtn" class="obiBtnWhite">Salvar Identificação</button>
             </div>
         </div>
     </div>
