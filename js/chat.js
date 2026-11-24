@@ -1306,6 +1306,21 @@ document.addEventListener('DOMContentLoaded', () => {
             if (modalJoinCodeDisplay) modalJoinCodeDisplay.textContent = codeText;
             if (mobileSheetJoinCode) mobileSheetJoinCode.textContent = codeText;
             if (mobileSceneSub) mobileSceneSub.textContent = codeText;
+
+            const canManage = Boolean(campanhaAtualObj.isOwner || campanhaAtualObj.canManageTable);
+            if (openAutomationBtn) {
+                openAutomationBtn.style.display = canManage ? '' : 'none';
+            }
+            document.querySelectorAll('[data-quick-tool="automation"], [data-sheet-shortcut="automation"]').forEach((el) => {
+                el.style.display = canManage ? '' : 'none';
+            });
+            if (messagesArea) {
+                messagesArea.querySelectorAll('.editMsgBtn').forEach((btn) => {
+                    const msgDiv = btn.closest('.message');
+                    const hasId = Boolean(msgDiv && msgDiv.getAttribute('data-id'));
+                    btn.style.display = canManage && hasId ? 'flex' : 'none';
+                });
+            }
         }
 
         if (!scenePartyPills) return;
@@ -1596,7 +1611,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const textoSeguro = text || 'Sinto um distúrbio na Força. O sinal foi perdido.';
 
         if (isUser) {
-            const displayBtn = messageId ? 'flex' : 'none';
+            const canEditTimeline = !campanhaAtualObj || campanhaAtualObj.isOwner || campanhaAtualObj.canManageTable;
+            const displayBtn = messageId && canEditTimeline ? 'flex' : 'none';
             const speakerLabel = extraMeta.senderLabel || '';
             messageDiv.innerHTML = `
                 <div class="messageContent">
@@ -1991,6 +2007,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         resposta.dados.forEach((conversa) => {
             const isFixado = conversa.fixado;
+            const isOwner = conversa.isOwner !== false;
             const iconSvg = isFixado
                 ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 11.2V6a3 3 0 0 0-6 0v5.2a2 2 0 0 1-1.11 1.35l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>`
                 : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>`;
@@ -2001,6 +2018,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
             li.setAttribute('data-id', conversa.id);
             li.setAttribute('data-fixado', isFixado);
+            li.setAttribute('data-is-owner', String(isOwner));
+
+            const ownerActionsHtml = isOwner
+                ? `
+                    <button class="dropdownItem action-rename">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        Renomear
+                    </button>
+                    <button class="dropdownItem danger action-delete">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        Excluir
+                    </button>
+                  `
+                : `
+                    <button class="dropdownItem danger action-leave">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                        Sair da mesa
+                    </button>
+                  `;
 
             li.innerHTML = `
                 <span class="chatIcon">${iconSvg}</span>
@@ -2013,16 +2049,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="chatDropdown">
                     <button class="dropdownItem action-pin">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 11.2V6a3 3 0 0 0-6 0v5.2a2 2 0 0 1-1.11 1.35l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>
-                        ${isFixado ? 'Desfixar' : 'Fixar'}
+                        ${isFixado ? (isOwner ? 'Desfixar' : 'Desfixar para mim') : (isOwner ? 'Fixar' : 'Fixar para mim')}
                     </button>
-                    <button class="dropdownItem action-rename">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                        Renomear
-                    </button>
-                    <button class="dropdownItem danger action-delete">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                        Excluir
-                    </button>
+                    ${ownerActionsHtml}
                 </div>
             `;
             chatHistoryList.appendChild(li);
@@ -2305,7 +2334,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 9C. Modal do Diário Canônico
+    // 9C. Modal do Diário Canônico (Somente leitura para convidados sem permissão do dono)
     if (openCanonBtn && canonModal) {
         openCanonBtn.addEventListener('click', async () => {
             if (!conversaAtualId) await iniciarNovaConversa();
@@ -2313,6 +2342,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (res.sucesso && res.dados) {
                 campanhaAtualObj = res.dados;
                 canonSummaryTextarea.value = res.dados.canon_summary || '';
+                const canManage = Boolean(res.dados.isOwner || res.dados.canManageTable);
+                canonSummaryTextarea.readOnly = !canManage;
+                if (saveCanonBtn) {
+                    saveCanonBtn.style.display = canManage ? '' : 'none';
+                }
             }
             canonModal.classList.add('show');
         });
@@ -2322,22 +2356,34 @@ document.addEventListener('DOMContentLoaded', () => {
         saveCanonBtn.addEventListener('click', async () => {
             if (!conversaAtualId) return;
             saveCanonBtn.textContent = 'Salvando...';
-            await API.atualizarConversa(conversaAtualId, {
+            const res = await API.atualizarConversa(conversaAtualId, {
                 canon_summary: canonSummaryTextarea.value.trim()
             });
             saveCanonBtn.textContent = 'Salvar Registro';
+            if (!res.sucesso) {
+                alert(res.erro || 'Sem permissão para alterar o Diário Canônico.');
+                return;
+            }
             canonModal.classList.remove('show');
             atualizarBarraTatica();
         });
     }
 
-    // 9D. Modal de Preferências de Automação (Com Custom Select Minimalista)
+    // 9D. Modal de Preferências de Automação (Apenas Dono ou Convidado autorizado pelo Dono)
+    const prefGuestManage = document.getElementById('prefGuestManage');
+    const ownerGuestPermGroup = document.getElementById('ownerGuestPermGroup');
+
     if (openAutomationBtn && automationModal) {
         openAutomationBtn.addEventListener('click', async () => {
             if (!conversaAtualId) await iniciarNovaConversa();
             const res = await API.obterCampanhaPorId(conversaAtualId);
             if (res.sucesso && res.dados) {
                 campanhaAtualObj = res.dados;
+                const canManage = Boolean(res.dados.isOwner || res.dados.canManageTable);
+                if (!canManage) {
+                    alert('Apenas o dono da mesa pode gerenciar as configurações de Automação.');
+                    return;
+                }
                 const prefs = res.dados.automation_prefs || {};
                 setObiSelectValue('prefEnabled', String(prefs.enabled !== false));
                 setObiSelectValue('prefCombat', prefs.combat_damage || 'ask_on_combat_start');
@@ -2345,6 +2391,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 setObiSelectValue('prefCredits', prefs.credits || 'confirm_card');
                 setObiSelectValue('prefXp', prefs.xp || 'manual');
                 setObiSelectValue('prefSheetMgmt', prefs.sheet_management || 'confirm_card');
+                setObiSelectValue('prefGuestManage', String(Boolean(prefs.guest_can_manage)));
+                if (ownerGuestPermGroup) {
+                    ownerGuestPermGroup.style.display = res.dados.isOwner ? '' : 'none';
+                }
             }
             automationModal.classList.add('show');
         });
@@ -2361,16 +2411,36 @@ document.addEventListener('DOMContentLoaded', () => {
                 items: prefItems.value,
                 credits: prefCredits.value,
                 xp: prefXp.value,
-                sheet_management: prefSheetMgmt ? prefSheetMgmt.value : 'confirm_card'
+                sheet_management: prefSheetMgmt ? prefSheetMgmt.value : 'confirm_card',
+                guest_can_manage: prefGuestManage ? prefGuestManage.value === 'true' : false
             };
-            await API.atualizarConversa(conversaAtualId, {
+            const res = await API.atualizarConversa(conversaAtualId, {
                 automation_prefs: nextPrefs
             });
             saveAutomationBtn.textContent = 'Salvar Preferências';
+            if (!res.sucesso) {
+                alert(res.erro || 'Sem permissão para alterar a Automação.');
+                return;
+            }
             automationModal.classList.remove('show');
             atualizarBarraTatica();
         });
     }
+
+    const sairDaMesa = async (id) => {
+        if (!confirm('Deseja sair desta mesa compartilhada? Sua ficha será desvinculada da cena (a conversa do dono da mesa permanecerá intacta).')) {
+            return;
+        }
+        await API.sairDaMesaConvidado(id);
+        if (conversaAtualId === id) {
+            conversaAtualId = null;
+            if (messagesArea) {
+                messagesArea.querySelectorAll('.message:not(.systemMsg)').forEach((msg) => msg.remove());
+            }
+        }
+        await renderizarHistorico();
+        await atualizarBarraTatica();
+    };
 
     // ==========================================
     // 10. CLIQUES NA BARRA LATERAL
@@ -2396,10 +2466,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const liContainer = dropdownItem.closest('.historyItem');
                 const chatId = liContainer.getAttribute('data-id');
                 const estadoFixado = liContainer.getAttribute('data-fixado');
+                const isOwner = liContainer.getAttribute('data-is-owner') !== 'false';
 
                 if (dropdownItem.classList.contains('action-pin')) fixarConversa(chatId, estadoFixado);
-                if (dropdownItem.classList.contains('action-rename')) renomearConversa(chatId);
-                if (dropdownItem.classList.contains('action-delete')) excluirConversa(chatId);
+                if (isOwner && dropdownItem.classList.contains('action-rename')) renomearConversa(chatId);
+                if (isOwner && dropdownItem.classList.contains('action-delete')) excluirConversa(chatId);
+                if (!isOwner && dropdownItem.classList.contains('action-leave')) sairDaMesa(chatId);
 
                 liContainer.querySelector('.chatDropdown').classList.remove('show');
                 return;

@@ -3,29 +3,57 @@
 // ============================================================================
 const clienteSupabase = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
 
+// Helpers de Pin Local para Convidados (não afeta o pin do Dono da Mesa no banco!)
+function obterPinsLocaisConvidado(userId) {
+    if (!userId) return {};
+    try {
+        return JSON.parse(localStorage.getItem(`obiwan_guest_pins_${userId}`) || "{}");
+    } catch {
+        return {};
+    }
+}
+
+function salvarPinLocalConvidado(userId, campaignId, fixado) {
+    if (!userId || !campaignId) return;
+    const map = obterPinsLocaisConvidado(userId);
+    if (fixado) map[campaignId] = true;
+    else delete map[campaignId];
+    localStorage.setItem(`obiwan_guest_pins_${userId}`, JSON.stringify(map));
+}
+
 // Mapeia uma linha da tabela nova 'campaigns' para o formato compatível com o frontend
-function mapearCampanha(row) {
+function mapearCampanha(row, currentUserId = null) {
     if (!row) return null;
+    const isOwner = Boolean(currentUserId && row.owner_id === currentUserId);
+    const prefs = row.automation_prefs || {
+        enabled: true,
+        combat_damage: "ask_on_combat_start",
+        combat_strain: "ask_on_combat_start",
+        items: "confirm_card",
+        credits: "confirm_card",
+        xp: "manual",
+        sheet_management: "confirm_card",
+        guest_can_manage: false
+    };
+    const guestPins = !isOwner && currentUserId ? obterPinsLocaisConvidado(currentUserId) : {};
+    // Para quem entra por código (convidado), a conversa NUNCA chega fixada do dono; usa apenas o pin local do convidado!
+    const isPinned = isOwner ? Boolean(row.pinned) : Boolean(guestPins[row.id]);
+
     return {
         id: row.id,
         titulo: row.title || "Nova Aventura...",
         title: row.title || "Nova Aventura...",
-        fixado: Boolean(row.pinned),
-        pinned: Boolean(row.pinned),
+        fixado: isPinned,
+        pinned: isPinned,
         usuario_id: row.owner_id,
         owner_id: row.owner_id,
+        isOwner,
+        canManageTable: isOwner || Boolean(prefs.guest_can_manage),
         join_code: row.join_code || "------",
         status: row.status || "ativo",
         canon_summary: row.canon_summary || "",
         scene_state: row.scene_state || { in_combat: false, combat_auto_damage: null },
-        automation_prefs: row.automation_prefs || {
-            enabled: true,
-            combat_damage: "ask_on_combat_start",
-            combat_strain: "ask_on_combat_start",
-            items: "confirm_card",
-            credits: "confirm_card",
-            xp: "manual"
-        },
+        automation_prefs: prefs,
         created_at: row.created_at,
         updated_at: row.updated_at
     };
@@ -318,7 +346,7 @@ const API = {
                 console.warn("Aviso ao auto-vincular ficha inicial:", e);
             }
 
-            return { sucesso: true, dados: mapearCampanha(data) };
+            return { sucesso: true, dados: mapearCampanha(data, userData.user.id) };
         } catch (erro) {
             console.error("Erro ao criar campanha:", erro.message);
             return { sucesso: false, erro: erro.message };
@@ -328,14 +356,19 @@ const API = {
     // 5. Puxar Lista de Campanhas do Usuário (Próprias ou Convidado)
     async obterConversas() {
         try {
+            const { data: userData } = await clienteSupabase.auth.getUser();
+            const currentUserId = userData?.user?.id || null;
+
             const { data, error } = await clienteSupabase
                 .from("campaigns")
                 .select("*")
-                .order("pinned", { ascending: false })
                 .order("created_at", { ascending: false });
 
             if (error) throw error;
-            return { sucesso: true, dados: (data || []).map(mapearCampanha) };
+            const lista = (data || [])
+                .map((row) => mapearCampanha(row, currentUserId))
+                .sort((a, b) => Number(b.fixado) - Number(a.fixado));
+            return { sucesso: true, dados: lista };
         } catch (erro) {
             console.error("Erro ao buscar campanhas:", erro.message);
             return { sucesso: false, erro: erro.message };
@@ -345,28 +378,70 @@ const API = {
     // 5B. Obter Detalhes de uma Campanha Específica
     async obterCampanhaPorId(id) {
         try {
+            const { data: userData } = await clienteSupabase.auth.getUser();
+            const currentUserId = userData?.user?.id || null;
+
             const { data, error } = await clienteSupabase
                 .from("campaigns")
                 .select("*")
                 .eq("id", id)
                 .single();
             if (error) throw error;
-            return { sucesso: true, dados: mapearCampanha(data) };
+            return { sucesso: true, dados: mapearCampanha(data, currentUserId) };
         } catch (erro) {
             return { sucesso: false, erro: erro.message };
         }
     },
 
-    // 6. Atualizar Campanha (Renomear, Fixar, Diário Canônico, Preferências de Automação)
+    // 6. Atualizar Campanha (Com trava de segurança: Convidado não renomeia nem gerencia sem permissão do Dono!)
     async atualizarConversa(id, atualizacoes) {
         try {
+            const { data: userData } = await clienteSupabase.auth.getUser();
+            const currentUserId = userData?.user?.id;
+            if (!currentUserId) throw new Error("Sessão expirada.");
+
+            const { data: campAtual, error: campErr } = await clienteSupabase
+                .from("campaigns")
+                .select("*")
+                .eq("id", id)
+                .single();
+            if (campErr || !campAtual) throw campErr || new Error("Mesa não encontrada.");
+
+            const isOwner = campAtual.owner_id === currentUserId;
+            const guestCanManage = Boolean(campAtual.automation_prefs?.guest_can_manage);
+
+            // Se for convidado tentando fixar/desfixar: salva APENAS localmente para ele!
+            if (!isOwner && ("fixado" in atualizacoes || "pinned" in atualizacoes)) {
+                const novoPin = Boolean(atualizacoes.fixado ?? atualizacoes.pinned);
+                salvarPinLocalConvidado(currentUserId, id, novoPin);
+                return { sucesso: true, dados: mapearCampanha(campAtual, currentUserId) };
+            }
+
+            // Convidado NUNCA pode renomear a mesa do dono
+            if (!isOwner && ("titulo" in atualizacoes || "title" in atualizacoes)) {
+                throw new Error("Apenas o criador da mesa pode renomear esta aventura.");
+            }
+
+            // Convidado só pode editar Diário Canônico ou Automação se o dono liberou guest_can_manage
+            if (!isOwner && !guestCanManage && ("canon_summary" in atualizacoes || "automation_prefs" in atualizacoes)) {
+                throw new Error("Apenas o dono da mesa pode alterar o Diário Canônico e a Automação (permissão restrita).");
+            }
+
             const payload = {};
-            if ("titulo" in atualizacoes) payload.title = atualizacoes.titulo;
-            if ("title" in atualizacoes) payload.title = atualizacoes.title;
-            if ("fixado" in atualizacoes) payload.pinned = atualizacoes.fixado;
-            if ("pinned" in atualizacoes) payload.pinned = atualizacoes.pinned;
+            if (isOwner && "titulo" in atualizacoes) payload.title = atualizacoes.titulo;
+            if (isOwner && "title" in atualizacoes) payload.title = atualizacoes.title;
+            if (isOwner && "fixado" in atualizacoes) payload.pinned = atualizacoes.fixado;
+            if (isOwner && "pinned" in atualizacoes) payload.pinned = atualizacoes.pinned;
             if ("canon_summary" in atualizacoes) payload.canon_summary = atualizacoes.canon_summary;
-            if ("automation_prefs" in atualizacoes) payload.automation_prefs = atualizacoes.automation_prefs;
+            if ("automation_prefs" in atualizacoes) {
+                // Garante que apenas o dono possa alterar a chave guest_can_manage
+                payload.automation_prefs = {
+                    ...atualizacoes.automation_prefs,
+                    guest_can_manage: isOwner
+                        ? Boolean(atualizacoes.automation_prefs?.guest_can_manage)
+                        : Boolean(campAtual.automation_prefs?.guest_can_manage)
+                };
+            }
             if ("scene_state" in atualizacoes) payload.scene_state = atualizacoes.scene_state;
             payload.updated_at = new Date().toISOString();
 
@@ -378,25 +453,66 @@ const API = {
                 .single();
 
             if (error) throw error;
-            return { sucesso: true, dados: mapearCampanha(data) };
+            return { sucesso: true, dados: mapearCampanha(data, currentUserId) };
         } catch (erro) {
             console.error("Erro ao atualizar campanha:", erro.message);
             return { sucesso: false, erro: erro.message };
         }
     },
 
-    // 7. Excluir Campanha
+    // 7. Excluir Campanha (Apenas o Dono da Mesa pode excluir!)
     async excluirConversa(id) {
         try {
+            const { data: userData } = await clienteSupabase.auth.getUser();
+            const currentUserId = userData?.user?.id;
+            const { data: campAtual } = await clienteSupabase
+                .from("campaigns")
+                .select("owner_id")
+                .eq("id", id)
+                .single();
+
+            if (!campAtual || campAtual.owner_id !== currentUserId) {
+                throw new Error("Apenas o dono da mesa pode excluir esta aventura.");
+            }
+
             const { error } = await clienteSupabase
                 .from("campaigns")
                 .delete()
-                .eq("id", id);
+                .eq("id", id)
+                .eq("owner_id", currentUserId);
 
             if (error) throw error;
             return { sucesso: true };
         } catch (erro) {
             console.error("Erro ao excluir campanha:", erro.message);
+            return { sucesso: false, erro: erro.message };
+        }
+    },
+
+    // 7B. Sair da Mesa (Para convidados que entraram por código — remove apenas o vínculo deles sem apagar a mesa do dono)
+    async sairDaMesaConvidado(conversaId) {
+        try {
+            const { data: userData } = await clienteSupabase.auth.getUser();
+            const currentUserId = userData?.user?.id;
+            if (!currentUserId) throw new Error("Sessão expirada.");
+
+            await clienteSupabase
+                .from("campaign_characters")
+                .delete()
+                .eq("campaign_id", conversaId)
+                .eq("added_by_user_id", currentUserId);
+
+            const { error } = await clienteSupabase
+                .from("campaign_members")
+                .delete()
+                .eq("campaign_id", conversaId)
+                .eq("user_id", currentUserId);
+
+            if (error) throw error;
+            salvarPinLocalConvidado(currentUserId, conversaId, false);
+            return { sucesso: true };
+        } catch (erro) {
+            console.error("Erro ao sair da mesa:", erro.message);
             return { sucesso: false, erro: erro.message };
         }
     },

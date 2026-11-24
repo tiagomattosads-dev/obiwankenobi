@@ -770,6 +770,24 @@
                         </ul>
                     </div>
                 </div>
+
+                <!-- 7. Permissões dos Convidados da Mesa (Exclusivo do Dono da Mesa) -->
+                <div id="ownerGuestPermGroup" class="obiFieldGroup">
+                    <label class="obiFieldLabel">PERMISSÕES DE QUEM ENTRA NA MESA POR CÓDIGO</label>
+                    <div class="obiCustomSelect dropUp" data-target-input="prefGuestManage">
+                        <input type="hidden" id="prefGuestManage" value="false">
+                        <button type="button" class="obiSelectTrigger">
+                            <span class="obiSelectText">Restrito (Apenas jogar e gerenciar a própria ficha)</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="obiChevron">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </button>
+                        <ul class="obiSelectOptions">
+                            <li data-value="false">Restrito (Apenas jogar e gerenciar a própria ficha)</li>
+                            <li data-value="true">Liberado (Permitir que convidados editem Diário e Automação)</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
 
             <div class="obiModalFooter">
