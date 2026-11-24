@@ -31,7 +31,7 @@ function mapearCampanha(row) {
     };
 }
 
-// Chama o backend serverless /api/kenobi com fallback automático (localhost -> vercel)
+// Chama o backend serverless /api/kenobi com retry automático em pico 503 do Gemini
 async function chamarBackendKenobi(payload) {
     const { data: sessionData } = await clienteSupabase.auth.getSession();
     const token = sessionData?.session?.access_token;
@@ -43,28 +43,49 @@ async function chamarBackendKenobi(payload) {
     let ultimoErro = "Não foi possível conectar ao servidor do Mestre Kenobi.";
 
     for (const url of endpoints) {
-        try {
-            const resp = await fetch(url, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify(payload)
-            });
+        const maxAttempts = url.includes("localhost") ? 1 : 2;
 
-            const json = await resp.json().catch(() => null);
-            if (!resp.ok || !json?.ok) {
-                ultimoErro = json?.error || `Erro HTTP ${resp.status}`;
-                if (resp.status === 401 || resp.status === 400 || resp.status === 404) {
+        for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+            try {
+                const resp = await fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const json = await resp.json().catch(() => null);
+                if (!resp.ok || !json?.ok) {
+                    const serverErr = json?.error || `Erro HTTP ${resp.status}`;
+                    ultimoErro = serverErr;
+
+                    // Pico temporário de demanda (503) ou rate-limit (429): tenta mais 1x após breve pausa
+                    if ((resp.status === 503 || resp.status === 429) && attempt < maxAttempts) {
+                        await new Promise((r) => setTimeout(r, 1600));
+                        continue;
+                    }
+
+                    // Erro de autenticação, validação ou resposta explícita do servidor de produção
+                    if (resp.status === 401 || resp.status === 400 || resp.status === 503 || resp.status === 429) {
+                        throw new Error(serverErr);
+                    }
+                    break;
+                }
+                return json;
+            } catch (err) {
+                ultimoErro = err?.message || ultimoErro;
+                // Se já é um erro definitivo vindo do backend de produção, não mascara tentando outro endpoint
+                if (url.includes("swdatapad.vercel.app") && attempt >= maxAttempts) {
                     throw new Error(ultimoErro);
                 }
-                continue;
+                if (attempt < maxAttempts) {
+                    await new Promise((r) => setTimeout(r, 1200));
+                    continue;
+                }
+                break;
             }
-            return json;
-        } catch (err) {
-            ultimoErro = err?.message || ultimoErro;
-            continue;
         }
     }
 

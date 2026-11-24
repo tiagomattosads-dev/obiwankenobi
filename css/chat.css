@@ -2665,3 +2665,34 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
         flex: 1;
     }
 }
+
+/* Botão minimalista de retentativa em erros temporários (ex: pico 503 do Gemini) */
+.kenobiRetryWrap {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.kenobiRetryBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 14px;
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: #f4f4f5;
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.18s ease, border-color 0.18s ease, transform 0.12s ease;
+}
+
+.kenobiRetryBtn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.kenobiRetryBtn:active {
+    transform: scale(0.98);
+}

@@ -898,19 +898,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    const handleSendMessage = async () => {
-        const text = chatInput.value.trim();
+    const handleSendMessage = async (retryText = null, existingUserBubble = null) => {
+        const isRetry = typeof retryText === 'string' && retryText.trim().length > 0;
+        const text = isRetry ? retryText.trim() : chatInput.value.trim();
         if (!text) return;
 
-        // 1. Feedback visual instantâneo: desenha o balão do usuário e limpa o input na hora
-        const balaoUsuarioAtual = appendMessage(text, true);
+        // 1. Feedback visual instantâneo: desenha o balão do usuário (ou reaproveita em retry) e limpa o input
+        const balaoUsuarioAtual = existingUserBubble || appendMessage(text, true);
 
-        chatInput.value = '';
-        chatInput.focus();
-        if (typeof handleInputResize === 'function') handleInputResize();
+        if (!isRetry) {
+            chatInput.value = '';
+            chatInput.focus();
+            if (typeof handleInputResize === 'function') handleInputResize();
 
-        if (inputSection.classList.contains('expandedMode')) {
-            document.getElementById('expandBtn').click();
+            if (inputSection.classList.contains('expandedMode')) {
+                document.getElementById('expandBtn').click();
+            }
         }
 
         setAiLoading(true);
@@ -952,17 +955,44 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (erro) {
             console.error('Distúrbio na Força:', erro);
             removeTypingIndicator();
-            appendMessage(
+            const errBubble = appendMessage(
                 `Sinto um distúrbio na Força: ${erro.message || 'Não foi possível contatar o Mestre.'}`,
                 false
             );
+            if (errBubble) {
+                const retryWrap = document.createElement('div');
+                retryWrap.className = 'kenobiRetryWrap';
+                retryWrap.innerHTML = `
+                    <button type="button" class="kenobiRetryBtn">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <polyline points="23 4 23 10 17 10"></polyline>
+                            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                        </svg>
+                        <span>Tentar novamente</span>
+                    </button>
+                `;
+                const btnRetry = retryWrap.querySelector('.kenobiRetryBtn');
+                if (btnRetry) {
+                    btnRetry.addEventListener('click', () => {
+                        errBubble.remove();
+                        handleSendMessage(text, balaoUsuarioAtual);
+                    });
+                }
+                const contentCol = errBubble.querySelector('.aiContentWrapper') || errBubble;
+                const actionsEl = contentCol.querySelector('.msgActions');
+                if (actionsEl) {
+                    contentCol.insertBefore(retryWrap, actionsEl);
+                } else {
+                    contentCol.appendChild(retryWrap);
+                }
+            }
         } finally {
             setAiLoading(false);
         }
     };
 
     if (sendBtn && chatInput) {
-        sendBtn.addEventListener('click', handleSendMessage);
+        sendBtn.addEventListener('click', () => handleSendMessage());
         chatInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
