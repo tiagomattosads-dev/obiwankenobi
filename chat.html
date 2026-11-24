@@ -641,6 +641,25 @@
                         </ul>
                     </div>
                 </div>
+
+                <!-- 6. Criação e Gerenciamento Geral de Fichas -->
+                <div class="obiFieldGroup">
+                    <label class="obiFieldLabel">CRIAÇÃO E GERENCIAMENTO GERAL DE FICHAS (ATRIBUTOS, PERÍCIAS E ANOTAÇÕES)</label>
+                    <div class="obiCustomSelect" data-target-input="prefSheetMgmt">
+                        <input type="hidden" id="prefSheetMgmt" value="confirm_card">
+                        <button type="button" class="obiSelectTrigger">
+                            <span class="obiSelectText">Pedir confirmação via Card [Confirmar / Cancelar]</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="obiChevron">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </button>
+                        <ul class="obiSelectOptions">
+                            <li data-value="confirm_card">Pedir confirmação via Card [Confirmar / Cancelar]</li>
+                            <li data-value="auto">Gerenciamento Livre (Aplicar automaticamente quando eu pedir)</li>
+                            <li data-value="manual">Desativado (100% Manual no Datapad)</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
 
             <div class="obiModalFooter">

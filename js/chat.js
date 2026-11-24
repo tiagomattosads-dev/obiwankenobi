@@ -64,6 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const prefItems = document.getElementById('prefItems');
     const prefCredits = document.getElementById('prefCredits');
     const prefXp = document.getElementById('prefXp');
+    const prefSheetMgmt = document.getElementById('prefSheetMgmt');
     const saveAutomationBtn = document.getElementById('saveAutomationBtn');
 
     const profileModal = document.getElementById('profileModal');
@@ -518,11 +519,18 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     `;
                 } else {
+                    const isCreateSheet = card.payload?.actionType === 'create_sheet';
+                    const isNoteAdd = card.payload?.actionType === 'note_add';
+                    const confirmLabel = isCreateSheet
+                        ? 'Criar Ficha no Datapad'
+                        : isNoteAdd
+                        ? 'Salvar Anotação'
+                        : 'Confirmar';
                     buttonsHtml = `
                         <div class="kenobiCardButtons">
                             <button class="kenobiCardBtn confirm" data-card-action="confirm" data-card-id="${card.id}">
                                 ${SVG_ICONS.check}
-                                <span>Confirmar</span>
+                                <span>${confirmLabel}</span>
                             </button>
                             <button class="kenobiCardBtn cancel" data-card-action="cancel" data-card-id="${card.id}">
                                 ${SVG_ICONS.close}
@@ -1074,6 +1082,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 setObiSelectValue('prefItems', prefs.items || 'confirm_card');
                 setObiSelectValue('prefCredits', prefs.credits || 'confirm_card');
                 setObiSelectValue('prefXp', prefs.xp || 'manual');
+                setObiSelectValue('prefSheetMgmt', prefs.sheet_management || 'confirm_card');
             }
             automationModal.classList.add('show');
         });
@@ -1089,7 +1098,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 combat_strain: prefCombat.value,
                 items: prefItems.value,
                 credits: prefCredits.value,
-                xp: prefXp.value
+                xp: prefXp.value,
+                sheet_management: prefSheetMgmt ? prefSheetMgmt.value : 'confirm_card'
             };
             await API.atualizarConversa(conversaAtualId, {
                 automation_prefs: nextPrefs
