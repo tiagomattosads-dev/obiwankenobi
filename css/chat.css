@@ -2287,3 +2287,381 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
     color: #d4d4d8;
     font-size: 0.8rem;
 }
+
+/* =========================================================================
+   UX MOBILE REDESIGN, MENU RÁPIDO (+), ROLAGEM FÍSICA & BOTTOM SHEETS
+========================================================================= */
+
+/* Dropdown que abre para cima (evita corte nos últimos itens do modal) */
+.obiCustomSelect.dropUp .obiSelectOptions {
+    top: auto;
+    bottom: calc(100% + 6px);
+    transform: translateY(8px);
+}
+
+.obiCustomSelect.dropUp.open .obiSelectOptions {
+    transform: translateY(0);
+}
+
+/* Cabeçalho inline da IA (escondido no Desktop, visível no Mobile para largura total) */
+.aiHeaderMobile {
+    display: none;
+}
+
+/* Menu Flutuante do botão + (Barra de Digitação) */
+.quickToolsWrapper {
+    position: relative;
+}
+
+.quickToolsMenu {
+    position: absolute;
+    bottom: calc(100% + 12px);
+    left: 0;
+    min-width: 230px;
+    background: #0d0d11;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 12px;
+    padding: 6px;
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    z-index: 60;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px) scale(0.97);
+    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.quickToolsMenu.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+.quickToolItem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    color: #d4d4d8;
+    font-size: 0.86rem;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.quickToolItem:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+}
+
+.quickToolItem svg {
+    opacity: 0.8;
+    flex-shrink: 0;
+}
+
+/* Grid 2x2 de ações do Bottom Sheet Mobile */
+.mobileTableGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.mobileTableTile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px 12px;
+    border-radius: 12px;
+    background: #0d0d10;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #e4e4e7;
+    font-size: 0.84rem;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.mobileTableTile:active,
+.mobileTableTile:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.24);
+    color: #ffffff;
+}
+
+/* Construtor Rápido de Rolagem Física */
+.physicalRollGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.rollCounterCard {
+    background: #0d0d10;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 10px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.rollCounterCard.pos { border-color: rgba(34, 197, 94, 0.24); }
+.rollCounterCard.gold { border-color: rgba(234, 179, 8, 0.3); }
+.rollCounterCard.neg { border-color: rgba(168, 85, 247, 0.24); }
+.rollCounterCard.red { border-color: rgba(239, 68, 68, 0.3); }
+.rollCounterCard.force { border-color: rgba(255, 255, 255, 0.16); }
+
+.rollCounterLabel {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #a1a1aa;
+}
+
+.rollCounterControls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.rollStepBtn {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.rollStepBtn:hover,
+.rollStepBtn:active {
+    background: rgba(255, 255, 255, 0.16);
+}
+
+.rollCounterVal {
+    font-family: monospace;
+    font-size: 1.05rem;
+    color: #ffffff;
+    min-width: 24px;
+    text-align: center;
+}
+
+.physRollPreview {
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    font-family: monospace;
+    font-size: 0.8rem;
+    color: #d4d4d8;
+    line-height: 1.45;
+}
+
+/* =========================================================================
+   OVERRIDE MOBILE (<= 768px): HEADER ÚNICO, LARGURA TOTAL E BOTTOM SHEETS
+========================================================================= */
+@media screen and (max-width: 768px) {
+    /* 1. Elimina o topo duplo escondendo a tacticalCampaignBar no celular */
+    .tacticalCampaignBar {
+        display: none !important;
+    }
+
+    /* Header Mobile Único e Limpo (54px) */
+    .mobileHeader {
+        display: flex !important;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 12px !important;
+        height: 56px;
+        gap: 8px !important;
+        background: rgba(10, 10, 12, 0.94) !important;
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+    .mobileScenePill {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.045);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #ffffff;
+        cursor: pointer;
+        overflow: hidden;
+    }
+
+    .mobileSceneMain {
+        font-size: 0.84rem;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .mobileSceneSub {
+        font-family: monospace;
+        font-size: 0.72rem;
+        color: #8b8f98;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .mobileHeaderRight {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex-shrink: 0;
+    }
+
+    .mobileHeaderIconBtn {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: #d4d4d8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    /* 2. Resposta da IA & Action Cards em 100% da Largura no Celular */
+    .aiMessage {
+        flex-direction: column !important;
+        gap: 6px !important;
+    }
+
+    .aiMessage > .aiAvatar {
+        display: none !important;
+    }
+
+    .aiHeaderMobile {
+        display: flex !important;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 2px;
+    }
+
+    .aiHeaderMobile img {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+    }
+
+    .aiHeaderMobile span {
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: #a1a1aa;
+        letter-spacing: 0.02em;
+    }
+
+    .aiContentWrapper {
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    .kenobiActionCard {
+        padding: 14px !important;
+    }
+
+    .kenobiCardButtons {
+        width: 100%;
+    }
+
+    .kenobiCardBtn {
+        min-height: 44px;
+        flex: 1 1 130px;
+        justify-content: center;
+        font-size: 0.82rem;
+    }
+
+    /* 3. Todos os Modais viram Native Bottom Sheets no Celular */
+    .customModalOverlay {
+        align-items: flex-end !important;
+        padding: 0 !important;
+    }
+
+    .customModalBox,
+    .obiMinimalModal {
+        width: 100% !important;
+        max-width: 100% !important;
+        border-radius: 22px 22px 0 0 !important;
+        border-left: none !important;
+        border-right: none !important;
+        border-bottom: none !important;
+        max-height: 86dvh;
+        display: flex;
+        flex-direction: column;
+        padding: 12px 18px calc(20px + env(safe-area-inset-bottom)) 18px !important;
+        transform: translateY(100%) !important;
+    }
+
+    .customModalOverlay.show .customModalBox,
+    .customModalOverlay.show .obiMinimalModal {
+        transform: translateY(0) !important;
+    }
+
+    .obiMinimalModal::before {
+        content: '';
+        display: block;
+        width: 40px;
+        height: 4px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.2);
+        margin: 0 auto 14px auto;
+        flex-shrink: 0;
+    }
+
+    .obiModalHeader {
+        margin-bottom: 16px;
+        flex-shrink: 0;
+    }
+
+    .obiModalBody {
+        overflow-y: auto;
+        flex: 1;
+        margin-bottom: 16px;
+        padding-bottom: 8px;
+    }
+
+    .obiModalFooter {
+        flex-shrink: 0;
+        padding-top: 10px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .obiModalFooter button {
+        min-height: 44px;
+        flex: 1;
+    }
+}

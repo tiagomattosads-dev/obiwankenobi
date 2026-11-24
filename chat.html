@@ -245,16 +245,45 @@
         ========================================= -->
         <main class="chatMain">
 
-            <!-- NOVO: Cabeçalho Mobile (Só aparece no celular) -->
+            <!-- CABEÇALHO MOBILE UNIFICADO (SÓ APARECE NO CELULAR — ZERO TOPO DUPLO) -->
             <header class="mobileHeader">
                 <button id="mobileMenuBtn" class="iconBtn" aria-label="Abrir menu">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="3" y1="12" x2="21" y2="12"></line>
                         <line x1="3" y1="6" x2="21" y2="6"></line>
                         <line x1="3" y1="18" x2="21" y2="18"></line>
                     </svg>
                 </button>
-                <span class="mobileTitle">Mestre Kenobi</span>
+
+                <button id="mobileSceneSummaryBtn" class="mobileScenePill" type="button" aria-label="Abrir painel tático da mesa">
+                    <span id="mobileSceneTitle" class="mobileSceneMain">Mestre Kenobi</span>
+                    <span id="mobileSceneSub" class="mobileSceneSub">Mesa</span>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.65; flex-shrink:0;">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+
+                <div class="mobileHeaderRight">
+                    <button id="mobileTableBtn" class="mobileHeaderIconBtn" type="button" aria-label="Painel da mesa">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="4" y1="21" x2="4" y2="14"></line>
+                            <line x1="4" y1="10" x2="4" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12" y2="3"></line>
+                            <line x1="20" y1="21" x2="20" y2="16"></line>
+                            <line x1="20" y1="12" x2="20" y2="3"></line>
+                            <line x1="1" y1="14" x2="7" y2="14"></line>
+                            <line x1="9" y1="8" x2="15" y2="8"></line>
+                            <line x1="17" y1="16" x2="23" y2="16"></line>
+                        </svg>
+                    </button>
+                    <a href="https://swdatapad.vercel.app" target="_blank" rel="noopener noreferrer" class="mobileHeaderIconBtn" aria-label="Abrir Datapad">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+                            <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                        </svg>
+                    </a>
+                </div>
             </header>
 
             <!-- BARRA TÁTICA DA MESA (INTEGRAÇÃO NOCTURNE DATAPAD & DUPLA — ZERO EMOJIS, PURE SVG) -->
@@ -355,15 +384,59 @@
                     <!-- Linha inferior de ações -->
                     <div class="inputActions">
 
-                        <!-- Lado Esquerdo -->
-                        <div class="actionsLeft">
-                            <button id="attachBtn" class="actionBtn iconOnly" aria-label="Anexar">
+                        <!-- Lado Esquerdo: Botão + com Menu Rápido de RPG -->
+                        <div class="actionsLeft quickToolsWrapper">
+                            <button id="attachBtn" class="actionBtn iconOnly" type="button" aria-label="Ferramentas rápidas de RPG" title="Ferramentas rápidas de RPG">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <line x1="12" y1="5" x2="12" y2="19"></line>
                                     <line x1="5" y1="12" x2="19" y2="12"></line>
                                 </svg>
                             </button>
+
+                            <div id="quickToolsMenu" class="quickToolsMenu">
+                                <button type="button" class="quickToolItem" data-quick-tool="physical_roll">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="3" width="18" height="18" rx="3" ry="3"></rect>
+                                        <circle cx="8.5" cy="8.5" r="1.2"></circle>
+                                        <circle cx="15.5" cy="8.5" r="1.2"></circle>
+                                        <circle cx="15.5" cy="15.5" r="1.2"></circle>
+                                        <circle cx="8.5" cy="15.5" r="1.2"></circle>
+                                        <circle cx="12" cy="12" r="1.2"></circle>
+                                    </svg>
+                                    <span>Informar Rolagem Física</span>
+                                </button>
+                                <button type="button" class="quickToolItem" data-quick-tool="sheets">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                    </svg>
+                                    <span>Fichas na Cena</span>
+                                </button>
+                                <button type="button" class="quickToolItem" data-quick-tool="canon">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                                    </svg>
+                                    <span>Diário Canônico</span>
+                                </button>
+                                <button type="button" class="quickToolItem" data-quick-tool="automation">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="4" y1="21" x2="4" y2="14"></line>
+                                        <line x1="4" y1="10" x2="4" y2="3"></line>
+                                        <line x1="12" y1="21" x2="12" y2="12"></line>
+                                        <line x1="12" y1="8" x2="12" y2="3"></line>
+                                        <line x1="20" y1="21" x2="20" y2="16"></line>
+                                        <line x1="20" y1="12" x2="20" y2="3"></line>
+                                        <line x1="1" y1="14" x2="7" y2="14"></line>
+                                        <line x1="9" y1="8" x2="15" y2="8"></line>
+                                        <line x1="17" y1="16" x2="23" y2="16"></line>
+                                    </svg>
+                                    <span>Automação da Ficha</span>
+                                </button>
+                            </div>
                         </div>
 
                         <!-- Lado Direito -->
@@ -627,7 +700,7 @@
                 <!-- 5. Experiência (XP) -->
                 <div class="obiFieldGroup">
                     <label class="obiFieldLabel">EXPERIÊNCIA (XP)</label>
-                    <div class="obiCustomSelect" data-target-input="prefXp">
+                    <div class="obiCustomSelect dropUp" data-target-input="prefXp">
                         <input type="hidden" id="prefXp" value="manual">
                         <button type="button" class="obiSelectTrigger">
                             <span class="obiSelectText">100% Manual no Datapad</span>
@@ -645,7 +718,7 @@
                 <!-- 6. Criação e Gerenciamento Geral de Fichas -->
                 <div class="obiFieldGroup">
                     <label class="obiFieldLabel">CRIAÇÃO E GERENCIAMENTO GERAL DE FICHAS (ATRIBUTOS, PERÍCIAS E ANOTAÇÕES)</label>
-                    <div class="obiCustomSelect" data-target-input="prefSheetMgmt">
+                    <div class="obiCustomSelect dropUp" data-target-input="prefSheetMgmt">
                         <input type="hidden" id="prefSheetMgmt" value="confirm_card">
                         <button type="button" class="obiSelectTrigger">
                             <span class="obiSelectText">Pedir confirmação via Card [Confirmar / Cancelar]</span>
@@ -712,6 +785,180 @@
             <div class="obiModalFooter">
                 <button type="button" class="obiBtnGhost cancelModalBtn">Cancelar</button>
                 <button type="button" id="saveProfileBtn" class="obiBtnWhite">Salvar Identificação</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Sheet Mobile: Painel Tático da Mesa -->
+    <div id="mobileTableSheet" class="customModalOverlay">
+        <div class="customModalBox obiMinimalModal">
+            <div class="obiModalHeader">
+                <div>
+                    <h3 class="obiModalTitle">Painel da Mesa</h3>
+                    <p class="obiModalSubtitle">Fichas em cena, código da aventura e controles rápidos.</p>
+                </div>
+                <button type="button" class="obiModalClose cancelModalBtn" aria-label="Fechar">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="obiModalBody obiFieldsStack">
+                <div class="coopCodeBanner" style="margin-bottom: 0;">
+                    <div class="coopCodeRow">
+                        <span class="coopBannerLabel">CÓDIGO DA AVENTURA</span>
+                        <button type="button" id="mobileCopyCodeBtn" class="tacticalCodeBtn">
+                            <strong id="mobileSheetJoinCode">#------</strong>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="obiFieldGroup">
+                    <label class="obiFieldLabel">FICHAS ATIVAS NA CENA</label>
+                    <div id="mobileSheetPartyList" class="sheetsModalList"></div>
+                </div>
+
+                <div class="mobileTableGrid">
+                    <button type="button" class="mobileTableTile" data-sheet-shortcut="sheets">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        <span>Fichas</span>
+                    </button>
+                    <button type="button" class="mobileTableTile" data-sheet-shortcut="canon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                        </svg>
+                        <span>Diário</span>
+                    </button>
+                    <button type="button" class="mobileTableTile" data-sheet-shortcut="automation">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="4" y1="21" x2="4" y2="14"></line>
+                            <line x1="4" y1="10" x2="4" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12" y2="3"></line>
+                            <line x1="20" y1="21" x2="20" y2="16"></line>
+                            <line x1="20" y1="12" x2="20" y2="3"></line>
+                            <line x1="1" y1="14" x2="7" y2="14"></line>
+                            <line x1="9" y1="8" x2="15" y2="8"></line>
+                            <line x1="17" y1="16" x2="23" y2="16"></line>
+                        </svg>
+                        <span>Automação</span>
+                    </button>
+                    <a href="https://swdatapad.vercel.app" target="_blank" rel="noopener noreferrer" class="mobileTableTile">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+                            <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                        </svg>
+                        <span>Abrir Datapad</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal / Bottom Sheet: Construtor Rápido de Rolagem Física (Força e Destino) -->
+    <div id="physicalRollModal" class="customModalOverlay">
+        <div class="customModalBox obiMinimalModal">
+            <div class="obiModalHeader">
+                <div>
+                    <h3 class="obiModalTitle">Informar Rolagem Física</h3>
+                    <p class="obiModalSubtitle">Toque nos símbolos obtidos nos seus dados físicos na mesa.</p>
+                </div>
+                <button type="button" class="obiModalClose cancelModalBtn" aria-label="Fechar">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="obiModalBody obiFieldsStack">
+                <div class="obiFieldGroup">
+                    <label class="obiFieldLabel" for="physRollSkillInput">PERÍCIA / AÇÃO (OPCIONAL)</label>
+                    <input type="text" id="physRollSkillInput" class="obiTextInput" placeholder="Ex: Sabre de Luz, Percepção, Pilotar (Espaço)">
+                </div>
+
+                <div class="physicalRollGrid">
+                    <div class="rollCounterCard pos" data-symbol="success">
+                        <span class="rollCounterLabel">Sucessos</span>
+                        <div class="rollCounterControls">
+                            <button type="button" class="rollStepBtn" data-step="-1">−</button>
+                            <strong class="rollCounterVal" data-val="success">0</strong>
+                            <button type="button" class="rollStepBtn" data-step="1">+</button>
+                        </div>
+                    </div>
+                    <div class="rollCounterCard pos" data-symbol="advantage">
+                        <span class="rollCounterLabel">Vantagens</span>
+                        <div class="rollCounterControls">
+                            <button type="button" class="rollStepBtn" data-step="-1">−</button>
+                            <strong class="rollCounterVal" data-val="advantage">0</strong>
+                            <button type="button" class="rollStepBtn" data-step="1">+</button>
+                        </div>
+                    </div>
+                    <div class="rollCounterCard gold" data-symbol="triumph">
+                        <span class="rollCounterLabel">Triunfos</span>
+                        <div class="rollCounterControls">
+                            <button type="button" class="rollStepBtn" data-step="-1">−</button>
+                            <strong class="rollCounterVal" data-val="triumph">0</strong>
+                            <button type="button" class="rollStepBtn" data-step="1">+</button>
+                        </div>
+                    </div>
+                    <div class="rollCounterCard neg" data-symbol="failure">
+                        <span class="rollCounterLabel">Falhas</span>
+                        <div class="rollCounterControls">
+                            <button type="button" class="rollStepBtn" data-step="-1">−</button>
+                            <strong class="rollCounterVal" data-val="failure">0</strong>
+                            <button type="button" class="rollStepBtn" data-step="1">+</button>
+                        </div>
+                    </div>
+                    <div class="rollCounterCard neg" data-symbol="threat">
+                        <span class="rollCounterLabel">Ameaças</span>
+                        <div class="rollCounterControls">
+                            <button type="button" class="rollStepBtn" data-step="-1">−</button>
+                            <strong class="rollCounterVal" data-val="threat">0</strong>
+                            <button type="button" class="rollStepBtn" data-step="1">+</button>
+                        </div>
+                    </div>
+                    <div class="rollCounterCard red" data-symbol="despair">
+                        <span class="rollCounterLabel">Desesperos</span>
+                        <div class="rollCounterControls">
+                            <button type="button" class="rollStepBtn" data-step="-1">−</button>
+                            <strong class="rollCounterVal" data-val="despair">0</strong>
+                            <button type="button" class="rollStepBtn" data-step="1">+</button>
+                        </div>
+                    </div>
+                    <div class="rollCounterCard force" data-symbol="lightPip">
+                        <span class="rollCounterLabel">Força (Luz)</span>
+                        <div class="rollCounterControls">
+                            <button type="button" class="rollStepBtn" data-step="-1">−</button>
+                            <strong class="rollCounterVal" data-val="lightPip">0</strong>
+                            <button type="button" class="rollStepBtn" data-step="1">+</button>
+                        </div>
+                    </div>
+                    <div class="rollCounterCard force" data-symbol="darkPip">
+                        <span class="rollCounterLabel">Força (Sombrio)</span>
+                        <div class="rollCounterControls">
+                            <button type="button" class="rollStepBtn" data-step="-1">−</button>
+                            <strong class="rollCounterVal" data-val="darkPip">0</strong>
+                            <button type="button" class="rollStepBtn" data-step="1">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="physRollPreview" class="physRollPreview">Selecione os símbolos acima para montar o resultado.</div>
+            </div>
+
+            <div class="obiModalFooter">
+                <button type="button" id="resetPhysRollBtn" class="obiBtnGhost">Limpar</button>
+                <button type="button" id="insertPhysRollBtn" class="obiBtnGhost">Inserir</button>
+                <button type="button" id="sendPhysRollBtn" class="obiBtnWhite">Enviar Agora</button>
             </div>
         </div>
     </div>

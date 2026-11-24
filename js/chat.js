@@ -72,6 +72,186 @@ document.addEventListener('DOMContentLoaded', () => {
     const profileTreatmentInput = document.getElementById('profileTreatmentInput');
     const saveProfileBtn = document.getElementById('saveProfileBtn');
 
+    // === ELEMENTOS MOBILE UNIFICADOS, MENU (+) & ROLAGEM FÍSICA ===
+    const mobileSceneSummaryBtn = document.getElementById('mobileSceneSummaryBtn');
+    const mobileSceneTitle = document.getElementById('mobileSceneTitle');
+    const mobileSceneSub = document.getElementById('mobileSceneSub');
+    const mobileTableBtn = document.getElementById('mobileTableBtn');
+    const mobileTableSheet = document.getElementById('mobileTableSheet');
+    const mobileSheetJoinCode = document.getElementById('mobileSheetJoinCode');
+    const mobileCopyCodeBtn = document.getElementById('mobileCopyCodeBtn');
+    const mobileSheetPartyList = document.getElementById('mobileSheetPartyList');
+
+    const attachBtn = document.getElementById('attachBtn');
+    const quickToolsMenu = document.getElementById('quickToolsMenu');
+    const physicalRollModal = document.getElementById('physicalRollModal');
+    const physRollSkillInput = document.getElementById('physRollSkillInput');
+    const physRollPreview = document.getElementById('physRollPreview');
+    const resetPhysRollBtn = document.getElementById('resetPhysRollBtn');
+    const insertPhysRollBtn = document.getElementById('insertPhysRollBtn');
+    const sendPhysRollBtn = document.getElementById('sendPhysRollBtn');
+
+    const physRollState = {
+        success: 0,
+        advantage: 0,
+        triumph: 0,
+        failure: 0,
+        threat: 0,
+        despair: 0,
+        lightPip: 0,
+        darkPip: 0
+    };
+
+    const fecharTodosOsModais = () => {
+        document.querySelectorAll('.customModalOverlay.show').forEach((m) => m.classList.remove('show'));
+        if (quickToolsMenu) quickToolsMenu.classList.remove('open');
+    };
+
+    const formatarTextoRolagemFisica = () => {
+        const partes = [];
+        if (physRollState.success > 0) partes.push(`${physRollState.success} ${physRollState.success === 1 ? 'Sucesso' : 'Sucessos'}`);
+        if (physRollState.advantage > 0) partes.push(`${physRollState.advantage} ${physRollState.advantage === 1 ? 'Vantagem' : 'Vantagens'}`);
+        if (physRollState.triumph > 0) partes.push(`${physRollState.triumph} ${physRollState.triumph === 1 ? 'Triunfo' : 'Triunfos'}`);
+        if (physRollState.failure > 0) partes.push(`${physRollState.failure} ${physRollState.failure === 1 ? 'Falha' : 'Falhas'}`);
+        if (physRollState.threat > 0) partes.push(`${physRollState.threat} ${physRollState.threat === 1 ? 'Ameaça' : 'Ameaças'}`);
+        if (physRollState.despair > 0) partes.push(`${physRollState.despair} ${physRollState.despair === 1 ? 'Desespero' : 'Desesperos'}`);
+        if (physRollState.lightPip > 0) partes.push(`${physRollState.lightPip} ${physRollState.lightPip === 1 ? 'Ponto de Luz' : 'Pontos de Luz'}`);
+        if (physRollState.darkPip > 0) partes.push(`${physRollState.darkPip} ${physRollState.darkPip === 1 ? 'Ponto Sombrio' : 'Pontos Sombrios'}`);
+
+        if (partes.length === 0) return '';
+        const skill = (physRollSkillInput?.value || '').trim();
+        return skill
+            ? `Resultado da rolagem de ${skill}: ${partes.join(', ')}.`
+            : `Resultado da rolagem: ${partes.join(', ')}.`;
+    };
+
+    const atualizarPreviewRolagemFisica = () => {
+        Object.keys(physRollState).forEach((k) => {
+            const el = document.querySelector(`.rollCounterVal[data-val="${k}"]`);
+            if (el) el.textContent = String(physRollState[k]);
+        });
+        if (physRollPreview) {
+            const txt = formatarTextoRolagemFisica();
+            physRollPreview.textContent = txt || 'Selecione os símbolos acima para montar o resultado.';
+        }
+    };
+
+    const abrirModalRolagemFisica = (skillInicial = '') => {
+        Object.keys(physRollState).forEach((k) => {
+            physRollState[k] = 0;
+        });
+        if (physRollSkillInput) physRollSkillInput.value = skillInicial;
+        atualizarPreviewRolagemFisica();
+        fecharTodosOsModais();
+        if (physicalRollModal) physicalRollModal.classList.add('show');
+    };
+
+    if (physicalRollModal) {
+        physicalRollModal.addEventListener('click', (e) => {
+            const btn = e.target.closest('.rollStepBtn');
+            if (!btn) return;
+            const card = btn.closest('.rollCounterCard');
+            const sym = card?.getAttribute('data-symbol');
+            const step = parseInt(btn.getAttribute('data-step') || '0', 10);
+            if (!sym || !(sym in physRollState)) return;
+            physRollState[sym] = Math.max(0, Math.min(20, physRollState[sym] + step));
+            atualizarPreviewRolagemFisica();
+        });
+    }
+
+    if (physRollSkillInput) {
+        physRollSkillInput.addEventListener('input', atualizarPreviewRolagemFisica);
+    }
+
+    if (resetPhysRollBtn) {
+        resetPhysRollBtn.addEventListener('click', () => {
+            Object.keys(physRollState).forEach((k) => {
+                physRollState[k] = 0;
+            });
+            if (physRollSkillInput) physRollSkillInput.value = '';
+            atualizarPreviewRolagemFisica();
+        });
+    }
+
+    if (insertPhysRollBtn) {
+        insertPhysRollBtn.addEventListener('click', () => {
+            const txt = formatarTextoRolagemFisica();
+            if (!txt || !chatInput) return;
+            chatInput.value = chatInput.value.trim() ? `${chatInput.value.trim()} ${txt}` : txt;
+            handleInputResize();
+            physicalRollModal.classList.remove('show');
+            chatInput.focus();
+        });
+    }
+
+    if (sendPhysRollBtn) {
+        sendPhysRollBtn.addEventListener('click', async () => {
+            const txt = formatarTextoRolagemFisica();
+            if (!txt || !chatInput) return;
+            chatInput.value = txt;
+            handleInputResize();
+            physicalRollModal.classList.remove('show');
+            await handleSendMessage();
+        });
+    }
+
+    // Menu rápido do botão +
+    if (attachBtn && quickToolsMenu) {
+        attachBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            quickToolsMenu.classList.toggle('open');
+        });
+
+        quickToolsMenu.addEventListener('click', (e) => {
+            const item = e.target.closest('[data-quick-tool]');
+            if (!item) return;
+            e.stopPropagation();
+            const tool = item.getAttribute('data-quick-tool');
+            quickToolsMenu.classList.remove('open');
+            if (tool === 'physical_roll') abrirModalRolagemFisica('');
+            else if (tool === 'sheets' && manageSheetsBtn) manageSheetsBtn.click();
+            else if (tool === 'canon' && openCanonBtn) openCanonBtn.click();
+            else if (tool === 'automation' && openAutomationBtn) openAutomationBtn.click();
+        });
+    }
+
+    // Abertura do Bottom Sheet "Painel da Mesa" no Mobile
+    const abrirPainelMesaMobile = async () => {
+        if (!conversaAtualId) await iniciarNovaConversa();
+        await atualizarBarraTatica();
+        fecharTodosOsModais();
+        if (mobileTableSheet) mobileTableSheet.classList.add('show');
+    };
+
+    if (mobileSceneSummaryBtn) mobileSceneSummaryBtn.addEventListener('click', abrirPainelMesaMobile);
+    if (mobileTableBtn) mobileTableBtn.addEventListener('click', abrirPainelMesaMobile);
+
+    if (mobileCopyCodeBtn) {
+        mobileCopyCodeBtn.addEventListener('click', async () => {
+            if (!campanhaAtualObj?.join_code) return;
+            try {
+                await navigator.clipboard.writeText(campanhaAtualObj.join_code);
+                const old = mobileSheetJoinCode.textContent;
+                mobileSheetJoinCode.textContent = 'COPIADO';
+                setTimeout(() => {
+                    mobileSheetJoinCode.textContent = old;
+                }, 1400);
+            } catch {}
+        });
+    }
+
+    if (mobileTableSheet) {
+        mobileTableSheet.addEventListener('click', (e) => {
+            const tile = e.target.closest('[data-sheet-shortcut]');
+            if (!tile) return;
+            const target = tile.getAttribute('data-sheet-shortcut');
+            mobileTableSheet.classList.remove('show');
+            if (target === 'sheets' && manageSheetsBtn) manageSheetsBtn.click();
+            else if (target === 'canon' && openCanonBtn) openCanonBtn.click();
+            else if (target === 'automation' && openAutomationBtn) openAutomationBtn.click();
+        });
+    }
+
     let conversaAtualId = null;
     let campanhaAtualObj = null;
 
@@ -124,6 +304,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('click', () => {
         document.querySelectorAll('.obiCustomSelect.open').forEach((w) => w.classList.remove('open'));
         document.querySelectorAll('.chatDropdown.show').forEach((menu) => menu.classList.remove('show'));
+        if (quickToolsMenu) quickToolsMenu.classList.remove('open');
     });
 
     // ==========================================
@@ -366,6 +547,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const codeText = `#${campRes.dados.join_code}`;
             if (campaignJoinCodeText) campaignJoinCodeText.textContent = codeText;
             if (modalJoinCodeDisplay) modalJoinCodeDisplay.textContent = codeText;
+            if (mobileSheetJoinCode) mobileSheetJoinCode.textContent = codeText;
+            if (mobileSceneSub) mobileSceneSub.textContent = codeText;
         }
 
         if (!scenePartyPills) return;
@@ -374,10 +557,25 @@ document.addEventListener('DOMContentLoaded', () => {
         if (ativas.length === 0) {
             scenePartyPills.innerHTML =
                 '<span class="emptyPartyHint">Nenhuma ficha vinculada — clique em "Fichas" para adicionar.</span>';
+            if (mobileSceneTitle) mobileSceneTitle.textContent = campanhaAtualObj?.titulo || 'Mestre Kenobi';
+            if (mobileSheetPartyList) {
+                mobileSheetPartyList.innerHTML =
+                    '<p class="obiModalSubtitle">Nenhuma ficha vinculada ainda.</p>';
+            }
             return;
         }
 
+        const primeiraFicha = ativas[0].entity;
+        if (mobileSceneTitle) {
+            if (primeiraFicha.entityType === 'ship') {
+                mobileSceneTitle.textContent = `${primeiraFicha.name} • AC ${primeiraFicha.hullTrauma?.current ?? 0}/${primeiraFicha.hullTrauma?.threshold ?? 15}`;
+            } else {
+                mobileSceneTitle.textContent = `${primeiraFicha.name} • ${primeiraFicha.wounds?.current ?? 0}/${primeiraFicha.wounds?.threshold ?? 10}`;
+            }
+        }
+
         scenePartyPills.innerHTML = '';
+        if (mobileSheetPartyList) mobileSheetPartyList.innerHTML = '';
         ativas.forEach((item) => {
             const ent = item.entity;
             const pill = document.createElement('div');
@@ -413,6 +611,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="partySheetStats">${statsHtml}</span>
             `;
             scenePartyPills.appendChild(pill);
+
+            if (mobileSheetPartyList) {
+                const row = document.createElement('div');
+                row.className = 'sheetModalRow';
+                row.innerHTML = `
+                    <div class="sheetModalInfo">
+                        <span class="sheetModalName">${svgIcon} <span>${ent.name}</span></span>
+                        <span class="sheetModalMeta">${statsHtml}</span>
+                    </div>
+                `;
+                mobileSheetPartyList.appendChild(row);
+            }
         });
     };
 
@@ -629,6 +839,10 @@ document.addEventListener('DOMContentLoaded', () => {
             );
 
             messageDiv.innerHTML = `
+                <div class="aiHeaderMobile">
+                    <img src="assets/img/obiwankenobiprofile.webp" alt="Kenobi">
+                    <span>Mestre Kenobi</span>
+                </div>
                 <div class="aiAvatar">
                     <img src="assets/img/obiwankenobiprofile.webp" alt="Kenobi">
                 </div>
@@ -906,13 +1120,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.cancelModalBtn').forEach((btn) => {
         btn.addEventListener('click', () => {
-            if (renameModal) renameModal.classList.remove('show');
-            if (deleteModal) deleteModal.classList.remove('show');
-            if (sheetsModal) sheetsModal.classList.remove('show');
-            if (canonModal) canonModal.classList.remove('show');
-            if (automationModal) automationModal.classList.remove('show');
-            if (profileModal) profileModal.classList.remove('show');
+            fecharTodosOsModais();
             chatAlvoId = null;
+        });
+    });
+
+    // Fecha Bottom Sheets / Modais ao tocar no fundo escuro (backdrop)
+    document.querySelectorAll('.customModalOverlay').forEach((overlay) => {
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                overlay.classList.remove('show');
+                chatAlvoId = null;
+            }
         });
     });
 
@@ -1167,10 +1386,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const cardBox = messagesArea.querySelector(`[data-card-box="${cardId}"]`);
 
                 if (cardAction === 'roll_physical') {
-                    const skillName = cardBtn.getAttribute('data-skill') || 'Perícia';
-                    chatInput.value = `Rolagem de ${skillName}: `;
-                    chatInput.focus();
-                    handleInputResize();
+                    const skillName = cardBtn.getAttribute('data-skill') || '';
+                    abrirModalRolagemFisica(skillName);
                     return;
                 }
 
