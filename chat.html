@@ -343,6 +343,14 @@
                         </svg>
                         <span>Automação</span>
                     </button>
+                    <button id="leaveTableTopBtn" class="tacticalActionBtn" style="display: none; color: #f87171; border-color: rgba(248, 113, 113, 0.28);" title="Sair desta mesa compartilhada e desvincular sua ficha">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                            <polyline points="16 17 21 12 16 7"></polyline>
+                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                        <span>Sair da Mesa</span>
+                    </button>
                     <a href="https://swdatapad.vercel.app" target="_blank" rel="noopener noreferrer" class="tacticalActionBtn datapadLinkBtn" title="Abrir Nocturne Datapad em nova aba">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
@@ -913,7 +921,37 @@
                         </svg>
                         <span>Abrir Datapad</span>
                     </a>
+                    <button type="button" id="mobileLeaveTableBtn" class="mobileTableTile" style="display: none; color: #f87171; border-color: rgba(248, 113, 113, 0.28);">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                            <polyline points="16 17 21 12 16 7"></polyline>
+                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                        <span>Sair da Mesa</span>
+                    </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Minimalista: Confirmar Saída da Mesa Compartilhada (Convidado) -->
+    <div id="leaveTableModal" class="customModalOverlay">
+        <div class="customModalBox obiMinimalModal">
+            <div class="obiModalHeader">
+                <div>
+                    <h3 class="obiModalTitle">Sair da Mesa Compartilhada?</h3>
+                    <p class="obiModalSubtitle">Sua ficha será desvinculada da cena e este chat sairá da sua lista de conversas (a aventura do dono da mesa continuará intacta).</p>
+                </div>
+                <button type="button" class="obiModalClose cancelModalBtn" aria-label="Fechar">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="obiModalFooter">
+                <button type="button" class="obiBtnGhost cancelModalBtn">Cancelar</button>
+                <button type="button" id="confirmLeaveTableBtn" class="modalBtn modalBtnDanger">Sair da Mesa</button>
             </div>
         </div>
     </div>

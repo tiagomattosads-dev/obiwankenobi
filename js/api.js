@@ -496,11 +496,26 @@ const API = {
             const currentUserId = userData?.user?.id;
             if (!currentUserId) throw new Error("Sessão expirada.");
 
+            // Remove todas as fichas pertencentes ao convidado desta campanha
+            const { data: ownChars } = await clienteSupabase
+                .from("characters")
+                .select("id")
+                .eq("user_id", currentUserId);
+            const ownCharIds = (ownChars || []).map((c) => c.id);
+
             await clienteSupabase
                 .from("campaign_characters")
                 .delete()
                 .eq("campaign_id", conversaId)
                 .eq("added_by_user_id", currentUserId);
+
+            if (ownCharIds.length > 0) {
+                await clienteSupabase
+                    .from("campaign_characters")
+                    .delete()
+                    .eq("campaign_id", conversaId)
+                    .in("character_id", ownCharIds);
+            }
 
             const { error } = await clienteSupabase
                 .from("campaign_members")

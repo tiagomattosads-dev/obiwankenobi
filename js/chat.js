@@ -1308,6 +1308,15 @@ document.addEventListener('DOMContentLoaded', () => {
             if (mobileSceneSub) mobileSceneSub.textContent = codeText;
 
             const canManage = Boolean(campanhaAtualObj.isOwner || campanhaAtualObj.canManageTable);
+            const isGuest = campanhaAtualObj.isOwner === false;
+            const leaveTableTopBtn = document.getElementById('leaveTableTopBtn');
+            const mobileLeaveTableBtn = document.getElementById('mobileLeaveTableBtn');
+            if (leaveTableTopBtn) {
+                leaveTableTopBtn.style.display = isGuest ? '' : 'none';
+            }
+            if (mobileLeaveTableBtn) {
+                mobileLeaveTableBtn.style.display = isGuest ? '' : 'none';
+            }
             if (openAutomationBtn) {
                 openAutomationBtn.style.display = canManage ? '' : 'none';
             }
@@ -2427,20 +2436,49 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const sairDaMesa = async (id) => {
-        if (!confirm('Deseja sair desta mesa compartilhada? Sua ficha será desvinculada da cena (a conversa do dono da mesa permanecerá intacta).')) {
-            return;
+    const leaveTableModal = document.getElementById('leaveTableModal');
+    const confirmLeaveTableBtn = document.getElementById('confirmLeaveTableBtn');
+    const leaveTableTopBtn = document.getElementById('leaveTableTopBtn');
+    const mobileLeaveTableBtn = document.getElementById('mobileLeaveTableBtn');
+    let mesaParaSairId = null;
+
+    const sairDaMesa = (id) => {
+        mesaParaSairId = id || conversaAtualId;
+        if (!mesaParaSairId) return;
+        fecharTodosOsModais();
+        if (leaveTableModal) {
+            leaveTableModal.classList.add('show');
         }
-        await API.sairDaMesaConvidado(id);
-        if (conversaAtualId === id) {
-            conversaAtualId = null;
-            if (messagesArea) {
-                messagesArea.querySelectorAll('.message:not(.systemMsg)').forEach((msg) => msg.remove());
-            }
-        }
-        await renderizarHistorico();
-        await atualizarBarraTatica();
     };
+
+    if (leaveTableTopBtn) {
+        leaveTableTopBtn.addEventListener('click', () => sairDaMesa(conversaAtualId));
+    }
+    if (mobileLeaveTableBtn) {
+        mobileLeaveTableBtn.addEventListener('click', () => sairDaMesa(conversaAtualId));
+    }
+
+    if (confirmLeaveTableBtn) {
+        confirmLeaveTableBtn.addEventListener('click', async () => {
+            if (!mesaParaSairId) return;
+            confirmLeaveTableBtn.disabled = true;
+            confirmLeaveTableBtn.textContent = 'Saindo...';
+            await API.sairDaMesaConvidado(mesaParaSairId);
+            confirmLeaveTableBtn.disabled = false;
+            confirmLeaveTableBtn.textContent = 'Sair da Mesa';
+            if (leaveTableModal) leaveTableModal.classList.remove('show');
+
+            if (conversaAtualId === mesaParaSairId) {
+                conversaAtualId = null;
+                if (messagesArea) {
+                    messagesArea.querySelectorAll('.message:not(.systemMsg)').forEach((msg) => msg.remove());
+                }
+            }
+            mesaParaSairId = null;
+            await renderizarHistorico();
+            await atualizarBarraTatica();
+        });
+    }
 
     // ==========================================
     // 10. CLIQUES NA BARRA LATERAL
