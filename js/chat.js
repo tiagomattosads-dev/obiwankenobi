@@ -2343,7 +2343,189 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 9C. Modal do Diário Canônico (Somente leitura para convidados sem permissão do dono)
+    // 9C. Modal do Diário Canônico & Cérebro de Memória (Fatos, Entidades, Capítulos e Resumo)
+    const canonBrainTabs = document.getElementById('canonBrainTabs');
+    const canonFactsList = document.getElementById('canonFactsList');
+    const canonEntitiesList = document.getElementById('canonEntitiesList');
+    const canonChaptersList = document.getElementById('canonChaptersList');
+    const canonFactsCount = document.getElementById('canonFactsCount');
+    const canonEntitiesCount = document.getElementById('canonEntitiesCount');
+    const canonChaptersCount = document.getElementById('canonChaptersCount');
+    const canonAddFactBar = document.getElementById('canonAddFactBar');
+    const canonNewFactInput = document.getElementById('canonNewFactInput');
+    const canonAddFactBtn = document.getElementById('canonAddFactBtn');
+    let canonCanManageAtual = false;
+
+    const escapeCanonHtml = (str) =>
+        String(str || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+
+    const alternarAbaCanon = (tabName) => {
+        if (!canonBrainTabs) return;
+        canonBrainTabs.querySelectorAll('[data-canon-tab]').forEach((btn) => {
+            btn.classList.toggle('active', btn.getAttribute('data-canon-tab') === tabName);
+        });
+        const panes = {
+            facts: document.getElementById('canonTabFacts'),
+            entities: document.getElementById('canonTabEntities'),
+            chapters: document.getElementById('canonTabChapters'),
+            summary: document.getElementById('canonTabSummary')
+        };
+        Object.entries(panes).forEach(([k, el]) => {
+            if (el) el.classList.toggle('hidden', k !== tabName);
+        });
+        if (saveCanonBtn) {
+            saveCanonBtn.style.display = tabName === 'summary' && canonCanManageAtual ? '' : 'none';
+        }
+    };
+
+    const carregarMemoriaCanonicaModal = async () => {
+        if (!conversaAtualId) return;
+        const mem = await API.obterMemoriaCanonica(conversaAtualId);
+        if (canonFactsCount) canonFactsCount.textContent = String(mem.facts.length);
+        if (canonEntitiesCount) canonEntitiesCount.textContent = String(mem.entities.length);
+        if (canonChaptersCount) canonChaptersCount.textContent = String(mem.chapters.length);
+
+        if (canonFactsList) {
+            if (mem.facts.length === 0) {
+                canonFactsList.innerHTML = '<p class="canonBrainMeta">Nenhum fato canônico registrado ainda. Conforme vocês jogam, o Extrator registra automaticamente a geografia e os fatos da cena aqui.</p>';
+            } else {
+                canonFactsList.innerHTML = mem.facts
+                    .map((f) => {
+                        const isCorr = f.authority === 'user_correction' || f.category === 'correction';
+                        const isGeo = f.category === 'scene_geography' || f.category === 'location';
+                        const badgeClass = isCorr ? 'correction' : isGeo ? 'geo' : '';
+                        const badgeLabel = isCorr
+                            ? 'CORREÇÃO CANÔNICA'
+                            : f.category === 'scene_geography'
+                            ? 'GEOGRAFIA DA CENA'
+                            : String(f.category || 'FATO').toUpperCase();
+                        const actionsHtml = canonCanManageAtual
+                            ? `<div class="canonBrainActions">
+                                <button type="button" class="canonMiniBtn" data-fact-pin="${f.id}" data-pinned="${f.is_pinned ? 'true' : 'false'}">${f.is_pinned ? 'Desafixar' : 'Fixar'}</button>
+                                <button type="button" class="canonMiniBtn danger" data-fact-archive="${f.id}">Arquivar</button>
+                               </div>`
+                            : '';
+                        return `
+                            <div class="canonBrainCard ${f.is_pinned ? 'pinned' : ''}">
+                                <div class="canonBrainCardTop">
+                                    <div class="canonBrainBadges">
+                                        <span class="canonBadge ${badgeClass}">${badgeLabel}</span>
+                                        ${f.is_pinned ? '<span class="canonBadge geo">FIXADO</span>' : ''}
+                                        <span class="canonBrainMeta">${escapeCanonHtml(f.fact_key)}</span>
+                                    </div>
+                                    ${actionsHtml}
+                                </div>
+                                <p class="canonBrainText">${escapeCanonHtml(f.content)}</p>
+                            </div>
+                        `;
+                    })
+                    .join('');
+            }
+        }
+
+        if (canonEntitiesList) {
+            if (mem.entities.length === 0) {
+                canonEntitiesList.innerHTML = '<p class="canonBrainMeta">Nenhuma entidade registrada ainda.</p>';
+            } else {
+                canonEntitiesList.innerHTML = mem.entities
+                    .map(
+                        (e) => `
+                            <div class="canonBrainCard ${e.is_locked ? 'pinned' : ''}">
+                                <div class="canonBrainCardTop">
+                                    <div class="canonBrainBadges">
+                                        <span class="canonBadge geo">${escapeCanonHtml(String(e.entity_kind || 'npc').toUpperCase())}</span>
+                                        <strong style="color:#fff; font-size:0.88rem;">${escapeCanonHtml(e.name)}</strong>
+                                    </div>
+                                </div>
+                                ${e.current_location ? `<div class="canonBrainMeta"><strong>Local:</strong> ${escapeCanonHtml(e.current_location)}</div>` : ''}
+                                ${e.current_status ? `<div class="canonBrainMeta"><strong>Estado:</strong> ${escapeCanonHtml(e.current_status)}</div>` : ''}
+                                ${e.description ? `<p class="canonBrainText">${escapeCanonHtml(e.description)}</p>` : ''}
+                            </div>
+                        `
+                    )
+                    .join('');
+            }
+        }
+
+        if (canonChaptersList) {
+            if (mem.chapters.length === 0) {
+                canonChaptersList.innerHTML = '<p class="canonBrainMeta">Os capítulos cronológicos são consolidados automaticamente a cada ~24 mensagens da aventura.</p>';
+            } else {
+                canonChaptersList.innerHTML = mem.chapters
+                    .map(
+                        (ch) => `
+                            <div class="canonBrainCard">
+                                <div class="canonBrainCardTop">
+                                    <div class="canonBrainBadges">
+                                        <span class="canonBadge correction">CAPÍTULO ${ch.chapter_number}</span>
+                                        <strong style="color:#fff; font-size:0.88rem;">${escapeCanonHtml(ch.title)}</strong>
+                                    </div>
+                                    <span class="canonBrainMeta">${ch.message_count || 0} msgs</span>
+                                </div>
+                                <p class="canonBrainText">${escapeCanonHtml(ch.summary)}</p>
+                                ${
+                                    Array.isArray(ch.key_decisions) && ch.key_decisions.length > 0
+                                        ? `<div class="canonBrainMeta"><strong>Marcos:</strong> ${escapeCanonHtml(ch.key_decisions.join(' • '))}</div>`
+                                        : ''
+                                }
+                            </div>
+                        `
+                    )
+                    .join('');
+            }
+        }
+    };
+
+    if (canonBrainTabs) {
+        canonBrainTabs.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-canon-tab]');
+            if (!btn) return;
+            alternarAbaCanon(btn.getAttribute('data-canon-tab'));
+        });
+    }
+
+    if (canonAddFactBtn && canonNewFactInput) {
+        canonAddFactBtn.addEventListener('click', async () => {
+            if (!conversaAtualId || !canonCanManageAtual) return;
+            const txt = canonNewFactInput.value.trim();
+            if (!txt) return;
+            canonAddFactBtn.disabled = true;
+            canonAddFactBtn.textContent = 'Salvando...';
+            const res = await API.adicionarFatoCanonico(conversaAtualId, { content: txt });
+            canonAddFactBtn.disabled = false;
+            canonAddFactBtn.textContent = 'Fixar Fato';
+            if (res.sucesso) {
+                canonNewFactInput.value = '';
+                await carregarMemoriaCanonicaModal();
+            } else {
+                alert(res.erro || 'Erro ao fixar fato.');
+            }
+        });
+    }
+
+    if (canonFactsList) {
+        canonFactsList.addEventListener('click', async (e) => {
+            if (!canonCanManageAtual) return;
+            const pinBtn = e.target.closest('[data-fact-pin]');
+            if (pinBtn) {
+                const id = pinBtn.getAttribute('data-fact-pin');
+                const currentlyPinned = pinBtn.getAttribute('data-pinned') === 'true';
+                await API.alternarFixacaoFatoCanonico(id, !currentlyPinned);
+                await carregarMemoriaCanonicaModal();
+                return;
+            }
+            const archBtn = e.target.closest('[data-fact-archive]');
+            if (archBtn) {
+                const id = archBtn.getAttribute('data-fact-archive');
+                await API.arquivarFatoCanonico(id);
+                await carregarMemoriaCanonicaModal();
+            }
+        });
+    }
+
     if (openCanonBtn && canonModal) {
         openCanonBtn.addEventListener('click', async () => {
             if (!conversaAtualId) await iniciarNovaConversa();
@@ -2351,13 +2533,15 @@ document.addEventListener('DOMContentLoaded', () => {
             if (res.sucesso && res.dados) {
                 campanhaAtualObj = res.dados;
                 canonSummaryTextarea.value = res.dados.canon_summary || '';
-                const canManage = Boolean(res.dados.isOwner || res.dados.canManageTable);
-                canonSummaryTextarea.readOnly = !canManage;
-                if (saveCanonBtn) {
-                    saveCanonBtn.style.display = canManage ? '' : 'none';
+                canonCanManageAtual = Boolean(res.dados.isOwner || res.dados.canManageTable);
+                canonSummaryTextarea.readOnly = !canonCanManageAtual;
+                if (canonAddFactBar) {
+                    canonAddFactBar.style.display = canonCanManageAtual ? 'flex' : 'none';
                 }
             }
+            alternarAbaCanon('facts');
             canonModal.classList.add('show');
+            await carregarMemoriaCanonicaModal();
         });
     }
 
@@ -2368,7 +2552,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await API.atualizarConversa(conversaAtualId, {
                 canon_summary: canonSummaryTextarea.value.trim()
             });
-            saveCanonBtn.textContent = 'Salvar Registro';
+            saveCanonBtn.textContent = 'Salvar Resumo';
             if (!res.sucesso) {
                 alert(res.erro || 'Sem permissão para alterar o Diário Canônico.');
                 return;

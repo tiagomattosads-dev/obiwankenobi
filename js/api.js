@@ -717,5 +717,100 @@ const API = {
             pendingActionId,
             pool
         });
+    },
+
+    // ==========================================
+    // CÉREBRO CANÔNICO (Entidades, Fatos Ativos & Capítulos)
+    // ==========================================
+    async obterMemoriaCanonica(conversaId) {
+        try {
+            const [entRes, factRes, chapRes] = await Promise.all([
+                clienteSupabase
+                    .from("campaign_entities")
+                    .select("*")
+                    .eq("campaign_id", conversaId)
+                    .order("updated_at", { ascending: false }),
+                clienteSupabase
+                    .from("campaign_facts")
+                    .select("*")
+                    .eq("campaign_id", conversaId)
+                    .eq("status", "active")
+                    .order("is_pinned", { ascending: false })
+                    .order("updated_at", { ascending: false }),
+                clienteSupabase
+                    .from("campaign_chapters")
+                    .select("*")
+                    .eq("campaign_id", conversaId)
+                    .order("chapter_number", { ascending: true })
+            ]);
+            return {
+                sucesso: true,
+                entities: entRes.data || [],
+                facts: factRes.data || [],
+                chapters: chapRes.data || []
+            };
+        } catch (erro) {
+            return { sucesso: false, erro: erro.message, entities: [], facts: [], chapters: [] };
+        }
+    },
+
+    async adicionarFatoCanonico(conversaId, { content, category = "correction", factKey = "" }) {
+        try {
+            const texto = String(content || "").trim();
+            if (!texto) throw new Error("Escreva o fato canônico antes de salvar.");
+            const key =
+                String(factKey || "")
+                    .trim()
+                    .toLowerCase()
+                    .replace(/[^a-z0-9_]+/g, "_") ||
+                `fato_${Date.now()}`;
+            const { data, error } = await clienteSupabase
+                .from("campaign_facts")
+                .insert({
+                    campaign_id: conversaId,
+                    category,
+                    fact_key: key,
+                    content: texto,
+                    status: "active",
+                    authority: "user_pinned",
+                    is_pinned: true
+                })
+                .select("*")
+                .single();
+            if (error) throw error;
+            return { sucesso: true, dados: data };
+        } catch (erro) {
+            return { sucesso: false, erro: erro.message };
+        }
+    },
+
+    async arquivarFatoCanonico(factId) {
+        try {
+            const { error } = await clienteSupabase
+                .from("campaign_facts")
+                .update({ status: "archived", updated_at: new Date().toISOString() })
+                .eq("id", factId);
+            if (error) throw error;
+            return { sucesso: true };
+        } catch (erro) {
+            return { sucesso: false, erro: erro.message };
+        }
+    },
+
+    async alternarFixacaoFatoCanonico(factId, isPinned) {
+        try {
+            const { error } = await clienteSupabase
+                .from("campaign_facts")
+                .update({
+                    is_pinned: Boolean(isPinned),
+                    authority: isPinned ? "user_pinned" : "ai_extracted",
+                    updated_at: new Date().toISOString()
+                })
+                .eq("id", factId);
+            if (error) throw error;
+            return { sucesso: true };
+        } catch (erro) {
+            return { sucesso: false, erro: erro.message };
+        }
     }
 };

@@ -3155,3 +3155,125 @@ textarea#chatInput::-webkit-scrollbar-thumb:hover {
         max-height: 220px;
     }
 }
+
+
+/* =========================================================================
+   DIÁRIO & CÉREBRO DE MEMÓRIA CANÔNICA (FATOS, ENTIDADES E CAPÍTULOS)
+========================================================================= */
+.obiCanonBrainModal {
+    max-width: 720px !important;
+}
+
+.canonTabPane.hidden {
+    display: none !important;
+}
+
+.canonAddFactBar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.canonAddFactBar .obiTextInput {
+    flex: 1;
+}
+
+.canonBrainList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 360px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.canonBrainCard {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 10px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.canonBrainCard.pinned {
+    border-color: rgba(56, 189, 248, 0.34);
+    background: rgba(56, 189, 248, 0.05);
+}
+
+.canonBrainCardTop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.canonBrainBadges {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.canonBadge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #d4d4d8;
+}
+
+.canonBadge.correction {
+    background: rgba(251, 191, 36, 0.16);
+    color: #fde68a;
+    border: 1px solid rgba(251, 191, 36, 0.35);
+}
+
+.canonBadge.geo {
+    background: rgba(56, 189, 248, 0.16);
+    color: #bae6fd;
+    border: 1px solid rgba(56, 189, 248, 0.35);
+}
+
+.canonBrainText {
+    margin: 0;
+    font-size: 0.84rem;
+    line-height: 1.45;
+    color: #e4e4e7;
+}
+
+.canonBrainMeta {
+    font-size: 0.74rem;
+    color: #9ca3af;
+}
+
+.canonBrainActions {
+    display: flex;
+    gap: 6px;
+}
+
+.canonMiniBtn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #d4d4d8;
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.canonMiniBtn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+}
+
+.canonMiniBtn.danger:hover {
+    border-color: rgba(248, 113, 113, 0.5);
+    color: #fca5a5;
+}
