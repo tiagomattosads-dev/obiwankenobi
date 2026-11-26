@@ -1608,16 +1608,59 @@ document.addEventListener('DOMContentLoaded', () => {
     // 6. ENVIO E LOADING DA IA
     // ==========================================
     let typingBubble = null;
+    let enviandoMensagemLocal = false;
+    let carregarConversaSeq = 0;
 
     const appendMessage = (text, isUser = true, messageId = null, extraMeta = {}) => {
+        const textoSeguro = text || 'Sinto um distúrbio na Força. O sinal foi perdido.';
+
+        // Trava anti-duplicação 1: se já existe um balão no DOM com este mesmo data-id, apenas atualiza!
+        if (messageId && messagesArea) {
+            const existingById = messagesArea.querySelector(`.message[data-id="${messageId}"]`);
+            if (existingById) {
+                if (!isUser) {
+                    const cardsHtml = construirActionCardsHtml(
+                        extraMeta.actionCards || [],
+                        extraMeta.autoAppliedLogs || []
+                    );
+                    const wrapper = existingById.querySelector('.aiContentWrapper');
+                    if (wrapper && cardsHtml && !wrapper.querySelector('.kenobiCardsContainer')) {
+                        const actionsEl = wrapper.querySelector('.msgActions');
+                        if (actionsEl) {
+                            actionsEl.insertAdjacentHTML('beforebegin', cardsHtml);
+                        } else {
+                            wrapper.insertAdjacentHTML('beforeend', cardsHtml);
+                        }
+                    }
+                }
+                return existingById;
+            }
+        }
+
+        // Trava anti-duplicação 2: se chegou o ID real de uma mensagem do usuário que já tinha balão otimista pendente, vincula ao balão existente!
+        if (isUser && messageId && messagesArea) {
+            const pendingUserBubble = messagesArea.querySelector('.message.userMessage[data-pending="true"]');
+            if (pendingUserBubble) {
+                pendingUserBubble.removeAttribute('data-pending');
+                pendingUserBubble.setAttribute('data-id', messageId);
+                const canEditTimeline = !campanhaAtualObj || campanhaAtualObj.isOwner || campanhaAtualObj.canManageTable;
+                const displayBtn = canEditTimeline ? 'flex' : 'none';
+                const btnEditar = pendingUserBubble.querySelector('.editMsgBtn');
+                const btnCopiar = pendingUserBubble.querySelector('.copyMsgBtn');
+                if (btnEditar) btnEditar.style.display = displayBtn;
+                if (btnCopiar) btnCopiar.style.display = displayBtn;
+                return pendingUserBubble;
+            }
+        }
+
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${isUser ? 'userMessage' : 'aiMessage'}`;
 
         if (messageId) {
             messageDiv.setAttribute('data-id', messageId);
+        } else if (isUser) {
+            messageDiv.setAttribute('data-pending', 'true');
         }
-
-        const textoSeguro = text || 'Sinto um distúrbio na Força. O sinal foi perdido.';
 
         if (isUser) {
             const canEditTimeline = !campanhaAtualObj || campanhaAtualObj.isOwner || campanhaAtualObj.canManageTable;
@@ -1734,6 +1777,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         setAiLoading(true);
         showTypingIndicator();
+        enviandoMensagemLocal = true;
 
         try {
             // 2. Se ainda não havia aventura ativa, cria agora no banco unificado
@@ -1753,12 +1797,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const idMensagemUsuario = dadosIA.userMessageId;
             const idMensagemIA = dadosIA.aiMessageId;
 
-            if (idMensagemUsuario && balaoUsuarioAtual) {
-                balaoUsuarioAtual.setAttribute('data-id', idMensagemUsuario);
-                const btnEditar = balaoUsuarioAtual.querySelector('.editMsgBtn');
-                const btnCopiar = balaoUsuarioAtual.querySelector('.copyMsgBtn');
-                if (btnEditar) btnEditar.style.display = 'flex';
-                if (btnCopiar) btnCopiar.style.display = 'flex';
+            if (balaoUsuarioAtual) {
+                balaoUsuarioAtual.removeAttribute('data-pending');
+                if (idMensagemUsuario) {
+                    balaoUsuarioAtual.setAttribute('data-id', idMensagemUsuario);
+                    const btnEditar = balaoUsuarioAtual.querySelector('.editMsgBtn');
+                    const btnCopiar = balaoUsuarioAtual.querySelector('.copyMsgBtn');
+                    if (btnEditar) btnEditar.style.display = 'flex';
+                    if (btnCopiar) btnCopiar.style.display = 'flex';
+                }
             }
 
             removeTypingIndicator();
@@ -1803,6 +1850,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         } finally {
+            enviandoMensagemLocal = false;
             setAiLoading(false);
         }
     };
@@ -1865,9 +1913,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Se a mensagem já foi desenhada localmente nesta aba, ignora
                     if (messagesArea.querySelector(`.message[data-id="${novaMsg.id}"]`)) return;
 
-                    // Para mensagens da IA, aguarda breve instante caso o UPDATE de metadata (actionCards) venha logo em seguida
+                    // Se esta própria aba está no meio de um envio para /api/kenobi, não deixa o Realtime duplicar
+                    // o balão otimista do usuário nem desenhar a resposta da IA antes do retorno completo do HTTP!
+                    if (enviandoMensagemLocal) {
+                        if (novaMsg.autor === 'user') {
+                            const pendingBubble = messagesArea.querySelector('.message.userMessage[data-pending="true"]');
+                            if (pendingBubble) {
+                                pendingBubble.removeAttribute('data-pending');
+                                pendingBubble.setAttribute('data-id', novaMsg.id);
+                                return;
+                            }
+                        } else if (novaMsg.autor === 'ia') {
+                            return;
+                        }
+                    }
+
+                    // Para mensagens da IA vindas de outra aba/parceiro, aguarda breve instante para carregar metadata/actionCards
                     if (novaMsg.autor === 'ia') {
-                        await new Promise((r) => setTimeout(r, 450));
+                        await new Promise((r) => setTimeout(r, 650));
+                        if (messagesArea.querySelector(`.message[data-id="${novaMsg.id}"]`)) return;
                         const { data: freshMsg } = await API.clienteSupabase
                             .from('messages')
                             .select('*')
@@ -1965,6 +2029,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const carregarConversa = async (id) => {
+        const seq = ++carregarConversaSeq;
         conversaAtualId = id;
         conectarCanalRealtimeDaCampanha(id);
         renderizarHistorico();
@@ -1976,6 +2041,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (chatInput) chatInput.focus();
 
         const resposta = await API.obterMensagens(id);
+        if (seq !== carregarConversaSeq) return; // Ignora resposta atrasada se outra conversa já foi solicitada
+
+        if (messagesArea) {
+            messagesArea.querySelectorAll('.message:not(.systemMsg)').forEach((msg) => msg.remove());
+        }
+
         if (resposta.sucesso && resposta.dados.length > 0) {
             resposta.dados.forEach((msg) => {
                 const isUser = msg.autor === 'user';
