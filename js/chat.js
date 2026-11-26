@@ -1887,15 +1887,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const newChatBtn = document.getElementById('newChatBtn');
     const chatHistoryList = document.getElementById('chatHistoryList');
 
-    const conectarCanalRealtimeDaCampanha = (idCampanha) => {
-        if (coopCampaignChannel) {
-            API.clienteSupabase.removeChannel(coopCampaignChannel);
-            coopCampaignChannel = null;
-        }
-        if (!idCampanha) return;
+    let coopCampaignChannelId = null;
+    const inFlightRealtimeMsgIds = new Set();
 
+    const conectarCanalRealtimeDaCampanha = (idCampanha) => {
+        if (!idCampanha) return;
+        // Se já estamos inscritos no canal Realtime desta mesma campanha, NÃO recria nem empilha listeners!
+        if (coopCampaignChannel && coopCampaignChannelId === idCampanha) {
+            return;
+        }
+        if (coopCampaignChannel) {
+            const oldChannel = coopCampaignChannel;
+            coopCampaignChannel = null;
+            coopCampaignChannelId = null;
+            try {
+                oldChannel.unsubscribe();
+                API.clienteSupabase.removeChannel(oldChannel);
+            } catch {}
+        }
+
+        coopCampaignChannelId = idCampanha;
+        const uniqueChannelTopic = `kenobi-coop-room-${idCampanha}-${Date.now()}`;
         coopCampaignChannel = API.clienteSupabase
-            .channel(`kenobi-coop-room-${idCampanha}`, {
+            .channel(uniqueChannelTopic, {
                 config: { broadcast: { self: false } }
             })
             // 1. Novas mensagens enviadas pelo parceiro (Mestre Tiago / Mestra Helo) ou pelo Mestre Kenobi
@@ -1909,8 +1923,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 async (payload) => {
                     const novaMsg = payload.new;
-                    if (!novaMsg || novaMsg.campaign_id !== conversaAtualId || !messagesArea) return;
-                    // Se a mensagem já foi desenhada localmente nesta aba, ignora
+                    if (!novaMsg || !novaMsg.id || novaMsg.campaign_id !== conversaAtualId || !messagesArea) return;
+                    // Se a mensagem já está sendo processada pelo Realtime ou já foi desenhada no DOM, ignora!
+                    if (inFlightRealtimeMsgIds.has(novaMsg.id)) return;
                     if (messagesArea.querySelector(`.message[data-id="${novaMsg.id}"]`)) return;
 
                     // Se esta própria aba está no meio de um envio para /api/kenobi, não deixa o Realtime duplicar
@@ -1928,33 +1943,38 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
 
-                    // Para mensagens da IA vindas de outra aba/parceiro, aguarda breve instante para carregar metadata/actionCards
-                    if (novaMsg.autor === 'ia') {
-                        await new Promise((r) => setTimeout(r, 650));
-                        if (messagesArea.querySelector(`.message[data-id="${novaMsg.id}"]`)) return;
-                        const { data: freshMsg } = await API.clienteSupabase
-                            .from('messages')
-                            .select('*')
-                            .eq('id', novaMsg.id)
-                            .single();
-                        const { data: cards } = await API.clienteSupabase
-                            .from('pending_actions')
-                            .select('*')
-                            .eq('message_id', novaMsg.id)
-                            .order('created_at', { ascending: true });
+                    inFlightRealtimeMsgIds.add(novaMsg.id);
+                    try {
+                        // Para mensagens da IA vindas de outra aba/parceiro, aguarda breve instante para carregar metadata/actionCards
+                        if (novaMsg.autor === 'ia') {
+                            await new Promise((r) => setTimeout(r, 650));
+                            if (messagesArea.querySelector(`.message[data-id="${novaMsg.id}"]`)) return;
+                            const { data: freshMsg } = await API.clienteSupabase
+                                .from('messages')
+                                .select('*')
+                                .eq('id', novaMsg.id)
+                                .single();
+                            const { data: cards } = await API.clienteSupabase
+                                .from('pending_actions')
+                                .select('*')
+                                .eq('message_id', novaMsg.id)
+                                .order('created_at', { ascending: true });
 
-                        if (messagesArea.querySelector(`.message[data-id="${novaMsg.id}"]`)) return;
-                        removeTypingIndicator();
-                        const mUse = freshMsg || novaMsg;
-                        appendMessage(mUse.conteudo, false, mUse.id, {
-                            actionCards: (cards && cards.length > 0) ? cards : mUse.metadata?.actionCards || [],
-                            autoAppliedLogs: mUse.metadata?.autoAppliedLogs || []
-                        });
-                        atualizarBarraTatica();
-                    } else {
-                        appendMessage(novaMsg.conteudo, true, novaMsg.id, {
-                            senderLabel: novaMsg.metadata?.senderLabel || novaMsg.metadata?.senderName || ''
-                        });
+                            if (messagesArea.querySelector(`.message[data-id="${novaMsg.id}"]`)) return;
+                            removeTypingIndicator();
+                            const mUse = freshMsg || novaMsg;
+                            appendMessage(mUse.conteudo, false, mUse.id, {
+                                actionCards: (cards && cards.length > 0) ? cards : mUse.metadata?.actionCards || [],
+                                autoAppliedLogs: mUse.metadata?.autoAppliedLogs || []
+                            });
+                            atualizarBarraTatica();
+                        } else {
+                            appendMessage(novaMsg.conteudo, true, novaMsg.id, {
+                                senderLabel: novaMsg.metadata?.senderLabel || novaMsg.metadata?.senderName || ''
+                            });
+                        }
+                    } finally {
+                        inFlightRealtimeMsgIds.delete(novaMsg.id);
                     }
                 }
             )

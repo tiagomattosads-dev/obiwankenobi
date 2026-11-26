@@ -720,27 +720,42 @@ const API = {
     },
 
     // ==========================================
-    // CÉREBRO CANÔNICO (Entidades, Fatos Ativos & Capítulos)
+    // CÉREBRO CANÔNICO (Entidades, Fatos Ativos & Capítulos unificados na Conta)
     // ==========================================
     async obterMemoriaCanonica(conversaId) {
         try {
+            const { data: userData } = await clienteSupabase.auth.getUser();
+            const uid = userData?.user?.id;
+            let campIds = [conversaId];
+            if (uid) {
+                const { data: ownCamps } = await clienteSupabase
+                    .from("campaigns")
+                    .select("id")
+                    .eq("owner_id", uid)
+                    .order("updated_at", { ascending: false })
+                    .limit(20);
+                if (Array.isArray(ownCamps) && ownCamps.length > 0) {
+                    campIds = Array.from(new Set([conversaId, ...ownCamps.map((c) => c.id).filter(Boolean)]));
+                }
+            }
+
             const [entRes, factRes, chapRes] = await Promise.all([
                 clienteSupabase
                     .from("campaign_entities")
                     .select("*")
-                    .eq("campaign_id", conversaId)
+                    .in("campaign_id", campIds)
                     .order("updated_at", { ascending: false }),
                 clienteSupabase
                     .from("campaign_facts")
                     .select("*")
-                    .eq("campaign_id", conversaId)
+                    .in("campaign_id", campIds)
                     .eq("status", "active")
                     .order("is_pinned", { ascending: false })
                     .order("updated_at", { ascending: false }),
                 clienteSupabase
                     .from("campaign_chapters")
                     .select("*")
-                    .eq("campaign_id", conversaId)
+                    .in("campaign_id", campIds)
                     .order("chapter_number", { ascending: true })
             ]);
             return {
